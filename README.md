@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/Inertia-v3-4B0082?style=flat-square&logo=inertia&logoColor=white" alt="Inertia.js">
   <img src="https://img.shields.io/badge/Tailwind-v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS">
   <img src="https://img.shields.io/badge/Pest-4-C21325?style=flat-square&logo=pestphp&logoColor=white" alt="Pest">
-  <img src="https://img.shields.io/github/actions/workflow/status/nickojs/myfish/tests.yml?style=flat-square&logo=github&label=tests&color=4CAF50" alt="Tests">
+  <img src="https://img.shields.io/github/actions/workflow/status/anikwai/myfish/tests.yml?style=flat-square&logo=github&label=tests&color=4CAF50" alt="Tests">
 </p>
 
 A fish order fulfillment platform where customers browse available stock, select fish by type and size (small, medium, or large), set their budget, and customize orders with options like filleting and delivery.
