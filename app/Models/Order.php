@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Validation\ValidationException;
 
 #[Fillable([
     'user_id', 'guest_name', 'guest_phone', 'status',
@@ -14,6 +17,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 ])]
 class Order extends Model
 {
+    /** @use HasFactory<OrderFactory> */
+    use HasFactory;
+
     /**
      * @return array<string, string>
      */
@@ -43,6 +49,62 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Valid transitions from each status.
+     *
+     * @var array<string, string[]>
+     */
+    public const TRANSITIONS = [
+        'placed' => ['confirmed', 'rejected', 'on_hold'],
+        'on_hold' => ['confirmed', 'rejected'],
+        'confirmed' => ['packed'],
+        'packed' => ['delivered'],
+        'rejected' => [],
+        'delivered' => [],
+    ];
+
+    /**
+     * Transition this order to a new status, or throw if the transition is invalid.
+     */
+    public function transitionTo(string $newStatus, ?string $rejectionReason = null): void
+    {
+        $allowed = static::TRANSITIONS[$this->status] ?? [];
+
+        if (! in_array($newStatus, $allowed, true)) {
+            throw ValidationException::withMessages([
+                'status' => "Cannot transition from '{$this->status}' to '{$newStatus}'.",
+            ]);
+        }
+
+        $this->status = $newStatus;
+
+        if ($newStatus === 'rejected') {
+            $this->rejection_reason = $rejectionReason;
+        }
+
+        $this->save();
+
+        if ($newStatus === 'packed') {
+            $this->deductFromInventory();
+        }
+    }
+
+    /**
+     * Deduct the total order weight from inventory and record the adjustment.
+     */
+    private function deductFromInventory(): void
+    {
+        $totalKg = $this->items->sum(fn (OrderItem $item) => (float) $item->quantity_kg);
+
+        Inventory::current()->adjust(
+            deltaKg: -$totalKg,
+            type: 'deduction',
+            reason: "Order #{$this->id} packed",
+            userId: auth()->id(),
+            orderId: $this->id,
+        );
     }
 
     /**
