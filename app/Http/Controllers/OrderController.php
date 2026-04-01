@@ -6,7 +6,7 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Models\FishType;
 use App\Models\Inventory;
 use App\Models\Order;
-use App\Notifications\OrderNotifier;
+use App\Services\OrderCreatorInterface;
 use App\Values\PricingConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +15,8 @@ use Inertia\Response;
 
 class OrderController extends Controller
 {
+    public function __construct(private readonly OrderCreatorInterface $orderCreator) {}
+
     public function create(): Response
     {
         $pricing = PricingConfig::current();
@@ -33,58 +35,16 @@ class OrderController extends Controller
     {
         $data = $request->validated();
 
-        $pricing = PricingConfig::current();
-        $pricePerPound = $pricing->pricePerPound;
-        $filletingFee = $pricing->filletingFee;
-        $deliveryFee = $pricing->deliveryFee;
+        $order = $this->orderCreator->placeForUser(
+            user: $request->user(),
+            items: $data['items'],
+            filleting: $data['filleting'],
+            delivery: $data['delivery'],
+            deliveryLocation: $data['delivery_location'] ?? null,
+        );
 
-        $totalPounds = 0;
-        $itemsToCreate = [];
-
-        foreach ($data['items'] as $item) {
-            $pounds = round($item['quantity_kg'] * 2.20462, 3);
-            $subtotal = round($pounds * $pricePerPound, 2);
-            $totalPounds += $pounds;
-
-            $itemsToCreate[] = [
-                'fish_type_id' => $item['fish_type_id'],
-                'quantity_kg' => $item['quantity_kg'],
-                'quantity_pounds' => $pounds,
-                'subtotal_sbd' => $subtotal,
-            ];
-        }
-
-        $total = round($totalPounds * $pricePerPound, 2);
-
-        if ($data['filleting']) {
-            $total += $filletingFee;
-        }
-
-        if ($data['delivery']) {
-            $total += $deliveryFee;
-        }
-
-        $order = Order::create([
-            'user_id' => $request->user()->id,
-            'status' => 'placed',
-            'price_per_pound_snapshot' => $pricePerPound,
-            'filleting_fee_snapshot' => $filletingFee,
-            'delivery_fee_snapshot' => $deliveryFee,
-            'filleting' => $data['filleting'],
-            'delivery' => $data['delivery'],
-            'delivery_location' => $data['delivery_location'] ?? null,
-            'total_sbd' => $total,
-        ]);
-
-        $order->items()->createMany($itemsToCreate);
-
-        // Warn admin if order exceeds available stock
-        $totalKg = array_sum(array_column($itemsToCreate, 'quantity_kg'));
-        $inventory = Inventory::current();
-
-        session()->flash('stock_warning', $totalKg > (float) $inventory->stock_kg);
-
-        app(OrderNotifier::class)->orderPlaced($order);
+        $totalKg = array_sum(array_column($data['items'], 'quantity_kg'));
+        session()->flash('stock_warning', $totalKg > (float) Inventory::current()->stock_kg);
 
         return to_route('orders.show', $order);
     }

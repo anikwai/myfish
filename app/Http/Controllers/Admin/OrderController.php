@@ -8,7 +8,7 @@ use App\Http\Requests\Admin\StoreGuestOrderRequest;
 use App\Http\Requests\Admin\UpdateOrderStatusRequest;
 use App\Models\FishType;
 use App\Models\Order;
-use App\Notifications\OrderNotifier;
+use App\Services\OrderCreatorInterface;
 use App\Values\PricingConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,6 +18,8 @@ use Inertia\Response;
 
 class OrderController extends Controller
 {
+    public function __construct(private readonly OrderCreatorInterface $orderCreator) {}
+
     public function index(Request $request): Response
     {
         $query = Order::with(['user:id,name', 'items'])
@@ -78,54 +80,14 @@ class OrderController extends Controller
     {
         $data = $request->validated();
 
-        $pricing = PricingConfig::current();
-        $pricePerPound = $pricing->pricePerPound;
-        $filletingFee = $pricing->filletingFee;
-        $deliveryFee = $pricing->deliveryFee;
-
-        $totalPounds = 0;
-        $itemsToCreate = [];
-
-        foreach ($data['items'] as $item) {
-            $pounds = round($item['quantity_kg'] * 2.20462, 3);
-            $subtotal = round($pounds * $pricePerPound, 2);
-            $totalPounds += $pounds;
-
-            $itemsToCreate[] = [
-                'fish_type_id' => $item['fish_type_id'],
-                'quantity_kg' => $item['quantity_kg'],
-                'quantity_pounds' => $pounds,
-                'subtotal_sbd' => $subtotal,
-            ];
-        }
-
-        $total = round($totalPounds * $pricePerPound, 2);
-
-        if ($data['filleting']) {
-            $total += $filletingFee;
-        }
-
-        if ($data['delivery']) {
-            $total += $deliveryFee;
-        }
-
-        $order = Order::create([
-            'user_id' => null,
-            'guest_name' => $data['guest_name'],
-            'guest_phone' => $data['guest_phone'],
-            'status' => 'placed',
-            'price_per_pound_snapshot' => $pricePerPound,
-            'filleting_fee_snapshot' => $filletingFee,
-            'delivery_fee_snapshot' => $deliveryFee,
-            'filleting' => $data['filleting'],
-            'delivery' => $data['delivery'],
-            'delivery_location' => $data['delivery_location'] ?? null,
-            'total_sbd' => $total,
-        ]);
-
-        $order->items()->createMany($itemsToCreate);
-
-        app(OrderNotifier::class)->orderPlaced($order);
+        $order = $this->orderCreator->placeForGuest(
+            guestName: $data['guest_name'],
+            guestPhone: $data['guest_phone'],
+            items: $data['items'],
+            filleting: $data['filleting'],
+            delivery: $data['delivery'],
+            deliveryLocation: $data['delivery_location'] ?? null,
+        );
 
         return to_route('admin.orders.show', $order);
     }
