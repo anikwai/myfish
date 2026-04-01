@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\DeductOrderFromInventory;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreGuestOrderRequest;
 use App\Http\Requests\Admin\UpdateOrderStatusRequest;
@@ -12,6 +13,7 @@ use App\Notifications\OrderPlacedNotification;
 use App\Values\PricingConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -45,9 +47,17 @@ class OrderController extends Controller
     public function updateStatus(UpdateOrderStatusRequest $request, Order $order): RedirectResponse
     {
         $data = $request->validated();
+        $newStatus = $data['status'];
 
         $order->load('items');
-        $order->transitionTo($data['status'], $data['rejection_reason'] ?? null);
+
+        DB::transaction(function () use ($order, $newStatus, $data, $request): void {
+            $order->transitionTo($newStatus, $data['rejection_reason'] ?? null);
+
+            if ($newStatus === 'packed') {
+                (new DeductOrderFromInventory)->execute($order, $request->user()->id);
+            }
+        });
 
         return to_route('admin.orders.show', $order)->with('status', 'order-updated');
     }

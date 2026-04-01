@@ -90,26 +90,6 @@ class Order extends Model
         if ($this->user) {
             $this->user->notify(new OrderStatusChangedNotification($this, $newStatus));
         }
-
-        if ($newStatus === 'packed') {
-            $this->deductFromInventory();
-        }
-    }
-
-    /**
-     * Deduct the total order weight from inventory and record the adjustment.
-     */
-    private function deductFromInventory(): void
-    {
-        $totalKg = $this->items->sum(fn (OrderItem $item) => (float) $item->quantity_kg);
-
-        Inventory::current()->adjust(
-            deltaKg: -$totalKg,
-            type: 'deduction',
-            reason: "Order #{$this->id} packed",
-            userId: auth()->id(),
-            orderId: $this->id,
-        );
     }
 
     /**
