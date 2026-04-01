@@ -30,6 +30,7 @@ final class OrderCreator implements OrderCreatorInterface
 
     public function placeForGuest(
         string $guestName,
+        ?string $guestEmail,
         string $guestPhone,
         array $items,
         bool $filleting,
@@ -37,7 +38,7 @@ final class OrderCreator implements OrderCreatorInterface
         ?string $deliveryLocation = null,
     ): Order {
         return $this->place(
-            identity: ['user_id' => null, 'guest_name' => $guestName, 'guest_phone' => $guestPhone],
+            identity: ['user_id' => null, 'guest_name' => $guestName, 'guest_email' => $guestEmail, 'guest_phone' => $guestPhone],
             items: $items,
             filleting: $filleting,
             delivery: $delivery,

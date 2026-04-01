@@ -21,12 +21,13 @@ interface OrderCreatorInterface
     ): Order;
 
     /**
-     * Place an order on behalf of a walk-in guest.
+     * Place an order on behalf of a walk-in or online guest.
      *
      * @param  array<int, array{fish_type_id: int, quantity_kg: float}>  $items
      */
     public function placeForGuest(
         string $guestName,
+        ?string $guestEmail,
         string $guestPhone,
         array $items,
         bool $filleting,
