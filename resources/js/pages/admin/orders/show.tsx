@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import AdminOrderController from '@/actions/App/Http/Controllers/Admin/OrderController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
@@ -65,7 +65,7 @@ export default function AdminOrderShow({
     order: Order;
     allowedTransitions: string[];
 }) {
-    const { data, setData, patch, processing, errors } = useForm<{
+    const { data, setData, errors } = useForm<{
         status: string;
         rejection_reason: string;
     }>({
@@ -74,9 +74,9 @@ export default function AdminOrderShow({
     });
 
     function transition(newStatus: string) {
-        setData('status', newStatus);
-        patch(AdminOrderController.updateStatus.url(order), {
-            data: { status: newStatus, rejection_reason: data.rejection_reason },
+        router.patch(AdminOrderController.updateStatus.url(order), {
+            status: newStatus,
+            rejection_reason: data.rejection_reason,
         });
     }
 
@@ -228,7 +228,6 @@ export default function AdminOrderShow({
                                             ? 'destructive'
                                             : 'default'
                                     }
-                                    disabled={processing}
                                     onClick={() => transition(t)}
                                 >
                                     {TRANSITION_LABELS[t] ?? t}
