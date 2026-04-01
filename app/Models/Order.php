@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\OrderStatusChangedNotification;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -85,6 +86,10 @@ class Order extends Model
         }
 
         $this->save();
+
+        if ($this->user) {
+            $this->user->notify(new OrderStatusChangedNotification($this, $newStatus));
+        }
 
         if ($newStatus === 'packed') {
             $this->deductFromInventory();

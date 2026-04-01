@@ -7,8 +7,11 @@ use App\Models\FishType;
 use App\Models\Inventory;
 use App\Models\Order;
 use App\Models\Setting;
+use App\Models\User;
+use App\Notifications\OrderPlacedNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -79,6 +82,9 @@ class OrderController extends Controller
         $inventory = Inventory::current();
 
         session()->flash('stock_warning', $totalKg > (float) $inventory->stock_kg);
+
+        $admins = User::role('admin')->get();
+        Notification::send($admins, new OrderPlacedNotification($order));
 
         return to_route('orders.show', $order);
     }
