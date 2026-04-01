@@ -10,6 +10,13 @@ import { login } from '@/routes';
 import { store } from '@/routes/register';
 
 export default function Register() {
+    const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+    const prefill = {
+        name: params.get('name') ?? '',
+        email: params.get('email') ?? '',
+        phone: params.get('phone') ?? '',
+    };
+
     return (
         <>
             <Head title="Register" />
@@ -28,11 +35,12 @@ export default function Register() {
                                     id="name"
                                     type="text"
                                     required
-                                    autoFocus
+                                    autoFocus={!prefill.name}
                                     tabIndex={1}
                                     autoComplete="name"
                                     name="name"
                                     placeholder="Full name"
+                                    defaultValue={prefill.name}
                                 />
                                 <InputError
                                     message={errors.name}
@@ -50,6 +58,7 @@ export default function Register() {
                                     autoComplete="email"
                                     name="email"
                                     placeholder="email@example.com"
+                                    defaultValue={prefill.email}
                                 />
                                 <InputError message={errors.email} />
                             </div>
@@ -68,6 +77,7 @@ export default function Register() {
                                     autoComplete="tel"
                                     name="phone"
                                     placeholder="+677 12345"
+                                    defaultValue={prefill.phone}
                                 />
                                 <InputError message={errors.phone} />
                             </div>

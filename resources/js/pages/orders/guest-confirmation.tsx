@@ -215,7 +215,15 @@ export default function GuestConfirmation({
                                         faster next time.
                                     </p>
                                     <Button asChild className="mt-4 w-full">
-                                        <Link href={register()}>
+                                        <Link
+                                            href={register({
+                                                query: {
+                                                    name: order.guest_name,
+                                                    email: order.guest_email,
+                                                    phone: order.guest_phone ?? '',
+                                                },
+                                            })}
+                                        >
                                             Create account
                                         </Link>
                                     </Button>
