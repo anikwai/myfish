@@ -6,9 +6,9 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Models\FishType;
 use App\Models\Inventory;
 use App\Models\Order;
-use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\OrderPlacedNotification;
+use App\Values\PricingConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
@@ -19,12 +19,14 @@ class OrderController extends Controller
 {
     public function create(): Response
     {
+        $pricing = PricingConfig::current();
+
         return Inertia::render('orders/create', [
             'fishTypes' => FishType::active()->orderBy('name')->get(['id', 'name']),
             'pricing' => [
-                'price_per_pound' => Setting::get('price_per_pound'),
-                'filleting_fee' => Setting::get('filleting_fee'),
-                'delivery_fee' => Setting::get('delivery_fee'),
+                'price_per_pound' => $pricing->pricePerPound,
+                'filleting_fee' => $pricing->filletingFee,
+                'delivery_fee' => $pricing->deliveryFee,
             ],
         ]);
     }
@@ -33,9 +35,10 @@ class OrderController extends Controller
     {
         $data = $request->validated();
 
-        $pricePerPound = Setting::get('price_per_pound');
-        $filletingFee = Setting::get('filleting_fee');
-        $deliveryFee = Setting::get('delivery_fee');
+        $pricing = PricingConfig::current();
+        $pricePerPound = $pricing->pricePerPound;
+        $filletingFee = $pricing->filletingFee;
+        $deliveryFee = $pricing->deliveryFee;
 
         $totalPounds = 0;
         $itemsToCreate = [];

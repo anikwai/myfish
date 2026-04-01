@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Setting;
 use App\Models\User;
+use App\Values\PricingConfig;
 use Database\Seeders\RoleSeeder;
 
 beforeEach(function (): void {
@@ -32,9 +32,7 @@ test('staff cannot access the pricing page', function (): void {
 test('admin can view pricing page with current values', function (): void {
     $admin = User::factory()->admin()->create();
 
-    Setting::set('price_per_pound', 25.00);
-    Setting::set('filleting_fee', 10.00);
-    Setting::set('delivery_fee', 5.00);
+    defaultPricing();
 
     $this->actingAs($admin)
         ->get(route('admin.pricing.edit'))
@@ -59,9 +57,10 @@ test('admin can update pricing settings', function (): void {
         ->assertRedirect(route('admin.pricing.edit'))
         ->assertSessionHasNoErrors();
 
-    expect(Setting::get('price_per_pound'))->toBe(30.0);
-    expect(Setting::get('filleting_fee'))->toBe(15.0);
-    expect(Setting::get('delivery_fee'))->toBe(8.0);
+    $pricing = PricingConfig::current();
+    expect($pricing->pricePerPound)->toBe(30.0);
+    expect($pricing->filletingFee)->toBe(15.0);
+    expect($pricing->deliveryFee)->toBe(8.0);
 });
 
 test('pricing update requires positive numeric values', function (): void {

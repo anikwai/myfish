@@ -1,5 +1,6 @@
 <?php
 
+use App\Values\PricingConfig;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -44,7 +45,7 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function defaultPricing(float $pricePerPound = 25.00, float $filletingFee = 10.00, float $deliveryFee = 5.00): void
 {
-    // ..
+    PricingConfig::set($pricePerPound, $filletingFee, $deliveryFee);
 }

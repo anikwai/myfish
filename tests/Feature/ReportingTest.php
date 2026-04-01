@@ -3,16 +3,13 @@
 use App\Models\FishType;
 use App\Models\Inventory;
 use App\Models\Order;
-use App\Models\Setting;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
 
 beforeEach(function (): void {
     $this->seed(RoleSeeder::class);
 
-    Setting::set('price_per_pound', 25.00);
-    Setting::set('filleting_fee', 10.00);
-    Setting::set('delivery_fee', 5.00);
+    defaultPricing();
 
     Inventory::current()->update(['stock_kg' => 500]);
 });
