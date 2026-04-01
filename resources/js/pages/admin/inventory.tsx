@@ -1,5 +1,5 @@
 import { Transition } from '@headlessui/react';
-import { Form, Head, usePage } from '@inertiajs/react';
+import { Form, Head } from '@inertiajs/react';
 import InventoryController from '@/actions/App/Http/Controllers/Admin/InventoryController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
