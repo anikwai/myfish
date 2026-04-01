@@ -17,10 +17,11 @@ final class OrderNotifier
 
     public function statusChanged(Order $order, string $newStatus): void
     {
-        if (! $order->user) {
-            return;
+        if ($order->user) {
+            $order->user->notify(new OrderStatusChangedNotification($order, $newStatus));
+        } elseif ($order->guest_email) {
+            Notification::route('mail', $order->guest_email)
+                ->notify(new OrderStatusChangedNotification($order, $newStatus));
         }
-
-        $order->user->notify(new OrderStatusChangedNotification($order, $newStatus));
     }
 }
