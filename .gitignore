@@ -32,6 +32,8 @@ yarn-error.log
 /.amp
 /.gemini
 /.agents
+/.windsurf
+/.junie
 CLAUDE.md
 CODEX.md
 CURSOR.md
