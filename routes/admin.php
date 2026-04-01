@@ -4,9 +4,11 @@ use App\Http\Controllers\Admin\FishTypeController;
 use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PricingController;
+use App\Http\Controllers\Admin\ReportingController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('reports', [ReportingController::class, 'index'])->name('reports.index');
     Route::get('pricing', [PricingController::class, 'edit'])->name('pricing.edit');
     Route::patch('pricing', [PricingController::class, 'update'])->name('pricing.update');
 
