@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Validation\ValidationException;
 
 #[Fillable([
-    'user_id', 'guest_name', 'guest_phone', 'status',
+    'user_id', 'guest_name', 'guest_email', 'guest_phone', 'status',
     'price_per_pound_snapshot', 'filleting_fee_snapshot', 'delivery_fee_snapshot',
     'filleting', 'delivery', 'delivery_location', 'total_sbd', 'rejection_reason',
 ])]

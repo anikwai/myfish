@@ -20,6 +20,7 @@ class OrderFactory extends Factory
         return [
             'user_id' => null,
             'guest_name' => null,
+            'guest_email' => null,
             'guest_phone' => null,
             'status' => 'placed',
             'price_per_pound_snapshot' => 25.00,
