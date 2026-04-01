@@ -42,6 +42,7 @@ export default function GuestOrder({
 
     const totalPounds = data.items.reduce((sum, item) => {
         const kg = parseFloat(item.quantity_kg) || 0;
+
         return sum + kg * KG_TO_LBS;
     }, 0);
 
@@ -108,6 +109,7 @@ export default function GuestOrder({
                                     const kg = parseFloat(data.items[i]?.quantity_kg) || 0;
                                     const lbs = kg * KG_TO_LBS;
                                     const sub = lbs * pricing.price_per_pound;
+
                                     return (
                                         <tr key={ft.id} className="border-b last:border-0">
                                             <td className="px-4 py-2">{ft.name}</td>

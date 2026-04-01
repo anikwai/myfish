@@ -30,7 +30,7 @@ export default function CreateOrder({
     fishTypes: FishType[];
     pricing: Pricing;
 }) {
-    const { data, setData, post, processing, errors } = useForm<FormData>({
+    const { data, setData, post, transform, processing, errors } = useForm<FormData>({
         items: fishTypes.map((ft) => ({
             fish_type_id: ft.id,
             quantity_kg: '',
@@ -42,6 +42,7 @@ export default function CreateOrder({
 
     const totalPounds = data.items.reduce((sum, item) => {
         const kg = parseFloat(item.quantity_kg) || 0;
+
         return sum + kg * KG_TO_LBS;
     }, 0);
 
@@ -56,6 +57,10 @@ export default function CreateOrder({
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+        transform((d) => ({
+            ...d,
+            items: d.items.filter((item) => parseFloat(item.quantity_kg) > 0),
+        }));
         post(OrderController.store.url());
     }
 
@@ -97,6 +102,7 @@ export default function CreateOrder({
                                     const lbs = kg * KG_TO_LBS;
                                     const sub =
                                         lbs * pricing.price_per_pound;
+
                                     return (
                                         <tr
                                             key={ft.id}

@@ -1,11 +1,9 @@
 import { Link, usePage } from '@inertiajs/react';
 import { ClipboardList, Fish, LayoutGrid, Package, Settings2, ShoppingBag, TrendingUp } from 'lucide-react';
 
-import AdminOrderController from '@/actions/App/Http/Controllers/Admin/OrderController';
 import Admin from '@/actions/App/Http/Controllers/Admin';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
 import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
