@@ -25,6 +25,7 @@ class StoreGuestOrderRequest extends FormRequest
     {
         return [
             'guest_name' => ['required', 'string', 'max:100'],
+            'guest_email' => ['nullable', 'string', 'email', 'max:255'],
             'guest_phone' => ['required', 'string', 'max:30'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.fish_type_id' => ['required', 'integer', Rule::exists('fish_types', 'id')->where('is_active', true)],

@@ -82,6 +82,7 @@ class OrderController extends Controller
 
         $order = $this->orderCreator->placeForGuest(
             guestName: $data['guest_name'],
+            guestEmail: $data['guest_email'] ?? null,
             guestPhone: $data['guest_phone'],
             items: $data['items'],
             filleting: $data['filleting'],
