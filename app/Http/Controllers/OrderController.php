@@ -6,12 +6,10 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Models\FishType;
 use App\Models\Inventory;
 use App\Models\Order;
-use App\Models\User;
-use App\Notifications\OrderPlacedNotification;
+use App\Notifications\OrderNotifier;
 use App\Values\PricingConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -86,8 +84,7 @@ class OrderController extends Controller
 
         session()->flash('stock_warning', $totalKg > (float) $inventory->stock_kg);
 
-        $admins = User::role('admin')->get();
-        Notification::send($admins, new OrderPlacedNotification($order));
+        app(OrderNotifier::class)->orderPlaced($order);
 
         return to_route('orders.show', $order);
     }

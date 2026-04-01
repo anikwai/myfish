@@ -8,13 +8,11 @@ use App\Http\Requests\Admin\StoreGuestOrderRequest;
 use App\Http\Requests\Admin\UpdateOrderStatusRequest;
 use App\Models\FishType;
 use App\Models\Order;
-use App\Models\User;
-use App\Notifications\OrderPlacedNotification;
+use App\Notifications\OrderNotifier;
 use App\Values\PricingConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -127,8 +125,7 @@ class OrderController extends Controller
 
         $order->items()->createMany($itemsToCreate);
 
-        $admins = User::role('admin')->get();
-        Notification::send($admins, new OrderPlacedNotification($order));
+        app(OrderNotifier::class)->orderPlaced($order);
 
         return to_route('admin.orders.show', $order);
     }
