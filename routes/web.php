@@ -1,12 +1,14 @@
 <?php
 
+use App\Http\Controllers\GuestOrderController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
 
-Route::inertia('/', 'welcome', [
-    'canRegister' => Features::enabled(Features::registration()),
-])->name('home');
+Route::get('/', WelcomeController::class)->name('home');
+
+Route::post('orders/guest', [GuestOrderController::class, 'store'])->name('guest-orders.store');
+Route::get('orders/guest/{order}', [GuestOrderController::class, 'show'])->name('guest-orders.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
