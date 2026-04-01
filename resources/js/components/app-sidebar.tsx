@@ -1,5 +1,9 @@
-import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { ClipboardList, Fish, LayoutGrid, Package, Settings2, ShoppingBag, TrendingUp } from 'lucide-react';
+
+import AdminOrderController from '@/actions/App/Http/Controllers/Admin/OrderController';
+import Admin from '@/actions/App/Http/Controllers/Admin';
+import OrderController from '@/actions/App/Http/Controllers/OrderController';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -16,28 +20,51 @@ import {
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
+const userNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
     },
+    {
+        title: 'My orders',
+        href: OrderController.index.url(),
+        icon: ShoppingBag,
+    },
 ];
 
-const footerNavItems: NavItem[] = [
+const adminNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
+        title: 'Orders',
+        href: Admin.OrderController.index.url(),
+        icon: ClipboardList,
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
+        title: 'Inventory',
+        href: Admin.InventoryController.index.url(),
+        icon: Package,
+    },
+    {
+        title: 'Fish types',
+        href: Admin.FishTypeController.index.url(),
+        icon: Fish,
+    },
+    {
+        title: 'Pricing',
+        href: Admin.PricingController.edit.url(),
+        icon: Settings2,
+    },
+    {
+        title: 'Reports',
+        href: Admin.ReportingController.index.url(),
+        icon: TrendingUp,
     },
 ];
 
 export function AppSidebar() {
+    const { auth } = usePage().props;
+    const isAdminOrStaff = auth.user?.roles?.some((r: string) => ['admin', 'staff'].includes(r)) ?? false;
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -53,11 +80,11 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={userNavItems} label="Menu" />
+                {isAdminOrStaff && <NavMain items={adminNavItems} label="Admin" />}
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

@@ -25,12 +25,9 @@ export default function Pricing({
         <>
             <Head title="Pricing settings" />
 
-            <h1 className="sr-only">Pricing settings</h1>
-
             <div className="space-y-6">
                 <Heading
-                    variant="small"
-                    title="Pricing"
+                    title="Pricing settings"
                     description="Set the price per pound and flat fees for filleting and delivery. Changes apply to new orders only."
                 />
 

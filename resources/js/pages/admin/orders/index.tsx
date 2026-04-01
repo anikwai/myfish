@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import AdminOrderController from '@/actions/App/Http/Controllers/Admin/OrderController';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { index, show } from '@/routes/admin/orders';
@@ -51,7 +52,7 @@ export default function AdminOrders({
                 <div className="flex items-center justify-between">
                     <Heading title="Orders" />
                     <Button asChild variant="outline">
-                        <Link href="/admin/orders/guest">
+                        <Link href={AdminOrderController.createGuest.url()}>
                             New guest order
                         </Link>
                     </Button>

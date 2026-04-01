@@ -25,9 +25,8 @@ export default function FishTypes({
         <>
             <Head title="Fish types" />
 
-            <h1 className="sr-only">Fish types</h1>
-
             <div className="space-y-8">
+                <Heading title="Fish types" />
                 <div className="space-y-4">
                     <Heading
                         variant="small"

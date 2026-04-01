@@ -5,7 +5,7 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { index } from '@/routes/orders';
+import { create, index } from '@/routes/orders';
 
 const KG_TO_LBS = 2.20462;
 
@@ -262,6 +262,6 @@ export default function CreateOrder({
 CreateOrder.layout = {
     breadcrumbs: [
         { title: 'My orders', href: index() },
-        { title: 'Place order', href: '/orders/create' },
+        { title: 'Place order', href: create() },
     ],
 };

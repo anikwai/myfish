@@ -32,9 +32,8 @@ export default function Inventory({
         <>
             <Head title="Inventory" />
 
-            <h1 className="sr-only">Inventory</h1>
-
             <div className="space-y-8">
+                <Heading title="Inventory" />
                 <div className="grid grid-cols-2 gap-4">
                     <div className="rounded-lg border p-4">
                         <p className="text-sm text-muted-foreground">
