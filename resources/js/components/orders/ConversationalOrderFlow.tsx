@@ -1,6 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { CheckCircle2, Minus, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import GuestOrderController from '@/actions/App/Http/Controllers/GuestOrderController';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
@@ -55,7 +55,7 @@ function StepChip({
         <button
             type="button"
             onClick={onEdit}
-            className="flex w-full items-center justify-between rounded-lg border bg-muted/50 px-4 py-3 text-sm transition-colors hover:bg-muted"
+            className="animate-in fade-in slide-in-from-top-2 duration-200 motion-reduce:animate-none flex w-full items-center justify-between rounded-lg border bg-muted/50 px-4 py-3 text-sm transition-colors hover:bg-muted"
         >
             <div className="flex min-w-0 items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
@@ -145,8 +145,17 @@ function PricingSummary({
     );
 }
 
+const STEP_ANNOUNCEMENTS: Record<Step, string> = {
+    0: 'Step 1 of 4: What would you like to order?',
+    1: 'Step 2 of 4: Any extras?',
+    2: 'Step 3 of 4: Contact details',
+    3: 'Step 4 of 4: Review your order',
+};
+
 export function ConversationalOrderFlow({ fishTypes, pricing, authenticatedContact }: ConversationalOrderFlowProps) {
     const [activeStep, setActiveStep] = useState<Step>(0);
+    const activeCardRef = useRef<HTMLDivElement>(null);
+    const liveRegionRef = useRef<HTMLDivElement>(null);
 
     const { data, setData, post, transform, processing, errors } = useForm<FormData>({
         items: fishTypes.map((ft) => ({ fish_type_id: ft.id, quantity_kg: '' })),
@@ -216,6 +225,24 @@ parts.push(`Delivery to ${data.delivery_location}`);
         setData('items', updated);
     }
 
+    useEffect(() => {
+        if (liveRegionRef.current) {
+            liveRegionRef.current.textContent = STEP_ANNOUNCEMENTS[activeStep];
+        }
+
+        const card = activeCardRef.current;
+        if (!card) {
+            return;
+        }
+
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        const focusable = card.querySelector<HTMLElement>(
+            'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        );
+        focusable?.focus({ preventScroll: true });
+    }, [activeStep]);
+
     function goTo(step: Step) {
         setActiveStep(step);
     }
@@ -236,6 +263,14 @@ parts.push(`Delivery to ${data.delivery_location}`);
 
     return (
         <form onSubmit={handleSubmit}>
+            {/* aria-live region for screen reader announcements */}
+            <div
+                ref={liveRegionRef}
+                aria-live="polite"
+                aria-atomic="true"
+                className="sr-only"
+            />
+
             <div className="grid items-start gap-6 md:grid-cols-[1fr_300px]">
                 {/* Conversational flow column */}
                 <div className="space-y-3 pb-20 md:pb-0">
@@ -249,7 +284,11 @@ parts.push(`Delivery to ${data.delivery_location}`);
                         <StepChip stepName="Contact" label={contactChipLabel()} onEdit={() => goTo(2)} />
                     )}
 
-                    <Card>
+                    <Card
+                        key={activeStep}
+                        ref={activeCardRef}
+                        className="animate-in fade-in slide-in-from-bottom-3 duration-200 motion-reduce:animate-none"
+                    >
                         <CardContent className="pt-6">
                             {/* Mobile back link */}
                             {activeStep > 0 && (
