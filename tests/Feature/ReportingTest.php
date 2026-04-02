@@ -155,6 +155,32 @@ test('period can be set to month', function (): void {
         ->assertInertia(fn ($page) => $page->where('period', 'month'));
 });
 
+// ── Stock history period filtering ───────────────────────────────────────────
+
+test('stock history is filtered by period', function (): void {
+    $admin = User::factory()->admin()->create();
+
+    $inventory = Inventory::current();
+    $inventory->adjust(deltaKg: 10, type: 'manual', reason: 'Today stock', userId: $admin->id);
+
+    // Create an old adjustment by inserting directly with a past timestamp
+    DB::table('inventory_adjustments')->insert([
+        'inventory_id' => $inventory->id,
+        'user_id' => $admin->id,
+        'type' => 'manual',
+        'delta_kg' => 5,
+        'reason' => 'Old stock',
+        'created_at' => now()->subMonth()->toDateTimeString(),
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.reports.index', ['period' => 'today']))
+        ->assertInertia(fn ($page) => $page
+            ->where('stockHistory.0.reason', 'Today stock')
+            ->count('stockHistory', 1)
+        );
+});
+
 test('orders outside the selected period are excluded', function (): void {
     $client = User::factory()->client()->create();
 

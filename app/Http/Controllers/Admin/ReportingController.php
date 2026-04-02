@@ -53,8 +53,8 @@ class ReportingController extends Controller
             ->sortByDesc('order_count')
             ->values();
 
-        $stockHistory = InventoryAdjustment::latest('created_at')
-            ->limit(30)
+        $stockHistory = InventoryAdjustment::whereBetween('created_at', [$start, $end])
+            ->latest('created_at')
             ->get(['delta_kg', 'reason', 'type', 'created_at']);
 
         return Inertia::render('admin/reports', [
