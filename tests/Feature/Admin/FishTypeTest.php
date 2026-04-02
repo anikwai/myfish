@@ -16,7 +16,12 @@ test('admin can view fish types page', function (): void {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('admin/fish-types')
-            ->has('fishTypes', 1)
+            ->missing('fishTypes')
+            ->loadDeferredProps(fn ($reload) => $reload
+                ->has('fishTypes.data', 1)
+                ->where('fishTypes.total', 1)
+                ->where('fishTypes.current_page', 1)
+            )
         );
 });
 
@@ -56,6 +61,17 @@ test('admin can reactivate a fish type', function (): void {
         ->assertRedirect(route('admin.fish-types.index'));
 
     expect($fishType->fresh()->is_active)->toBeTrue();
+});
+
+test('admin can rename a fish type', function (): void {
+    $fishType = FishType::create(['name' => 'Tuna', 'is_active' => true]);
+
+    $this->actingAs(User::factory()->admin()->create())
+        ->patch(route('admin.fish-types.update', $fishType), ['name' => 'Yellowfin Tuna'])
+        ->assertRedirect(route('admin.fish-types.index'))
+        ->assertSessionHasNoErrors();
+
+    expect($fishType->fresh()->name)->toBe('Yellowfin Tuna');
 });
 
 test('fish type name is required', function (): void {
