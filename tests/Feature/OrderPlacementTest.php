@@ -58,6 +58,7 @@ test('client can place an order with correct total calculation', function (): vo
     $item = $order->items->first();
     expect((float) $item->quantity_kg)->toBe(2.0);
     expect((float) $item->quantity_pounds)->toBe(4.409); // rounded to 3dp
+    expect((float) $item->kg_to_lbs_rate_snapshot)->toBe(2.20462);
 });
 
 test('filleting fee is added to total when selected', function (): void {
@@ -115,6 +116,25 @@ test('fees are snapshotted at order time', function (): void {
     defaultPricing(pricePerPound: 30.00);
     $order->refresh();
     expect($order->price_per_pound_snapshot)->toEqual('25.00');
+});
+
+test('conversion rate is snapshotted and not affected by later rate changes', function (): void {
+    $tuna = FishType::create(['name' => 'Tuna']);
+
+    $this->actingAs(User::factory()->client()->create())
+        ->post(route('orders.store'), [
+            'items' => [['fish_type_id' => $tuna->id, 'quantity_kg' => 1]],
+            'filleting' => false,
+            'delivery' => false,
+        ]);
+
+    $item = Order::first()->items->first();
+    expect((float) $item->kg_to_lbs_rate_snapshot)->toBe(2.20462);
+
+    // Change rate — snapshot must not change
+    defaultPricing(kgToLbsRate: 2.5);
+    $item->refresh();
+    expect((float) $item->kg_to_lbs_rate_snapshot)->toBe(2.20462);
 });
 
 test('delivery location is required when delivery is selected', function (): void {

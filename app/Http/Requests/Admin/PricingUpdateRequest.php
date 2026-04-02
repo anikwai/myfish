@@ -26,6 +26,7 @@ class PricingUpdateRequest extends FormRequest
             'price_per_pound' => ['required', 'numeric', 'min:0'],
             'filleting_fee' => ['required', 'numeric', 'min:0'],
             'delivery_fee' => ['required', 'numeric', 'min:0'],
+            'kg_to_lbs_rate' => ['required', 'numeric', 'min:0'],
         ];
     }
 }

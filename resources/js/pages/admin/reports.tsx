@@ -3,8 +3,6 @@ import ReportingController from '@/actions/App/Http/Controllers/Admin/ReportingC
 import Heading from '@/components/heading';
 import { index } from '@/routes/admin/reports';
 
-const KG_TO_LBS = 2.20462;
-
 type FishTypeStat = {
     name: string;
     order_count: number;
@@ -30,6 +28,7 @@ export default function Reports({
     totalPounds,
     topFishTypes,
     stockHistory,
+    kgToLbsRate,
 }: {
     period: Period;
     orderCount: number;
@@ -40,6 +39,7 @@ export default function Reports({
     totalPounds: number;
     topFishTypes: FishTypeStat[];
     stockHistory: StockEntry[];
+    kgToLbsRate: number;
 }) {
     const fishRevenue = totalRevenue - filletingRevenue - deliveryRevenue;
 
@@ -126,7 +126,7 @@ export default function Reports({
                                             <td className="px-4 py-2">{ft.name}</td>
                                             <td className="px-4 py-2 text-right font-mono">{ft.order_count}</td>
                                             <td className="px-4 py-2 text-right font-mono">{ft.total_kg.toFixed(3)}</td>
-                                            <td className="px-4 py-2 text-right font-mono">{(ft.total_kg * KG_TO_LBS).toFixed(3)}</td>
+                                            <td className="px-4 py-2 text-right font-mono">{(ft.total_kg * kgToLbsRate).toFixed(3)}</td>
                                         </tr>
                                     ))}
                                 </tbody>

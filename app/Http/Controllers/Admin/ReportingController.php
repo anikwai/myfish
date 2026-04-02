@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\InventoryAdjustment;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Values\PricingConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
@@ -66,6 +67,7 @@ class ReportingController extends Controller
             'totalPounds' => round($totalPounds, 3),
             'topFishTypes' => $topFishTypes,
             'stockHistory' => $stockHistory,
+            'kgToLbsRate' => PricingConfig::current()->kgToLbsRate,
         ]);
     }
 }

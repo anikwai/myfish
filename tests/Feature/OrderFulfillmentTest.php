@@ -102,6 +102,7 @@ test('admin can pack a confirmed order and stock is deducted', function (): void
         'fish_type_id' => $tuna->id,
         'quantity_kg' => 10,
         'quantity_pounds' => 22.046,
+        'kg_to_lbs_rate_snapshot' => 2.20462,
         'subtotal_sbd' => 551.15,
     ]);
 

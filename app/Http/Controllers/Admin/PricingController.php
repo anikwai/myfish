@@ -20,6 +20,7 @@ class PricingController extends Controller
                 'price_per_pound' => $pricing->pricePerPound,
                 'filleting_fee' => $pricing->filletingFee,
                 'delivery_fee' => $pricing->deliveryFee,
+                'kg_to_lbs_rate' => $pricing->kgToLbsRate,
             ],
         ]);
     }
@@ -28,7 +29,7 @@ class PricingController extends Controller
     {
         $data = $request->validated();
 
-        PricingConfig::set($data['price_per_pound'], $data['filleting_fee'], $data['delivery_fee']);
+        PricingConfig::set($data['price_per_pound'], $data['filleting_fee'], $data['delivery_fee'], $data['kg_to_lbs_rate']);
 
         return to_route('admin.pricing.edit')->with('status', 'pricing-updated');
     }

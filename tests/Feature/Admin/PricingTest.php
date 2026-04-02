@@ -42,6 +42,7 @@ test('admin can view pricing page with current values', function (): void {
             ->where('pricing.price_per_pound', 25)
             ->where('pricing.filleting_fee', 10)
             ->where('pricing.delivery_fee', 5)
+            ->where('pricing.kg_to_lbs_rate', 2.20462)
         );
 });
 
@@ -53,6 +54,7 @@ test('admin can update pricing settings', function (): void {
             'price_per_pound' => 30.00,
             'filleting_fee' => 15.00,
             'delivery_fee' => 8.00,
+            'kg_to_lbs_rate' => 2.20462,
         ])
         ->assertRedirect(route('admin.pricing.edit'))
         ->assertSessionHasNoErrors();
@@ -61,6 +63,7 @@ test('admin can update pricing settings', function (): void {
     expect($pricing->pricePerPound)->toBe(30.0);
     expect($pricing->filletingFee)->toBe(15.0);
     expect($pricing->deliveryFee)->toBe(8.0);
+    expect($pricing->kgToLbsRate)->toBe(2.20462);
 });
 
 test('pricing update requires positive numeric values', function (): void {
@@ -72,7 +75,7 @@ test('pricing update requires positive numeric values', function (): void {
             'filleting_fee' => 'abc',
             'delivery_fee' => '',
         ])
-        ->assertSessionHasErrors(['price_per_pound', 'filleting_fee', 'delivery_fee']);
+        ->assertSessionHasErrors(['price_per_pound', 'filleting_fee', 'delivery_fee', 'kg_to_lbs_rate']);
 });
 
 test('clients cannot update pricing settings', function (): void {

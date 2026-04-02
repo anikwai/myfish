@@ -45,7 +45,7 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function defaultPricing(float $pricePerPound = 25.00, float $filletingFee = 10.00, float $deliveryFee = 5.00): void
+function defaultPricing(float $pricePerPound = 25.00, float $filletingFee = 10.00, float $deliveryFee = 5.00, float $kgToLbsRate = 2.20462): void
 {
-    PricingConfig::set($pricePerPound, $filletingFee, $deliveryFee);
+    PricingConfig::set($pricePerPound, $filletingFee, $deliveryFee, $kgToLbsRate);
 }

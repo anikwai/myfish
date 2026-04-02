@@ -85,6 +85,7 @@ test('report shows total weight sold', function (): void {
         'fish_type_id' => $tuna->id,
         'quantity_kg' => 10,
         'quantity_pounds' => 22.046,
+        'kg_to_lbs_rate_snapshot' => 2.20462,
         'subtotal_sbd' => 551.15,
     ]);
 
@@ -110,6 +111,7 @@ test('report shows top fish types by order frequency', function (): void {
             'fish_type_id' => $tuna->id,
             'quantity_kg' => 1,
             'quantity_pounds' => 2.20462,
+            'kg_to_lbs_rate_snapshot' => 2.20462,
             'subtotal_sbd' => 55.12,
         ]);
     }
@@ -119,6 +121,7 @@ test('report shows top fish types by order frequency', function (): void {
         'fish_type_id' => $snapper->id,
         'quantity_kg' => 1,
         'quantity_pounds' => 2.20462,
+        'kg_to_lbs_rate_snapshot' => 2.20462,
         'subtotal_sbd' => 55.12,
     ]);
 

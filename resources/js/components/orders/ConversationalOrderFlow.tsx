@@ -12,13 +12,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 
-const KG_TO_LBS = 2.20462;
-
 type FishType = { id: number; name: string };
 type Pricing = {
     price_per_pound: number;
     filleting_fee: number;
     delivery_fee: number;
+    kg_to_lbs_rate: number;
 };
 type AuthenticatedContact = {
     name: string;
@@ -81,7 +80,7 @@ function PricingSummary({
         .map((item) => {
             const ft = fishTypes.find((f) => f.id === item.fish_type_id);
             const kg = parseFloat(item.quantity_kg);
-            const sub = kg * KG_TO_LBS * pricing.price_per_pound;
+            const sub = kg * pricing.kg_to_lbs_rate * pricing.price_per_pound;
 
             return { name: ft?.name ?? '—', sub };
         });
@@ -172,7 +171,7 @@ export function ConversationalOrderFlow({ fishTypes, pricing, authenticatedConta
     const fishSubtotal = data.items.reduce((sum, item) => {
         const kg = parseFloat(item.quantity_kg) || 0;
 
-        return sum + kg * KG_TO_LBS * pricing.price_per_pound;
+        return sum + kg * pricing.kg_to_lbs_rate * pricing.price_per_pound;
     }, 0);
     const filletingCharge = data.filleting ? pricing.filleting_fee : 0;
     const deliveryCharge = data.delivery ? pricing.delivery_fee : 0;

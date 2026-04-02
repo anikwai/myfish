@@ -7,13 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { index } from '@/routes/admin/orders';
 
-const KG_TO_LBS = 2.20462;
-
 type FishType = { id: number; name: string };
 type Pricing = {
     price_per_pound: number;
     filleting_fee: number;
     delivery_fee: number;
+    kg_to_lbs_rate: number;
 };
 type FormData = {
     guest_name: string;
@@ -43,7 +42,7 @@ export default function GuestOrder({
     const totalPounds = data.items.reduce((sum, item) => {
         const kg = parseFloat(item.quantity_kg) || 0;
 
-        return sum + kg * KG_TO_LBS;
+        return sum + kg * pricing.kg_to_lbs_rate;
     }, 0);
 
     const subtotal = totalPounds * pricing.price_per_pound;
@@ -107,7 +106,7 @@ export default function GuestOrder({
                             <tbody>
                                 {fishTypes.map((ft, i) => {
                                     const kg = parseFloat(data.items[i]?.quantity_kg) || 0;
-                                    const lbs = kg * KG_TO_LBS;
+                                    const lbs = kg * pricing.kg_to_lbs_rate;
                                     const sub = lbs * pricing.price_per_pound;
 
                                     return (

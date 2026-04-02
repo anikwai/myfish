@@ -62,6 +62,7 @@ class GuestOrderController extends Controller
                 'price_per_pound' => $pricing->pricePerPound,
                 'filleting_fee' => $pricing->filletingFee,
                 'delivery_fee' => $pricing->deliveryFee,
+                'kg_to_lbs_rate' => $pricing->kgToLbsRate,
             ],
             'canRegister' => Features::enabled(Features::registration()),
         ]);

@@ -12,6 +12,7 @@ type Pricing = {
     price_per_pound: number;
     filleting_fee: number;
     delivery_fee: number;
+    kg_to_lbs_rate: number;
 };
 
 export default function Pricing({
@@ -28,7 +29,7 @@ export default function Pricing({
             <div className="space-y-6">
                 <Heading
                     title="Pricing settings"
-                    description="Set the price per pound and flat fees for filleting and delivery. Changes apply to new orders only."
+                    description="Set the price per pound, flat fees, and unit conversion rate. Changes apply to new orders only."
                 />
 
                 <Form
@@ -84,6 +85,22 @@ export default function Pricing({
                                     required
                                 />
                                 <InputError message={errors.delivery_fee} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="kg_to_lbs_rate">
+                                    Kg to lbs conversion rate
+                                </Label>
+                                <Input
+                                    id="kg_to_lbs_rate"
+                                    type="number"
+                                    step="0.00001"
+                                    min="0"
+                                    name="kg_to_lbs_rate"
+                                    defaultValue={pricing.kg_to_lbs_rate}
+                                    required
+                                />
+                                <InputError message={errors.kg_to_lbs_rate} />
                             </div>
 
                             <div className="flex items-center gap-4">

@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\DB;
 
 final class OrderCreator implements OrderCreatorInterface
 {
-    private const KG_TO_LBS = 2.20462;
-
     public function placeForUser(
         User $user,
         array $items,
@@ -63,7 +61,7 @@ final class OrderCreator implements OrderCreatorInterface
         $itemsToCreate = [];
 
         foreach ($items as $item) {
-            $pounds = round($item['quantity_kg'] * self::KG_TO_LBS, 3);
+            $pounds = round($item['quantity_kg'] * $pricing->kgToLbsRate, 3);
             $subtotal = round($pounds * $pricing->pricePerPound, 2);
             $totalPounds += $pounds;
 
@@ -71,6 +69,7 @@ final class OrderCreator implements OrderCreatorInterface
                 'fish_type_id' => $item['fish_type_id'],
                 'quantity_kg' => $item['quantity_kg'],
                 'quantity_pounds' => $pounds,
+                'kg_to_lbs_rate_snapshot' => $pricing->kgToLbsRate,
                 'subtotal_sbd' => $subtotal,
             ];
         }
