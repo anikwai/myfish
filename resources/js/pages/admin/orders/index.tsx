@@ -1,7 +1,27 @@
+import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
+import {
+    ColumnDef,
+    ColumnFiltersState,
+    SortingState,
+    VisibilityState,
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable,
+} from '@tanstack/react-table';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { SortByDown01Icon, SortByUp01Icon, Sorting01Icon } from '@hugeicons/core-free-icons';
 import AdminOrderController from '@/actions/App/Http/Controllers/Admin/OrderController';
 import Heading from '@/components/heading';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 import { index, show } from '@/routes/admin/orders';
 
 const STATUS_LABELS: Record<string, string> = {
@@ -31,6 +51,107 @@ type Order = {
     user: { id: number; name: string } | null;
 };
 
+function SortIcon({ sorted }: { sorted: false | 'asc' | 'desc' }) {
+    if (sorted === 'asc') {
+        return <HugeiconsIcon icon={SortByDown01Icon} data-icon="inline-end" />;
+    }
+    if (sorted === 'desc') {
+        return <HugeiconsIcon icon={SortByUp01Icon} data-icon="inline-end" />;
+    }
+    return <HugeiconsIcon icon={Sorting01Icon} data-icon="inline-end" />;
+}
+
+const columns: ColumnDef<Order>[] = [
+    {
+        accessorKey: 'id',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+                Order
+                <SortIcon sorted={column.getIsSorted()} />
+            </Button>
+        ),
+        cell: ({ row }) => <span className="font-mono">#{row.original.id}</span>,
+    },
+    {
+        id: 'customer',
+        accessorFn: (row) => row.user?.name ?? row.guest_name ?? 'Guest',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+                Customer
+                <SortIcon sorted={column.getIsSorted()} />
+            </Button>
+        ),
+        cell: ({ getValue }) => getValue() as string,
+    },
+    {
+        accessorKey: 'status',
+        header: 'Status',
+        cell: ({ row }) => (
+            <Badge
+                className={cn(
+                    'rounded-full',
+                    STATUS_COLORS[row.original.status] ?? 'bg-neutral-100 text-neutral-600',
+                )}
+            >
+                {STATUS_LABELS[row.original.status] ?? row.original.status}
+            </Badge>
+        ),
+    },
+    {
+        accessorKey: 'total_sbd',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                className="w-full justify-end"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+                Total (SBD)
+                <SortIcon sorted={column.getIsSorted()} />
+            </Button>
+        ),
+        cell: ({ row }) => (
+            <span className="block text-right font-mono">
+                ${Number(row.original.total_sbd).toFixed(2)}
+            </span>
+        ),
+        sortingFn: (a, b) => Number(a.original.total_sbd) - Number(b.original.total_sbd),
+    },
+    {
+        accessorKey: 'created_at',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+                Date
+                <SortIcon sorted={column.getIsSorted()} />
+            </Button>
+        ),
+        cell: ({ row }) => (
+            <span className="text-muted-foreground">
+                {new Date(row.original.created_at).toLocaleDateString('en-AU')}
+            </span>
+        ),
+    },
+    {
+        id: 'actions',
+        cell: ({ row }) => (
+            <Link
+                href={show(row.original)}
+                className="text-primary underline-offset-4 hover:underline"
+            >
+                View
+            </Link>
+        ),
+    },
+];
+
 export default function AdminOrders({
     orders,
     filterStatus,
@@ -40,6 +161,26 @@ export default function AdminOrders({
     filterStatus: string | null;
     statuses: string[];
 }) {
+    const [sorting, setSorting] = useState<SortingState>([{ id: 'created_at', desc: true }]);
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+    const [globalFilter, setGlobalFilter] = useState('');
+
+    const table = useReactTable({
+        data: orders,
+        columns,
+        state: { sorting, columnFilters, columnVisibility, globalFilter },
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        onColumnVisibilityChange: setColumnVisibility,
+        onGlobalFilterChange: setGlobalFilter,
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        initialState: { pagination: { pageSize: 20 } },
+    });
+
     function applyFilter(status: string | null) {
         router.get(index(), status ? { status } : {}, { preserveState: true });
     }
@@ -58,97 +199,115 @@ export default function AdminOrders({
                     </Button>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
-                    <button
-                        onClick={() => applyFilter(null)}
-                        className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${!filterStatus ? 'bg-foreground text-background' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
-                    >
-                        All
-                    </button>
-                    {statuses.map((s) => (
-                        <button
-                            key={s}
-                            onClick={() => applyFilter(s)}
-                            className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${filterStatus === s ? 'bg-foreground text-background' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex flex-wrap gap-2">
+                        <Button
+                            size="sm"
+                            variant={!filterStatus ? 'default' : 'secondary'}
+                            className="rounded-full"
+                            onClick={() => applyFilter(null)}
                         >
-                            {STATUS_LABELS[s] ?? s}
-                        </button>
-                    ))}
+                            All
+                        </Button>
+                        {statuses.map((s) => (
+                            <Button
+                                key={s}
+                                size="sm"
+                                variant={filterStatus === s ? 'default' : 'secondary'}
+                                className="rounded-full"
+                                onClick={() => applyFilter(s)}
+                            >
+                                {STATUS_LABELS[s] ?? s}
+                            </Button>
+                        ))}
+                    </div>
+
+                    <Input
+                        placeholder="Search by customer or order #..."
+                        value={globalFilter}
+                        onChange={(e) => setGlobalFilter(e.target.value)}
+                        className="w-64"
+                    />
                 </div>
 
-                {orders.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
-                        No orders found.
-                    </p>
-                ) : (
-                    <div className="overflow-x-auto rounded-lg border">
-                        <table className="w-full text-sm">
-                            <thead className="border-b bg-muted/50">
-                                <tr>
-                                    <th className="px-4 py-2 text-left font-medium">
-                                        Order
-                                    </th>
-                                    <th className="px-4 py-2 text-left font-medium">
-                                        Customer
-                                    </th>
-                                    <th className="px-4 py-2 text-left font-medium">
-                                        Status
-                                    </th>
-                                    <th className="px-4 py-2 text-right font-medium">
-                                        Total (SBD)
-                                    </th>
-                                    <th className="px-4 py-2 text-left font-medium">
-                                        Date
-                                    </th>
-                                    <th className="px-4 py-2" />
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {orders.map((order) => (
-                                    <tr
-                                        key={order.id}
-                                        className="border-b last:border-0"
-                                    >
-                                        <td className="px-4 py-2 font-mono">
-                                            #{order.id}
-                                        </td>
-                                        <td className="px-4 py-2">
-                                            {order.user?.name ??
-                                                order.guest_name ??
-                                                'Guest'}
-                                        </td>
-                                        <td className="px-4 py-2">
-                                            <span
-                                                className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[order.status] ?? 'bg-neutral-100'}`}
-                                            >
-                                                {STATUS_LABELS[
-                                                    order.status
-                                                ] ?? order.status}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-2 text-right font-mono">
-                                            $
-                                            {Number(
-                                                order.total_sbd,
-                                            ).toFixed(2)}
-                                        </td>
-                                        <td className="px-4 py-2 text-muted-foreground">
-                                            {new Date(
-                                                order.created_at,
-                                            ).toLocaleDateString()}
-                                        </td>
-                                        <td className="px-4 py-2">
-                                            <Link
-                                                href={show(order)}
-                                                className="text-primary underline-offset-4 hover:underline"
-                                            >
-                                                View
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                <div className="overflow-hidden rounded-md border">
+                    <Table>
+                        <TableHeader>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => (
+                                        <TableHead key={header.id}>
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                      header.column.columnDef.header,
+                                                      header.getContext(),
+                                                  )}
+                                        </TableHead>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableHeader>
+                        <TableBody>
+                            {table.getRowModel().rows.length ? (
+                                table.getRowModel().rows.map((row) => (
+                                    <TableRow key={row.id}>
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext(),
+                                                )}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={columns.length}>
+                                        <Empty>
+                                            <EmptyHeader>
+                                                <EmptyTitle>No orders found</EmptyTitle>
+                                                <EmptyDescription>
+                                                    No orders match the current filter.
+                                                </EmptyDescription>
+                                            </EmptyHeader>
+                                        </Empty>
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
+
+                {table.getPageCount() > 1 && (
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <span>
+                            {table.getFilteredRowModel().rows.length} order
+                            {table.getFilteredRowModel().rows.length !== 1 ? 's' : ''}
+                        </span>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => table.previousPage()}
+                                disabled={!table.getCanPreviousPage()}
+                            >
+                                Previous
+                            </Button>
+                            <span>
+                                Page {table.getState().pagination.pageIndex + 1} of{' '}
+                                {table.getPageCount()}
+                            </span>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => table.nextPage()}
+                                disabled={!table.getCanNextPage()}
+                            >
+                                Next
+                            </Button>
+                        </div>
                     </div>
                 )}
             </div>

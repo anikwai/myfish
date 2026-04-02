@@ -248,7 +248,7 @@ export default function AdminOrderShow({
                 )}
 
                 <p className="text-xs text-muted-foreground">
-                    Placed on {new Date(order.created_at).toLocaleString()}
+                    Placed on {new Date(order.created_at).toLocaleString('en-AU', { hour12: false })}
                 </p>
             </div>
         </>
