@@ -14,7 +14,7 @@ class FishTypeController extends Controller
     public function index(): Response
     {
         return Inertia::render('admin/fish-types', [
-            'fishTypes' => Inertia::defer(fn () => FishType::orderBy('name')->paginate(15)),
+            'fishTypes' => Inertia::defer(fn () => FishType::orderBy('name')->get()),
         ]);
     }
 

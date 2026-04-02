@@ -18,9 +18,8 @@ test('admin can view fish types page', function (): void {
             ->component('admin/fish-types')
             ->missing('fishTypes')
             ->loadDeferredProps(fn ($reload) => $reload
-                ->has('fishTypes.data', 1)
-                ->where('fishTypes.total', 1)
-                ->where('fishTypes.current_page', 1)
+                ->has('fishTypes', 1)
+                ->where('fishTypes.0.name', 'Tuna')
             )
         );
 });

@@ -1,20 +1,60 @@
 import { useState } from 'react';
 import { Deferred, Form, Head, useForm } from '@inertiajs/react';
-import { Fish, Pencil } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import {
+    PencilEdit01Icon,
+    SortByDown01Icon,
+    SortByUp01Icon,
+    Sorting01Icon,
+} from '@hugeicons/core-free-icons';
+import {
+    ColumnDef,
+    ColumnFiltersState,
+    SortingState,
+    VisibilityState,
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable,
+} from '@tanstack/react-table';
 import FishTypeController from '@/actions/App/Http/Controllers/Admin/FishTypeController';
+import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import {
+    Empty,
+    EmptyDescription,
+    EmptyHeader,
+    EmptyTitle,
+} from '@/components/ui/empty';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 import { index } from '@/routes/admin/fish-types';
 
 type FishType = {
@@ -23,22 +63,230 @@ type FishType = {
     is_active: boolean;
 };
 
-type PaginatedFishTypes = {
-    data: FishType[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    from: number | null;
-    to: number | null;
-    links: { url: string | null; label: string; active: boolean }[];
-};
+function SortIcon({ sorted }: { sorted: false | 'asc' | 'desc' }) {
+    if (sorted === 'asc')
+        return <HugeiconsIcon icon={SortByDown01Icon} data-icon="inline-end" />;
+    if (sorted === 'desc')
+        return <HugeiconsIcon icon={SortByUp01Icon} data-icon="inline-end" />;
+    return <HugeiconsIcon icon={Sorting01Icon} data-icon="inline-end" />;
+}
+
+function FishTypesTable({
+    fishTypes,
+    onEdit,
+}: {
+    fishTypes: FishType[];
+    onEdit: (fishType: FishType) => void;
+}) {
+    const [sorting, setSorting] = useState<SortingState>([
+        { id: 'name', desc: false },
+    ]);
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+    const [globalFilter, setGlobalFilter] = useState('');
+
+    const columns: ColumnDef<FishType>[] = [
+        {
+            accessorKey: 'name',
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                >
+                    Name
+                    <SortIcon sorted={column.getIsSorted()} />
+                </Button>
+            ),
+            cell: ({ row }) => (
+                <div className="flex items-center gap-2">
+                    <span className="font-medium">{row.original.name}</span>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="size-6 p-0 opacity-0 group-hover:opacity-100"
+                                onClick={() => onEdit(row.original)}
+                                aria-label={`Edit ${row.original.name}`}
+                            >
+                                <HugeiconsIcon icon={PencilEdit01Icon} />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Edit name</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
+            ),
+        },
+        {
+            accessorKey: 'is_active',
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                >
+                    Status
+                    <SortIcon sorted={column.getIsSorted()} />
+                </Button>
+            ),
+            cell: ({ row }) => (
+                <Badge
+                    variant={row.original.is_active ? 'outline' : 'secondary'}
+                    className={cn(
+                        row.original.is_active && 'border-green-200 bg-green-50 text-green-700',
+                    )}
+                >
+                    {row.original.is_active ? 'Active' : 'Inactive'}
+                </Badge>
+            ),
+        },
+        {
+            id: 'actions',
+            header: 'Actions',
+            cell: ({ row }) => (
+                <Form
+                    {...FishTypeController.update.form(row.original)}
+                    options={{ preserveScroll: true }}
+                >
+                    {({ processing }) => (
+                        <>
+                            <input
+                                type="hidden"
+                                name="is_active"
+                                value={row.original.is_active ? '0' : '1'}
+                            />
+                            <Button variant="ghost" size="sm" disabled={processing}>
+                                {row.original.is_active ? 'Deactivate' : 'Activate'}
+                            </Button>
+                        </>
+                    )}
+                </Form>
+            ),
+        },
+    ];
+
+    const table = useReactTable({
+        data: fishTypes,
+        columns,
+        state: { sorting, columnFilters, columnVisibility, globalFilter },
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        onColumnVisibilityChange: setColumnVisibility,
+        onGlobalFilterChange: setGlobalFilter,
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        initialState: { pagination: { pageSize: 15 } },
+    });
+
+    if (fishTypes.length === 0) {
+        return (
+            <Empty>
+                <EmptyHeader>
+                    <EmptyTitle>No fish types yet</EmptyTitle>
+                    <EmptyDescription>
+                        Add your first species using the form above.
+                    </EmptyDescription>
+                </EmptyHeader>
+            </Empty>
+        );
+    }
+
+    return (
+        <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between gap-3">
+                <span className="text-sm text-muted-foreground">
+                    {table.getFilteredRowModel().rows.length} of {fishTypes.length} fish type
+                    {fishTypes.length !== 1 ? 's' : ''}
+                </span>
+                <Input
+                    placeholder="Search fish types..."
+                    value={globalFilter}
+                    onChange={(e) => setGlobalFilter(e.target.value)}
+                    className="w-56"
+                />
+            </div>
+
+            <div className="overflow-hidden rounded-md border">
+                <Table>
+                    <TableHeader>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead key={header.id}>
+                                        {header.isPlaceholder
+                                            ? null
+                                            : flexRender(header.column.columnDef.header, header.getContext())}
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {table.getRowModel().rows.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id} className="group">
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={columns.length}>
+                                    <Empty>
+                                        <EmptyHeader>
+                                            <EmptyTitle>No results</EmptyTitle>
+                                            <EmptyDescription>
+                                                No fish types match your search.
+                                            </EmptyDescription>
+                                        </EmptyHeader>
+                                    </Empty>
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
+
+            {table.getPageCount() > 1 && (
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>
+                        Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                    </span>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => table.previousPage()}
+                            disabled={!table.getCanPreviousPage()}
+                        >
+                            Previous
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => table.nextPage()}
+                            disabled={!table.getCanNextPage()}
+                        >
+                            Next
+                        </Button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
 
 export default function FishTypes({
     fishTypes,
     status,
 }: {
-    fishTypes?: PaginatedFishTypes;
+    fishTypes?: FishType[];
     status?: string;
 }) {
     const [editingFishType, setEditingFishType] = useState<FishType | null>(null);
@@ -71,14 +319,7 @@ export default function FishTypes({
             <Head title="Fish types" />
 
             <div className="space-y-6">
-                <div>
-                    <h1 className="text-2xl font-semibold tracking-tight">Fish Types</h1>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        Manage the species available for ordering.
-                    </p>
-                </div>
-
-                <Separator />
+                <Heading title="Fish Types" description="Manage the species available for ordering." />
 
                 {/* Add fish type */}
                 <Card>
@@ -120,154 +361,33 @@ export default function FishTypes({
                 </Card>
 
                 {/* All fish types */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>All Fish Types</CardTitle>
-                        <CardDescription>
-                            {fishTypes
-                                ? fishTypes.total === 0
-                                    ? 'No fish types yet.'
-                                    : `${fishTypes.total} fish type${fishTypes.total === 1 ? '' : 's'}`
-                                : 'Loading...'}
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Deferred
-                            data="fishTypes"
-                            fallback={
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Name</TableHead>
-                                            <TableHead>Status</TableHead>
-                                            <TableHead>Action</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {Array.from({ length: 5 }).map((_, i) => (
-                                            <TableRow key={i}>
-                                                <TableCell><Skeleton className="h-4 w-36" /></TableCell>
-                                                <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
-                                                <TableCell><Skeleton className="h-7 w-20" /></TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            }
-                        >
-                        {fishTypes?.total === 0 ? (
-                            <Empty>
-                                <EmptyHeader>
-                                    <EmptyMedia variant="icon">
-                                        <Fish />
-                                    </EmptyMedia>
-                                    <EmptyTitle>No fish types yet</EmptyTitle>
-                                    <EmptyDescription>
-                                        Add your first species using the form above.
-                                    </EmptyDescription>
-                                </EmptyHeader>
-                            </Empty>
-                        ) : (
-                            <>
+                <Deferred
+                    data="fishTypes"
+                    fallback={
+                        <div className="overflow-hidden rounded-md border">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Name</TableHead>
                                         <TableHead>Status</TableHead>
-                                        <TableHead>Action</TableHead>
+                                        <TableHead>Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {fishTypes?.data.map((fishType) => (
-                                        <TableRow key={fishType.id} className="group">
-                                            <TableCell>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-medium">{fishType.name}</span>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100"
-                                                                onClick={() => openEdit(fishType)}
-                                                                aria-label={`Edit ${fishType.name}`}
-                                                            >
-                                                                <Pencil className="h-3 w-3" />
-                                                            </Button>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent><p>Edit name</p></TooltipContent>
-                                                    </Tooltip>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge
-                                                    variant={fishType.is_active ? 'outline' : 'secondary'}
-                                                    className={fishType.is_active ? 'border-green-200 bg-green-50 text-green-700' : ''}
-                                                >
-                                                    {fishType.is_active ? 'Active' : 'Inactive'}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Form
-                                                    {...FishTypeController.update.form(fishType)}
-                                                    options={{ preserveScroll: true }}
-                                                >
-                                                    {({ processing }) => (
-                                                        <>
-                                                            <input
-                                                                type="hidden"
-                                                                name="is_active"
-                                                                value={fishType.is_active ? '0' : '1'}
-                                                            />
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                disabled={processing}
-                                                            >
-                                                                {fishType.is_active ? 'Deactivate' : 'Activate'}
-                                                            </Button>
-                                                        </>
-                                                    )}
-                                                </Form>
-                                            </TableCell>
+                                    {Array.from({ length: 5 }).map((_, i) => (
+                                        <TableRow key={i}>
+                                            <TableCell><Skeleton className="h-4 w-36" /></TableCell>
+                                            <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
+                                            <TableCell><Skeleton className="h-7 w-20" /></TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
                             </Table>
-                            {fishTypes && fishTypes.last_page > 1 && (
-                                <div className="border-t px-4 py-3">
-                                    <Pagination>
-                                        <PaginationContent>
-                                            <PaginationItem>
-                                                <PaginationPrevious
-                                                    href={fishTypes.links[0].url ?? '#'}
-                                                    aria-disabled={!fishTypes.links[0].url}
-                                                    className={!fishTypes.links[0].url ? 'pointer-events-none opacity-50' : ''}
-                                                />
-                                            </PaginationItem>
-                                            {fishTypes.links.slice(1, -1).map((link) => (
-                                                <PaginationItem key={link.label}>
-                                                    <PaginationLink href={link.url ?? '#'} isActive={link.active}>
-                                                        {link.label}
-                                                    </PaginationLink>
-                                                </PaginationItem>
-                                            ))}
-                                            <PaginationItem>
-                                                <PaginationNext
-                                                    href={fishTypes.links[fishTypes.links.length - 1].url ?? '#'}
-                                                    aria-disabled={!fishTypes.links[fishTypes.links.length - 1].url}
-                                                    className={!fishTypes.links[fishTypes.links.length - 1].url ? 'pointer-events-none opacity-50' : ''}
-                                                />
-                                            </PaginationItem>
-                                        </PaginationContent>
-                                    </Pagination>
-                                </div>
-                            )}
-                            </>
-                        )}
-                        </Deferred>
-                    </CardContent>
-                </Card>
+                        </div>
+                    }
+                >
+                    <FishTypesTable fishTypes={fishTypes ?? []} onEdit={openEdit} />
+                </Deferred>
             </div>
 
             <Dialog open={editingFishType !== null} onOpenChange={(open) => { if (!open) closeDialog(); }}>
@@ -292,12 +412,7 @@ export default function FishTypes({
                         </div>
 
                         <DialogFooter>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={closeDialog}
-                                disabled={editProcessing}
-                            >
+                            <Button type="button" variant="outline" onClick={closeDialog} disabled={editProcessing}>
                                 Cancel
                             </Button>
                             <Button type="submit" disabled={editProcessing}>
