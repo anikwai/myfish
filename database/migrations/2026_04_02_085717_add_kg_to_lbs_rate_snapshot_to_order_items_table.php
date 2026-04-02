@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('order_items', function (Blueprint $table) {
-            $table->decimal('kg_to_lbs_rate_snapshot', 10, 5)->after('quantity_pounds');
+            $table->decimal('kg_to_lbs_rate_snapshot', 10, 5)->default(2.20462)->after('quantity_pounds');
         });
     }
 
