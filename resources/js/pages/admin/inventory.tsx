@@ -1,11 +1,30 @@
+import { useState } from 'react';
 import { Transition } from '@headlessui/react';
 import { Form, Head } from '@inertiajs/react';
+import {
+    ColumnDef,
+    ColumnFiltersState,
+    SortingState,
+    VisibilityState,
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable,
+} from '@tanstack/react-table';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { SortByDown01Icon, SortByUp01Icon, Sorting01Icon } from '@hugeicons/core-free-icons';
 import InventoryController from '@/actions/App/Http/Controllers/Admin/InventoryController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 import { index } from '@/routes/admin/inventory';
 
 type Adjustment = {
@@ -16,6 +35,95 @@ type Adjustment = {
     created_at: string;
     user: { id: number; name: string };
 };
+
+function SortIcon({ sorted }: { sorted: false | 'asc' | 'desc' }) {
+    if (sorted === 'asc') {
+        return <HugeiconsIcon icon={SortByDown01Icon} data-icon="inline-end" />;
+    }
+    if (sorted === 'desc') {
+        return <HugeiconsIcon icon={SortByUp01Icon} data-icon="inline-end" />;
+    }
+    return <HugeiconsIcon icon={Sorting01Icon} data-icon="inline-end" />;
+}
+
+const columns: ColumnDef<Adjustment>[] = [
+    {
+        accessorKey: 'created_at',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+                Date
+                <SortIcon sorted={column.getIsSorted()} />
+            </Button>
+        ),
+        cell: ({ row }) => (
+            <span className="text-muted-foreground">
+                {new Date(row.original.created_at).toLocaleString('en-AU', { hour12: false })}
+            </span>
+        ),
+    },
+    {
+        accessorKey: 'type',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+                Type
+                <SortIcon sorted={column.getIsSorted()} />
+            </Button>
+        ),
+        cell: ({ row }) => <span className="capitalize">{row.original.type}</span>,
+    },
+    {
+        accessorKey: 'delta_kg',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                className="w-full justify-end"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+                Delta (kg)
+                <SortIcon sorted={column.getIsSorted()} />
+            </Button>
+        ),
+        cell: ({ row }) => (
+            <span
+                className={cn(
+                    'block text-right font-mono',
+                    Number(row.original.delta_kg) >= 0 ? 'text-green-600' : 'text-red-600',
+                )}
+            >
+                {Number(row.original.delta_kg) > 0 ? '+' : ''}
+                {Number(row.original.delta_kg).toFixed(3)}
+            </span>
+        ),
+        sortingFn: (a, b) => Number(a.original.delta_kg) - Number(b.original.delta_kg),
+    },
+    {
+        accessorKey: 'reason',
+        header: 'Reason',
+        cell: ({ row }) => row.original.reason ?? '—',
+    },
+    {
+        id: 'user',
+        accessorFn: (row) => row.user.name,
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+                By
+                <SortIcon sorted={column.getIsSorted()} />
+            </Button>
+        ),
+        cell: ({ getValue }) => (
+            <span className="text-muted-foreground">{getValue() as string}</span>
+        ),
+    },
+];
 
 export default function Inventory({
     stock_kg,
@@ -28,24 +136,47 @@ export default function Inventory({
     adjustments: Adjustment[];
     status?: string;
 }) {
+    const [sorting, setSorting] = useState<SortingState>([{ id: 'created_at', desc: true }]);
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+    const [globalFilter, setGlobalFilter] = useState('');
+
+    const table = useReactTable({
+        data: adjustments,
+        columns,
+        state: { sorting, columnFilters, columnVisibility, globalFilter },
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        onColumnVisibilityChange: setColumnVisibility,
+        onGlobalFilterChange: setGlobalFilter,
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        initialState: { pagination: { pageSize: 20 } },
+    });
+
     return (
         <>
             <Head title="Inventory" />
 
             <div className="space-y-8">
                 <Heading title="Inventory" />
+
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="rounded-lg border p-4">
-                        <p className="text-sm text-muted-foreground">
-                            Current stock
-                        </p>
-                        <p className="mt-1 text-2xl font-semibold">
-                            {Number(stock_kg).toFixed(3)} kg
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                            {Number(stock_pounds).toFixed(3)} lbs
-                        </p>
-                    </div>
+                    <Card>
+                        <CardHeader className="pb-2">
+                            <CardDescription>Current stock</CardDescription>
+                            <CardTitle className="text-2xl">
+                                {Number(stock_kg).toFixed(3)} kg
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">
+                                {Number(stock_pounds).toFixed(3)} lbs
+                            </p>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 <div className="space-y-4">
@@ -63,9 +194,7 @@ export default function Inventory({
                         {({ processing, recentlySuccessful, errors }) => (
                             <>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="delta_kg">
-                                        Adjustment (kg)
-                                    </Label>
+                                    <Label htmlFor="delta_kg">Adjustment (kg)</Label>
                                     <Input
                                         id="delta_kg"
                                         type="number"
@@ -89,9 +218,7 @@ export default function Inventory({
                                 </div>
 
                                 <div className="flex items-center gap-4">
-                                    <Button disabled={processing}>
-                                        Apply adjustment
-                                    </Button>
+                                    <Button disabled={processing}>Apply adjustment</Button>
 
                                     <Transition
                                         show={
@@ -103,9 +230,7 @@ export default function Inventory({
                                         leave="transition ease-in-out"
                                         leaveTo="opacity-0"
                                     >
-                                        <p className="text-sm text-neutral-600">
-                                            Saved
-                                        </p>
+                                        <p className="text-sm text-neutral-600">Saved</p>
                                     </Transition>
                                 </div>
                             </>
@@ -114,72 +239,98 @@ export default function Inventory({
                 </div>
 
                 <div className="space-y-4">
-                    <Heading
-                        variant="small"
-                        title="Adjustment history"
-                        description="Last 50 stock changes."
-                    />
+                    <div className="flex items-center justify-between gap-3">
+                        <Heading
+                            variant="small"
+                            title="Adjustment history"
+                            description="Last 50 stock changes."
+                        />
+                        <Input
+                            placeholder="Search reason or user..."
+                            value={globalFilter}
+                            onChange={(e) => setGlobalFilter(e.target.value)}
+                            className="w-56"
+                        />
+                    </div>
 
-                    {adjustments.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">
-                            No adjustments yet.
-                        </p>
-                    ) : (
-                        <div className="overflow-x-auto rounded-lg border">
-                            <table className="w-full text-sm">
-                                <thead className="border-b bg-muted/50">
-                                    <tr>
-                                        <th className="px-4 py-2 text-left font-medium">
-                                            Date
-                                        </th>
-                                        <th className="px-4 py-2 text-left font-medium">
-                                            Type
-                                        </th>
-                                        <th className="px-4 py-2 text-right font-medium">
-                                            Delta (kg)
-                                        </th>
-                                        <th className="px-4 py-2 text-left font-medium">
-                                            Reason
-                                        </th>
-                                        <th className="px-4 py-2 text-left font-medium">
-                                            By
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {adjustments.map((adj) => (
-                                        <tr
-                                            key={adj.id}
-                                            className="border-b last:border-0"
-                                        >
-                                            <td className="px-4 py-2 text-muted-foreground">
-                                                {new Date(
-                                                    adj.created_at,
-                                                ).toLocaleString()}
-                                            </td>
-                                            <td className="px-4 py-2 capitalize">
-                                                {adj.type}
-                                            </td>
-                                            <td
-                                                className={`px-4 py-2 text-right font-mono ${Number(adj.delta_kg) >= 0 ? 'text-green-600' : 'text-red-600'}`}
-                                            >
-                                                {Number(adj.delta_kg) > 0
-                                                    ? '+'
-                                                    : ''}
-                                                {Number(adj.delta_kg).toFixed(
-                                                    3,
-                                                )}
-                                            </td>
-                                            <td className="px-4 py-2">
-                                                {adj.reason ?? '—'}
-                                            </td>
-                                            <td className="px-4 py-2 text-muted-foreground">
-                                                {adj.user.name}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                    <div className="overflow-hidden rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                {table.getHeaderGroups().map((headerGroup) => (
+                                    <TableRow key={headerGroup.id}>
+                                        {headerGroup.headers.map((header) => (
+                                            <TableHead key={header.id}>
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : flexRender(
+                                                          header.column.columnDef.header,
+                                                          header.getContext(),
+                                                      )}
+                                            </TableHead>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableHeader>
+                            <TableBody>
+                                {table.getRowModel().rows.length ? (
+                                    table.getRowModel().rows.map((row) => (
+                                        <TableRow key={row.id}>
+                                            {row.getVisibleCells().map((cell) => (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(
+                                                        cell.column.columnDef.cell,
+                                                        cell.getContext(),
+                                                    )}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={columns.length}>
+                                            <Empty>
+                                                <EmptyHeader>
+                                                    <EmptyTitle>No adjustments</EmptyTitle>
+                                                    <EmptyDescription>
+                                                        No stock changes match your search.
+                                                    </EmptyDescription>
+                                                </EmptyHeader>
+                                            </Empty>
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+
+                    {table.getPageCount() > 1 && (
+                        <div className="flex items-center justify-between text-sm text-muted-foreground">
+                            <span>
+                                {table.getFilteredRowModel().rows.length} adjustment
+                                {table.getFilteredRowModel().rows.length !== 1 ? 's' : ''}
+                            </span>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => table.previousPage()}
+                                    disabled={!table.getCanPreviousPage()}
+                                >
+                                    Previous
+                                </Button>
+                                <span>
+                                    Page {table.getState().pagination.pageIndex + 1} of{' '}
+                                    {table.getPageCount()}
+                                </span>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => table.nextPage()}
+                                    disabled={!table.getCanNextPage()}
+                                >
+                                    Next
+                                </Button>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -189,10 +340,5 @@ export default function Inventory({
 }
 
 Inventory.layout = {
-    breadcrumbs: [
-        {
-            title: 'Inventory',
-            href: index(),
-        },
-    ],
+    breadcrumbs: [{ title: 'Inventory', href: index() }],
 };
