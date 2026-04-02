@@ -162,7 +162,7 @@ export default function ShowOrder({ order, statusLogs }: { order: Order; statusL
 
                 <p className="text-xs text-muted-foreground">
                     Placed on{' '}
-                    {new Date(order.created_at).toLocaleString()}
+                    {new Date(order.created_at).toLocaleString('en-AU', { hour12: false })}
                 </p>
             </div>
         </>

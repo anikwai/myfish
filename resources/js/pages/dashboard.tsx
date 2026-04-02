@@ -92,7 +92,7 @@ export default function Dashboard({
                                                 ${Number(order.total_sbd).toFixed(2)}
                                             </td>
                                             <td className="px-4 py-2 text-muted-foreground">
-                                                {new Date(order.created_at).toLocaleDateString()}
+                                                {new Date(order.created_at).toLocaleDateString('en-AU')}
                                             </td>
                                             <td className="px-4 py-2">
                                                 <Link
