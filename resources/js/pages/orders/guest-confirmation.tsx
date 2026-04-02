@@ -1,4 +1,5 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, usePoll } from '@inertiajs/react';
+import { OrderTimeline, type StatusLog } from '@/components/orders/OrderTimeline';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -24,6 +25,7 @@ type Order = {
     filleting_fee_snapshot: string;
     delivery_fee_snapshot: string;
     total_sbd: string;
+    rejection_reason: string | null;
     created_at: string;
     items: OrderItem[];
 };
@@ -48,13 +50,17 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function GuestConfirmation({
     order,
+    statusLogs,
     canRegister = true,
 }: {
     order: Order;
+    statusLogs: StatusLog[];
     canRegister?: boolean;
 }) {
     const { props } = usePage<{ flash: { stock_warning?: boolean } }>();
     const stockWarning = props.flash?.stock_warning;
+
+    usePoll(30_000, { only: ['order', 'statusLogs'] });
 
     return (
         <>
@@ -118,6 +124,17 @@ export default function GuestConfirmation({
                                 shortly.
                             </div>
                         )}
+
+                        {/* Status timeline */}
+                        <Card>
+                            <CardContent className="pt-6">
+                                <OrderTimeline
+                                    logs={statusLogs}
+                                    currentStatus={order.status}
+                                    rejectionReason={order.rejection_reason ?? null}
+                                />
+                            </CardContent>
+                        </Card>
 
                         {/* Order items */}
                         <Card>

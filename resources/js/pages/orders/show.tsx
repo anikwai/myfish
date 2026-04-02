@@ -1,4 +1,5 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, usePage, usePoll } from '@inertiajs/react';
+import { OrderTimeline, type StatusLog } from '@/components/orders/OrderTimeline';
 import Heading from '@/components/heading';
 import { index } from '@/routes/orders';
 
@@ -19,6 +20,7 @@ type Order = {
     filleting_fee_snapshot: string;
     delivery_fee_snapshot: string;
     total_sbd: string;
+    rejection_reason: string | null;
     created_at: string;
     items: OrderItem[];
 };
@@ -41,9 +43,11 @@ const STATUS_COLORS: Record<string, string> = {
     delivered: 'bg-neutral-100 text-neutral-600',
 };
 
-export default function ShowOrder({ order }: { order: Order }) {
+export default function ShowOrder({ order, statusLogs }: { order: Order; statusLogs: StatusLog[] }) {
     const { props } = usePage<{ flash: { stock_warning?: boolean } }>();
     const stockWarning = props.flash?.stock_warning;
+
+    usePoll(30_000, { only: ['order', 'statusLogs'] });
 
     return (
         <>
@@ -65,6 +69,14 @@ export default function ShowOrder({ order }: { order: Order }) {
                         stock. We will confirm availability shortly.
                     </div>
                 )}
+
+                <div className="rounded-lg border p-4">
+                    <OrderTimeline
+                        logs={statusLogs}
+                        currentStatus={order.status}
+                        rejectionReason={order.rejection_reason}
+                    />
+                </div>
 
                 <div className="rounded-lg border overflow-x-auto">
                     <table className="w-full text-sm">

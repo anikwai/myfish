@@ -99,6 +99,7 @@ final class OrderCreator implements OrderCreatorInterface
             ]);
 
             $order->items()->createMany($itemsToCreate);
+            $order->statusLogs()->create(['status' => 'placed', 'user_id' => null]);
 
             return $order;
         });

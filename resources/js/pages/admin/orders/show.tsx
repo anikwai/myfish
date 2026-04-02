@@ -1,5 +1,6 @@
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, router, useForm, usePoll } from '@inertiajs/react';
 import AdminOrderController from '@/actions/App/Http/Controllers/Admin/OrderController';
+import { OrderTimeline, type StatusLog } from '@/components/orders/OrderTimeline';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -60,11 +61,15 @@ type Order = {
 
 export default function AdminOrderShow({
     order,
+    statusLogs,
     allowedTransitions,
 }: {
     order: Order;
+    statusLogs: StatusLog[];
     allowedTransitions: string[];
 }) {
+    usePoll(30_000, { only: ['order', 'statusLogs'] });
+
     const { data, setData, errors } = useForm<{
         status: string;
         rejection_reason: string;
@@ -105,11 +110,14 @@ export default function AdminOrderShow({
                     </span>
                 </div>
 
-                {order.rejection_reason && (
-                    <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-                        Rejection reason: {order.rejection_reason}
-                    </div>
-                )}
+                <div className="rounded-lg border p-4">
+                    <OrderTimeline
+                        logs={statusLogs}
+                        currentStatus={order.status}
+                        rejectionReason={order.rejection_reason}
+                        showActor
+                    />
+                </div>
 
                 <div className="overflow-x-auto rounded-lg border">
                     <table className="w-full text-sm">

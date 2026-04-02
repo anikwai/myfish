@@ -53,6 +53,14 @@ class Order extends Model
     }
 
     /**
+     * @return HasMany<OrderStatusLog, $this>
+     */
+    public function statusLogs(): HasMany
+    {
+        return $this->hasMany(OrderStatusLog::class)->orderBy('created_at');
+    }
+
+    /**
      * Valid transitions from each status.
      *
      * @var array<string, string[]>
@@ -69,7 +77,7 @@ class Order extends Model
     /**
      * Transition this order to a new status, or throw if the transition is invalid.
      */
-    public function transitionTo(string $newStatus, ?string $rejectionReason = null): void
+    public function transitionTo(string $newStatus, ?string $rejectionReason = null, ?User $actor = null): void
     {
         $allowed = static::TRANSITIONS[$this->status] ?? [];
 
@@ -86,6 +94,11 @@ class Order extends Model
         }
 
         $this->save();
+
+        $this->statusLogs()->create([
+            'status' => $newStatus,
+            'user_id' => $actor?->id,
+        ]);
 
         app(OrderNotifier::class)->statusChanged($this, $newStatus);
     }

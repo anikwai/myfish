@@ -38,8 +38,15 @@ class OrderController extends Controller
 
     public function show(Order $order): Response
     {
+        $order->load(['user:id,name', 'items.fishType', 'statusLogs.user:id,name']);
+
         return Inertia::render('admin/orders/show', [
-            'order' => $order->load(['user:id,name', 'items.fishType']),
+            'order' => $order,
+            'statusLogs' => $order->statusLogs->map(fn ($log) => [
+                'status' => $log->status,
+                'timestamp' => $log->created_at->toISOString(),
+                'actor' => $log->user?->name,
+            ]),
             'allowedTransitions' => Order::TRANSITIONS[$order->status] ?? [],
         ]);
     }
@@ -52,7 +59,7 @@ class OrderController extends Controller
         $order->load('items');
 
         DB::transaction(function () use ($order, $newStatus, $data, $request): void {
-            $order->transitionTo($newStatus, $data['rejection_reason'] ?? null);
+            $order->transitionTo($newStatus, $data['rejection_reason'] ?? null, $request->user());
 
             if ($newStatus === 'packed') {
                 (new DeductOrderFromInventory)->execute($order, $request->user()->id);

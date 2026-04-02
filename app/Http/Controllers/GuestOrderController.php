@@ -50,9 +50,14 @@ class GuestOrderController extends Controller
         abort_unless($request->hasValidSignature(), 403);
 
         $pricing = PricingConfig::current();
+        $order->load('items.fishType', 'statusLogs');
 
         return Inertia::render('orders/guest-confirmation', [
-            'order' => $order->load('items.fishType'),
+            'order' => $order,
+            'statusLogs' => $order->statusLogs->map(fn ($log) => [
+                'status' => $log->status,
+                'timestamp' => $log->created_at->toISOString(),
+            ]),
             'pricing' => [
                 'price_per_pound' => $pricing->pricePerPound,
                 'filleting_fee' => $pricing->filletingFee,

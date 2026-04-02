@@ -33,4 +33,15 @@ class OrderFactory extends Factory
             'rejection_reason' => null,
         ];
     }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (Order $order): void {
+            $order->statusLogs()->create([
+                'status' => 'placed',
+                'user_id' => null,
+                'created_at' => $order->created_at,
+            ]);
+        });
+    }
 }

@@ -53,8 +53,14 @@ class OrderController extends Controller
     {
         $this->authorizeOrderAccess($order);
 
+        $order->load('items.fishType', 'statusLogs');
+
         return Inertia::render('orders/show', [
-            'order' => $order->load('items.fishType'),
+            'order' => $order,
+            'statusLogs' => $order->statusLogs->map(fn ($log) => [
+                'status' => $log->status,
+                'timestamp' => $log->created_at->toISOString(),
+            ]),
         ]);
     }
 
