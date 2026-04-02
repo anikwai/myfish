@@ -79,6 +79,26 @@ test('guest cannot view order with invalid signature', function (): void {
         ->assertForbidden();
 });
 
+test('guest order redirects to signed confirmation url, not dashboard', function (): void {
+    $tuna = FishType::create(['name' => 'Tuna', 'is_active' => true]);
+
+    Notification::fake();
+
+    $response = $this->post(route('guest-orders.store'), [
+        'guest_name' => 'John Doe',
+        'guest_email' => 'john@example.com',
+        'guest_phone' => '+677 12345',
+        'items' => [['fish_type_id' => $tuna->id, 'quantity_kg' => 2]],
+        'filleting' => false,
+        'delivery' => false,
+    ]);
+
+    $order = Order::first();
+    $expectedUrl = URL::signedRoute('guest-orders.show', ['order' => $order->id]);
+
+    $response->assertRedirect($expectedUrl);
+});
+
 test('guest order validation requires guest fields', function (): void {
     $this->post(route('guest-orders.store'), [
         'filleting' => false,
