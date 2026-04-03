@@ -7,6 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { buildOrderPricingPreview } from "@/lib/order-pricing-preview";
 import {
@@ -113,21 +121,17 @@ export default function CreateOrder({
         />
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="rounded-lg border">
-            <table className="w-full text-sm">
-              <thead className="border-b bg-muted/50">
-                <tr>
-                  <th className="px-4 py-2 text-left font-medium">Fish type</th>
-                  <th className="px-4 py-2 text-right font-medium">
-                    Quantity (kg)
-                  </th>
-                  <th className="px-4 py-2 text-right font-medium">Pounds</th>
-                  <th className="px-4 py-2 text-right font-medium">
-                    Subtotal (SBD)
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
+          <div className="overflow-hidden rounded-lg border">
+            <Table>
+              <TableHeader className="bg-muted/50">
+                <TableRow>
+                  <TableHead>Fish type</TableHead>
+                  <TableHead className="text-right">Quantity (kg)</TableHead>
+                  <TableHead className="text-right">Pounds</TableHead>
+                  <TableHead className="text-right">Subtotal (SBD)</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {fishTypes.map((ft, i) => {
                   const kg = parseFloat(data.items[i]?.quantity_kg) || 0;
                   const lbs = kgToLbs(kg, pricing.kg_to_lbs_rate);
@@ -142,9 +146,9 @@ export default function CreateOrder({
                   );
 
                   return (
-                    <tr key={ft.id} className="border-b last:border-0">
-                      <td className="px-4 py-2">{ft.name}</td>
-                      <td className="px-4 py-2 text-right">
+                    <TableRow key={ft.id}>
+                      <TableCell>{ft.name}</TableCell>
+                      <TableCell className="text-right">
                         <div className="flex flex-col items-end">
                           <Input
                             type="number"
@@ -169,18 +173,18 @@ export default function CreateOrder({
                             }
                           />
                         </div>
-                      </td>
-                      <td className="px-4 py-2 text-right font-mono text-muted-foreground">
+                      </TableCell>
+                      <TableCell className="text-right font-mono text-muted-foreground">
                         {lbs > 0 ? lbs.toFixed(3) : "—"}
-                      </td>
-                      <td className="px-4 py-2 text-right font-mono">
+                      </TableCell>
+                      <TableCell className="text-right font-mono">
                         {sub > 0 ? sub.toFixed(2) : "—"}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   );
                 })}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
 
           <div className="space-y-3">
