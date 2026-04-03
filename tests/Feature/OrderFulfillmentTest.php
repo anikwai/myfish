@@ -37,18 +37,44 @@ test('admin can access admin order list', function (): void {
 // ── Order list & filtering ────────────────────────────────────────────────────
 
 test('admin can filter orders by status', function (): void {
-    $tuna = FishType::create(['name' => 'Tuna']);
     $client = User::factory()->client()->create();
 
     $placed = Order::factory()->for($client)->create(['status' => 'placed']);
-    $confirmed = Order::factory()->for($client)->create(['status' => 'confirmed']);
+    Order::factory()->for($client)->create(['status' => 'confirmed']);
 
     $this->actingAs(User::factory()->admin()->create())
         ->get(route('admin.orders.index', ['status' => 'placed']))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->has('orders', 1)
-            ->where('orders.0.id', $placed->id)
+            ->has('orders.data', 1)
+            ->where('orders.data.0.id', $placed->id)
+        );
+});
+
+test('admin can search orders by customer name', function (): void {
+    $alice = User::factory()->client()->create(['name' => 'Alice Smith']);
+    $bob = User::factory()->client()->create(['name' => 'Bob Jones']);
+
+    Order::factory()->for($alice)->create();
+    Order::factory()->for($bob)->create();
+
+    $this->actingAs(User::factory()->admin()->create())
+        ->get(route('admin.orders.index', ['search' => 'Alice']))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->has('orders.data', 1));
+});
+
+test('admin can search orders by order id', function (): void {
+    $client = User::factory()->client()->create();
+    $order = Order::factory()->for($client)->create();
+    Order::factory()->for($client)->create();
+
+    $this->actingAs(User::factory()->admin()->create())
+        ->get(route('admin.orders.index', ['search' => $order->id]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->has('orders.data', 1)
+            ->where('orders.data.0.id', $order->id)
         );
 });
 
@@ -92,7 +118,6 @@ test('admin can pack a confirmed order and stock is deducted', function (): void
 
     $order = Order::factory()->create([
         'status' => 'confirmed',
-        'price_per_pound_snapshot' => 25,
         'filleting_fee_snapshot' => 10,
         'delivery_fee_snapshot' => 5,
         'total_sbd' => 110,
@@ -104,6 +129,7 @@ test('admin can pack a confirmed order and stock is deducted', function (): void
         'quantity_pounds' => 22.046,
         'kg_to_lbs_rate_snapshot' => 2.20462,
         'subtotal_sbd' => 551.15,
+        'price_per_pound_snapshot' => 25,
     ]);
 
     Inventory::current()->update(['stock_kg' => 100]);

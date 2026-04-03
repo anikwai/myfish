@@ -23,6 +23,7 @@ test('welcome page passes active fish types only', function (): void {
         ->assertInertia(fn ($page) => $page
             ->has('fishTypes', 1)
             ->where('fishTypes.0.name', 'Tuna')
+            ->where('fishTypes.0.price_per_pound', null)
         );
 });
 
@@ -33,6 +34,9 @@ test('welcome page passes pricing', function (): void {
             ->where('pricing.price_per_pound', 25)
             ->where('pricing.filleting_fee', 10)
             ->where('pricing.delivery_fee', 5)
+            ->where('discount.mode', 'off')
+            ->where('tax.mode', 'off')
+            ->where('tax.label', 'Tax')
         );
 });
 

@@ -87,6 +87,7 @@ test('report shows total weight sold', function (): void {
         'quantity_pounds' => 22.046,
         'kg_to_lbs_rate_snapshot' => 2.20462,
         'subtotal_sbd' => 551.15,
+        'price_per_pound_snapshot' => 25.00,
     ]);
 
     $this->actingAs(User::factory()->admin()->create())
@@ -113,6 +114,7 @@ test('report shows top fish types by order frequency', function (): void {
             'quantity_pounds' => 2.20462,
             'kg_to_lbs_rate_snapshot' => 2.20462,
             'subtotal_sbd' => 55.12,
+            'price_per_pound_snapshot' => 25.00,
         ]);
     }
 
@@ -123,6 +125,7 @@ test('report shows top fish types by order frequency', function (): void {
         'quantity_pounds' => 2.20462,
         'kg_to_lbs_rate_snapshot' => 2.20462,
         'subtotal_sbd' => 55.12,
+        'price_per_pound_snapshot' => 25.00,
     ]);
 
     $this->actingAs(User::factory()->admin()->create())
