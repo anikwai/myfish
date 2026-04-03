@@ -12,7 +12,7 @@ class ReviewController extends Controller
 {
     public function index(): Response
     {
-        return Inertia::render('admin/reviews', [
+        return Inertia::render('admin/reviews/index', [
             'reviews' => Review::with('order:id')->latest()->get([
                 'id', 'order_id', 'reviewer_name', 'rating', 'comment', 'created_at',
             ]),

@@ -150,7 +150,7 @@ test('admin can view the reviews page', function (): void {
         ->get(route('admin.reviews.index'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('admin/reviews')
+            ->component('admin/reviews/index')
             ->has('reviews', 3)
             ->has('stats.total')
         );
