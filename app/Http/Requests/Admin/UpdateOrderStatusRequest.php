@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Order;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -23,7 +24,19 @@ class UpdateOrderStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['required', 'string', 'in:confirmed,rejected,on_hold,packed,delivered'],
+            'status' => [
+                'required',
+                'string',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    /** @var Order $order */
+                    $order = $this->route('order');
+                    $allowed = Order::TRANSITIONS[$order->status] ?? [];
+
+                    if (! in_array($value, $allowed, true)) {
+                        $fail("Cannot transition from '{$order->status}' to '{$value}'.");
+                    }
+                },
+            ],
             'rejection_reason' => ['nullable', 'string', 'max:500'],
         ];
     }
