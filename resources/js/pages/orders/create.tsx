@@ -143,29 +143,31 @@ export default function CreateOrder({
                   return (
                     <tr key={ft.id} className="border-b last:border-0">
                       <td className="px-4 py-2">{ft.name}</td>
-                      <td className="px-4 py-2">
-                        <Input
-                          type="number"
-                          step="0.001"
-                          min="0"
-                          className="w-28 text-right"
-                          value={data.items[i]?.quantity_kg}
-                          onChange={(e) => {
-                            const updated = [...data.items];
-                            updated[i] = {
-                              ...updated[i],
-                              quantity_kg: e.target.value,
-                            };
-                            setData("items", updated);
-                          }}
-                        />
-                        <InputError
-                          message={
-                            errors[
-                              `items.${i}.quantity_kg` as keyof typeof errors
-                            ]
-                          }
-                        />
+                      <td className="px-4 py-2 text-right">
+                        <div className="flex flex-col items-end">
+                          <Input
+                            type="number"
+                            step="0.001"
+                            min="0"
+                            className="w-28 text-right"
+                            value={data.items[i]?.quantity_kg}
+                            onChange={(e) => {
+                              const updated = [...data.items];
+                              updated[i] = {
+                                ...updated[i],
+                                quantity_kg: e.target.value,
+                              };
+                              setData("items", updated);
+                            }}
+                          />
+                          <InputError
+                            message={
+                              errors[
+                                `items.${i}.quantity_kg` as keyof typeof errors
+                              ]
+                            }
+                          />
+                        </div>
                       </td>
                       <td className="px-4 py-2 text-right font-mono text-muted-foreground">
                         {lbs > 0 ? lbs.toFixed(3) : "—"}
