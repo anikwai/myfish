@@ -28,6 +28,12 @@ const paddingAroundControl = [
 export default [
     js.configs.recommended,
     reactHooks.configs.flat['recommended-latest'],
+    {
+        rules: {
+            // TanStack Table's useReactTable trips React Compiler memoization heuristics; usage is supported and common.
+            'react-hooks/incompatible-library': 'off',
+        },
+    },
     ...typescript.configs.recommended,
     {
         ...react.configs.flat.recommended,
