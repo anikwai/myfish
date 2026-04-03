@@ -486,6 +486,46 @@ test('client can filter orders by delivered status', function (): void {
         );
 });
 
+test('note is saved when provided', function (): void {
+    $tuna = FishType::create(['name' => 'Tuna']);
+
+    $this->actingAs(User::factory()->client()->create())
+        ->post(route('orders.store'), [
+            'items' => [['fish_type_id' => $tuna->id, 'quantity_kg' => 1]],
+            'filleting' => false,
+            'delivery' => false,
+            'note' => 'Please call before delivery',
+        ]);
+
+    expect(Order::first()->note)->toBe('Please call before delivery');
+});
+
+test('note is null when not provided', function (): void {
+    $tuna = FishType::create(['name' => 'Tuna']);
+
+    $this->actingAs(User::factory()->client()->create())
+        ->post(route('orders.store'), [
+            'items' => [['fish_type_id' => $tuna->id, 'quantity_kg' => 1]],
+            'filleting' => false,
+            'delivery' => false,
+        ]);
+
+    expect(Order::first()->note)->toBeNull();
+});
+
+test('note exceeding 1000 characters is rejected', function (): void {
+    $tuna = FishType::create(['name' => 'Tuna']);
+
+    $this->actingAs(User::factory()->client()->create())
+        ->post(route('orders.store'), [
+            'items' => [['fish_type_id' => $tuna->id, 'quantity_kg' => 1]],
+            'filleting' => false,
+            'delivery' => false,
+            'note' => str_repeat('a', 1001),
+        ])
+        ->assertSessionHasErrors('note');
+});
+
 test('client only sees their own orders', function (): void {
     $client = User::factory()->client()->create();
     $other = User::factory()->client()->create();

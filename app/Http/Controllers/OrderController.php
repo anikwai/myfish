@@ -46,6 +46,7 @@ class OrderController extends Controller
             filleting: $data['filleting'],
             delivery: $data['delivery'],
             deliveryLocation: $data['delivery_location'] ?? null,
+            note: $data['note'] ?? null,
         );
 
         $totalKg = array_sum(array_column($data['items'], 'quantity_kg'));

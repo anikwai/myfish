@@ -26,12 +26,17 @@ class OrderPlacedNotification extends Notification implements ShouldQueue
     {
         $order = $this->order;
 
-        return (new MailMessage)
+        $message = (new MailMessage)
             ->subject("New order #{$order->id} placed")
             ->greeting('New order received')
             ->line("**Customer:** {$order->customerName()}")
-            ->line("**Total:** \${$order->total_sbd} SBD")
-            ->action('View order', route('admin.orders.show', $order));
+            ->line("**Total:** \${$order->total_sbd} SBD");
+
+        if ($order->note) {
+            $message->line("**Special instructions:** {$order->note}");
+        }
+
+        return $message->action('View order', route('admin.orders.show', $order));
     }
 
     /**

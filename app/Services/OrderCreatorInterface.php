@@ -18,6 +18,7 @@ interface OrderCreatorInterface
         bool $filleting,
         bool $delivery,
         ?string $deliveryLocation = null,
+        ?string $note = null,
     ): Order;
 
     /**
@@ -33,5 +34,6 @@ interface OrderCreatorInterface
         bool $filleting,
         bool $delivery,
         ?string $deliveryLocation = null,
+        ?string $note = null,
     ): Order;
 }

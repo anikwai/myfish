@@ -126,6 +126,24 @@ test('registration links guest orders by email', function (): void {
     expect($order->fresh()->user_id)->toBe($user->id);
 });
 
+test('guest order note is saved when provided', function (): void {
+    $tuna = FishType::create(['name' => 'Tuna', 'is_active' => true]);
+
+    Notification::fake();
+
+    $this->post(route('guest-orders.store'), [
+        'guest_name' => 'John Doe',
+        'guest_email' => 'john@example.com',
+        'guest_phone' => '+677 12345',
+        'items' => [['fish_type_id' => $tuna->id, 'quantity_kg' => 1]],
+        'filleting' => false,
+        'delivery' => false,
+        'note' => 'Please pack separately',
+    ]);
+
+    expect(Order::first()->note)->toBe('Please pack separately');
+});
+
 test('registration links guest orders by phone', function (): void {
     $order = Order::factory()->create([
         'guest_name' => 'John',

@@ -24,6 +24,7 @@ final class OrderCreator implements OrderCreatorInterface
         bool $filleting,
         bool $delivery,
         ?string $deliveryLocation = null,
+        ?string $note = null,
     ): Order {
         return $this->place(
             identity: ['user_id' => $user->id],
@@ -31,6 +32,7 @@ final class OrderCreator implements OrderCreatorInterface
             filleting: $filleting,
             delivery: $delivery,
             deliveryLocation: $deliveryLocation,
+            note: $note,
         );
     }
 
@@ -42,6 +44,7 @@ final class OrderCreator implements OrderCreatorInterface
         bool $filleting,
         bool $delivery,
         ?string $deliveryLocation = null,
+        ?string $note = null,
     ): Order {
         return $this->place(
             identity: ['user_id' => null, 'guest_name' => $guestName, 'guest_email' => $guestEmail, 'guest_phone' => $guestPhone],
@@ -49,6 +52,7 @@ final class OrderCreator implements OrderCreatorInterface
             filleting: $filleting,
             delivery: $delivery,
             deliveryLocation: $deliveryLocation,
+            note: $note,
         );
     }
 
@@ -62,6 +66,7 @@ final class OrderCreator implements OrderCreatorInterface
         bool $filleting,
         bool $delivery,
         ?string $deliveryLocation,
+        ?string $note = null,
     ): Order {
         $pricing = PricingConfig::current();
 
@@ -85,7 +90,7 @@ final class OrderCreator implements OrderCreatorInterface
 
         $taxConfig = TaxConfig::current();
 
-        $order = DB::transaction(function () use ($identity, $pricing, $filleting, $delivery, $deliveryLocation, $snapshot, $taxConfig): Order {
+        $order = DB::transaction(function () use ($identity, $pricing, $filleting, $delivery, $deliveryLocation, $note, $snapshot, $taxConfig): Order {
             $order = Order::create([
                 ...$identity,
                 'status' => 'placed',
@@ -94,6 +99,7 @@ final class OrderCreator implements OrderCreatorInterface
                 'filleting' => $filleting,
                 'delivery' => $delivery,
                 'delivery_location' => $deliveryLocation,
+                'note' => $note,
                 'discount_sbd' => $snapshot->discountSbd,
                 'tax_sbd' => $snapshot->taxSbd,
                 'tax_label_snapshot' => $taxConfig->customerFacingLabel(),

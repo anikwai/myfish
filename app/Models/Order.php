@@ -16,7 +16,7 @@ use Illuminate\Validation\ValidationException;
 #[Fillable([
     'user_id', 'guest_name', 'guest_email', 'guest_phone', 'status',
     'filleting_fee_snapshot', 'delivery_fee_snapshot',
-    'filleting', 'delivery', 'delivery_location', 'discount_sbd', 'tax_sbd', 'tax_label_snapshot', 'total_sbd', 'rejection_reason',
+    'filleting', 'delivery', 'delivery_location', 'note', 'discount_sbd', 'tax_sbd', 'tax_label_snapshot', 'total_sbd', 'rejection_reason',
 ])]
 class Order extends Model
 {

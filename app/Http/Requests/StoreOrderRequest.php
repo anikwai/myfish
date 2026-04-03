@@ -31,6 +31,7 @@ class StoreOrderRequest extends FormRequest
             'filleting' => ['required', 'boolean'],
             'delivery' => ['required', 'boolean'],
             'delivery_location' => ['required_if:delivery,true', 'nullable', 'string', 'max:255'],
+            'note' => ['nullable', 'string', 'max:1000'],
         ];
     }
 }

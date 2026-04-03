@@ -29,12 +29,18 @@ class GuestOrderConfirmationNotification extends Notification implements ShouldQ
     {
         $order = $this->order;
 
-        return (new MailMessage)
+        $message = (new MailMessage)
             ->subject("Order #{$order->id} confirmed — MyFish")
             ->greeting("Hi {$order->guest_name},")
             ->line("Thank you for your order! We've received it and will be in touch shortly.")
             ->line("**Order #:** {$order->id}")
-            ->line("**Total:** \${$order->total_sbd} SBD")
+            ->line("**Total:** \${$order->total_sbd} SBD");
+
+        if ($order->note) {
+            $message->line("**Special instructions:** {$order->note}");
+        }
+
+        return $message
             ->action('View your order', $this->signedUrl)
             ->line('Create an account to track all your future orders.');
     }

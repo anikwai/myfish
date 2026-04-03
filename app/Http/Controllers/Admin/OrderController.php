@@ -109,6 +109,7 @@ class OrderController extends Controller
             filleting: $data['filleting'],
             delivery: $data['delivery'],
             deliveryLocation: $data['delivery_location'] ?? null,
+            note: $data['note'] ?? null,
         );
 
         return to_route('admin.orders.show', $order);
