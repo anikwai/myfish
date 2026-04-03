@@ -44,6 +44,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { kgToLbs } from '@/lib/pricing';
 import { cn } from '@/lib/utils';
 import { index } from '@/routes/admin/inventory';
 
@@ -178,12 +179,14 @@ const columns: ColumnDef<Adjustment>[] = [
 export default function Inventory({
     stock_kg,
     stock_pounds,
+    kg_to_lbs_rate,
     adjustments,
     last_adjustment,
     status,
 }: {
     stock_kg: number;
     stock_pounds: number;
+    kg_to_lbs_rate: number;
     adjustments: Adjustment[];
     last_adjustment: LastAdjustment;
     status?: string;
@@ -222,8 +225,7 @@ export default function Inventory({
         !isNaN(parsedDelta) && deltaValue !== ''
             ? stock_kg + parsedDelta
             : null;
-    const conversionRate = stock_kg > 0 ? stock_pounds / stock_kg : 2.20462;
-    const newPounds = newKg !== null ? newKg * conversionRate : null;
+    const newPounds = newKg !== null ? kgToLbs(newKg, kg_to_lbs_rate) : null;
 
     const PRESETS = [10, 25, 50, -10, -25];
 

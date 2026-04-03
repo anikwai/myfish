@@ -1,3 +1,11 @@
+export function kgToLbs(kg: number, rate: number): number {
+    return kg * rate;
+}
+
+export function lbsToKg(lbs: number, rate: number): number {
+    return lbs / rate;
+}
+
 export function effectivePricePerPound(
     speciesPricePerPound: number | null | undefined,
     globalPricePerPound: number,
@@ -13,7 +21,7 @@ export function lineFishSubtotalSbd(
     kgToLbsRate: number,
     pricePerPound: number,
 ): number {
-    const pounds = Math.round(quantityKg * kgToLbsRate * 1000) / 1000;
+    const pounds = Math.round(kgToLbs(quantityKg, kgToLbsRate) * 1000) / 1000;
 
     return Math.round(pounds * pricePerPound * 100) / 100;
 }

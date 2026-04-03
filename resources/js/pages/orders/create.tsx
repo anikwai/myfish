@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { buildOrderPricingPreview } from '@/lib/order-pricing-preview';
-import { effectivePricePerPound, lineFishSubtotalSbd } from '@/lib/pricing';
+import { effectivePricePerPound, kgToLbs, lineFishSubtotalSbd } from '@/lib/pricing';
 import { create, index } from '@/routes/orders';
 
 type FishType = { id: number; name: string; price_per_pound: number | null };
@@ -131,7 +131,7 @@ export default function CreateOrder({
                                         parseFloat(
                                             data.items[i]?.quantity_kg,
                                         ) || 0;
-                                    const lbs = kg * pricing.kg_to_lbs_rate;
+                                    const lbs = kgToLbs(kg, pricing.kg_to_lbs_rate);
                                     const rate = effectivePricePerPound(
                                         ft.price_per_pound,
                                         pricing.price_per_pound,
