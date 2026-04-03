@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Pricing\OrderPricingPipeline;
 use App\Services\OrderCreator;
 use App\Services\OrderCreatorInterface;
 use Carbon\CarbonImmutable;
@@ -17,6 +18,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->singleton(OrderPricingPipeline::class, fn (): OrderPricingPipeline => OrderPricingPipeline::default());
+
         $this->app->bind(OrderCreatorInterface::class, OrderCreator::class);
     }
 

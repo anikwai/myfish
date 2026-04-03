@@ -10,7 +10,7 @@ interface OrderCreatorInterface
     /**
      * Place an order for an authenticated user.
      *
-     * @param  array<int, array{fish_type_id: int, quantity_kg: float}>  $items
+     * @param  array<int, array{fish_type_id: int, quantity_kg: float, cut?: string|null}>  $items
      */
     public function placeForUser(
         User $user,
@@ -23,7 +23,7 @@ interface OrderCreatorInterface
     /**
      * Place an order on behalf of a walk-in or online guest.
      *
-     * @param  array<int, array{fish_type_id: int, quantity_kg: float}>  $items
+     * @param  array<int, array{fish_type_id: int, quantity_kg: float, cut?: string|null}>  $items
      */
     public function placeForGuest(
         string $guestName,

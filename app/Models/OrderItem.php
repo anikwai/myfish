@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['order_id', 'fish_type_id', 'quantity_kg', 'quantity_pounds', 'kg_to_lbs_rate_snapshot', 'subtotal_sbd'])]
+#[Fillable(['order_id', 'fish_type_id', 'cut', 'quantity_kg', 'quantity_pounds', 'kg_to_lbs_rate_snapshot', 'subtotal_sbd', 'price_per_pound_snapshot'])]
 class OrderItem extends Model
 {
     /**
@@ -19,6 +19,7 @@ class OrderItem extends Model
             'quantity_pounds' => 'decimal:3',
             'kg_to_lbs_rate_snapshot' => 'decimal:5',
             'subtotal_sbd' => 'decimal:2',
+            'price_per_pound_snapshot' => 'decimal:2',
         ];
     }
 

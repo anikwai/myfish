@@ -2,14 +2,22 @@
 
 namespace App\Services;
 
+use App\Models\FishType;
 use App\Models\Order;
 use App\Models\User;
 use App\Notifications\OrderNotifier;
+use App\Pricing\OrderPricingPipeline;
+use App\Pricing\PricingContext;
 use App\Values\PricingConfig;
+use App\Values\TaxConfig;
 use Illuminate\Support\Facades\DB;
 
 final class OrderCreator implements OrderCreatorInterface
 {
+    public function __construct(
+        private readonly OrderPricingPipeline $pricingPipeline,
+    ) {}
+
     public function placeForUser(
         User $user,
         array $items,
@@ -46,7 +54,7 @@ final class OrderCreator implements OrderCreatorInterface
 
     /**
      * @param  array<string, mixed>  $identity
-     * @param  array<int, array{fish_type_id: int, quantity_kg: float}>  $items
+     * @param  array<int, array{fish_type_id: int, quantity_kg: float, cut?: string|null}>  $items
      */
     private function place(
         array $identity,
@@ -57,47 +65,42 @@ final class OrderCreator implements OrderCreatorInterface
     ): Order {
         $pricing = PricingConfig::current();
 
-        $totalPounds = 0;
-        $itemsToCreate = [];
+        $fishTypeIds = array_values(array_unique(array_map(
+            fn (array $item): int => (int) $item['fish_type_id'],
+            $items,
+        )));
 
-        foreach ($items as $item) {
-            $pounds = round($item['quantity_kg'] * $pricing->kgToLbsRate, 3);
-            $subtotal = round($pounds * $pricing->pricePerPound, 2);
-            $totalPounds += $pounds;
+        $fishTypes = FishType::query()
+            ->whereIn('id', $fishTypeIds)
+            ->get()
+            ->keyBy('id');
 
-            $itemsToCreate[] = [
-                'fish_type_id' => $item['fish_type_id'],
-                'quantity_kg' => $item['quantity_kg'],
-                'quantity_pounds' => $pounds,
-                'kg_to_lbs_rate_snapshot' => $pricing->kgToLbsRate,
-                'subtotal_sbd' => $subtotal,
-            ];
-        }
+        $snapshot = $this->pricingPipeline->run(new PricingContext(
+            $pricing,
+            $items,
+            $fishTypes,
+            $filleting,
+            $delivery,
+        ));
 
-        $total = round($totalPounds * $pricing->pricePerPound, 2);
+        $taxConfig = TaxConfig::current();
 
-        if ($filleting) {
-            $total += $pricing->filletingFee;
-        }
-
-        if ($delivery) {
-            $total += $pricing->deliveryFee;
-        }
-
-        $order = DB::transaction(function () use ($identity, $pricing, $filleting, $delivery, $deliveryLocation, $total, $itemsToCreate): Order {
+        $order = DB::transaction(function () use ($identity, $pricing, $filleting, $delivery, $deliveryLocation, $snapshot, $taxConfig): Order {
             $order = Order::create([
                 ...$identity,
                 'status' => 'placed',
-                'price_per_pound_snapshot' => $pricing->pricePerPound,
                 'filleting_fee_snapshot' => $pricing->filletingFee,
                 'delivery_fee_snapshot' => $pricing->deliveryFee,
                 'filleting' => $filleting,
                 'delivery' => $delivery,
                 'delivery_location' => $deliveryLocation,
-                'total_sbd' => $total,
+                'discount_sbd' => $snapshot->discountSbd,
+                'tax_sbd' => $snapshot->taxSbd,
+                'tax_label_snapshot' => $taxConfig->customerFacingLabel(),
+                'total_sbd' => $snapshot->grandTotalSbd,
             ]);
 
-            $order->items()->createMany($itemsToCreate);
+            $order->items()->createMany($snapshot->orderItemPayloads);
             $order->statusLogs()->create(['status' => 'placed', 'user_id' => null]);
 
             return $order;

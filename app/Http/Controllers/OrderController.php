@@ -7,7 +7,9 @@ use App\Models\FishType;
 use App\Models\Inventory;
 use App\Models\Order;
 use App\Services\OrderCreatorInterface;
+use App\Values\DiscountConfig;
 use App\Values\PricingConfig;
+use App\Values\TaxConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -22,13 +24,15 @@ class OrderController extends Controller
         $pricing = PricingConfig::current();
 
         return Inertia::render('orders/create', [
-            'fishTypes' => FishType::active()->orderBy('name')->get(['id', 'name']),
+            'fishTypes' => FishType::active()->orderBy('name')->get(['id', 'name', 'price_per_pound']),
             'pricing' => [
                 'price_per_pound' => $pricing->pricePerPound,
                 'filleting_fee' => $pricing->filletingFee,
                 'delivery_fee' => $pricing->deliveryFee,
                 'kg_to_lbs_rate' => $pricing->kgToLbsRate,
             ],
+            'discount' => DiscountConfig::current()->toInertiaProps(),
+            'tax' => TaxConfig::current()->toInertiaProps(),
         ]);
     }
 
@@ -67,13 +71,22 @@ class OrderController extends Controller
 
     public function index(Request $request): Response
     {
-        $orders = Order::where('user_id', $request->user()->id)
-            ->with('items.fishType')
-            ->latest()
-            ->get();
+        /** @var string[] */
+        $activeStatuses = ['placed', 'confirmed', 'on_hold', 'packed'];
+
+        $query = Order::where('user_id', $request->user()->id)->latest();
+
+        $filterStatus = $request->input('status');
+
+        if ($filterStatus === 'active') {
+            $query->whereIn('status', $activeStatuses);
+        } elseif ($filterStatus !== null) {
+            $query->where('status', $filterStatus);
+        }
 
         return Inertia::render('orders/index', [
-            'orders' => $orders,
+            'orders' => Inertia::scroll(fn () => $query->paginate(20, ['id', 'status', 'total_sbd', 'created_at'])),
+            'filterStatus' => $filterStatus,
         ]);
     }
 

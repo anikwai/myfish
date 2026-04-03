@@ -13,8 +13,8 @@ use Illuminate\Validation\ValidationException;
 
 #[Fillable([
     'user_id', 'guest_name', 'guest_email', 'guest_phone', 'status',
-    'price_per_pound_snapshot', 'filleting_fee_snapshot', 'delivery_fee_snapshot',
-    'filleting', 'delivery', 'delivery_location', 'total_sbd', 'rejection_reason',
+    'filleting_fee_snapshot', 'delivery_fee_snapshot',
+    'filleting', 'delivery', 'delivery_location', 'discount_sbd', 'tax_sbd', 'tax_label_snapshot', 'total_sbd', 'rejection_reason',
 ])]
 class Order extends Model
 {
@@ -29,9 +29,10 @@ class Order extends Model
         return [
             'filleting' => 'boolean',
             'delivery' => 'boolean',
-            'price_per_pound_snapshot' => 'decimal:2',
             'filleting_fee_snapshot' => 'decimal:2',
             'delivery_fee_snapshot' => 'decimal:2',
+            'discount_sbd' => 'decimal:2',
+            'tax_sbd' => 'decimal:2',
             'total_sbd' => 'decimal:2',
         ];
     }

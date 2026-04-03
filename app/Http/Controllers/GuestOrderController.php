@@ -7,7 +7,6 @@ use App\Models\Inventory;
 use App\Models\Order;
 use App\Notifications\GuestOrderConfirmationNotification;
 use App\Services\OrderCreatorInterface;
-use App\Values\PricingConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
@@ -49,7 +48,6 @@ class GuestOrderController extends Controller
     {
         abort_unless($request->hasValidSignature(), 403);
 
-        $pricing = PricingConfig::current();
         $order->load('items.fishType', 'statusLogs');
 
         return Inertia::render('orders/guest-confirmation', [
@@ -58,12 +56,6 @@ class GuestOrderController extends Controller
                 'status' => $log->status,
                 'timestamp' => $log->created_at->toISOString(),
             ]),
-            'pricing' => [
-                'price_per_pound' => $pricing->pricePerPound,
-                'filleting_fee' => $pricing->filletingFee,
-                'delivery_fee' => $pricing->deliveryFee,
-                'kg_to_lbs_rate' => $pricing->kgToLbsRate,
-            ],
             'canRegister' => Features::enabled(Features::registration()),
         ]);
     }

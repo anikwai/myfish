@@ -21,10 +21,16 @@ class InventoryController extends Controller
             ->limit(50)
             ->get();
 
+        $lastAdjustment = $adjustments->first();
+
         return Inertia::render('admin/inventory', [
             'stock_kg' => (float) $inventory->stock_kg,
             'stock_pounds' => $inventory->stockPounds(),
             'adjustments' => $adjustments,
+            'last_adjustment' => $lastAdjustment ? [
+                'user_name' => $lastAdjustment->user?->name,
+                'created_at' => $lastAdjustment->created_at,
+            ] : null,
         ]);
     }
 

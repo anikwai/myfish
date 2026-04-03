@@ -9,7 +9,9 @@ use App\Http\Requests\Admin\UpdateOrderStatusRequest;
 use App\Models\FishType;
 use App\Models\Order;
 use App\Services\OrderCreatorInterface;
+use App\Values\DiscountConfig;
 use App\Values\PricingConfig;
+use App\Values\TaxConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,16 +24,25 @@ class OrderController extends Controller
 
     public function index(Request $request): Response
     {
-        $query = Order::with(['user:id,name', 'items'])
-            ->latest();
+        $query = Order::with('user:id,name')->latest();
 
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search): void {
+                $q->whereHas('user', fn ($u) => $u->where('name', 'like', "%{$search}%"))
+                    ->orWhere('guest_name', 'like', "%{$search}%")
+                    ->orWhere('id', is_numeric($search) ? (int) $search : -1);
+            });
         }
 
         return Inertia::render('admin/orders/index', [
-            'orders' => $query->get(),
-            'filterStatus' => $request->status,
+            'orders' => Inertia::scroll(fn () => $query->paginate(20, ['id', 'status', 'total_sbd', 'created_at', 'guest_name', 'user_id'])),
+            'filterStatus' => $request->input('status'),
+            'search' => $request->input('search', ''),
             'statuses' => array_keys(Order::TRANSITIONS),
         ]);
     }
@@ -74,13 +85,15 @@ class OrderController extends Controller
         $pricing = PricingConfig::current();
 
         return Inertia::render('admin/orders/guest', [
-            'fishTypes' => FishType::active()->orderBy('name')->get(['id', 'name']),
+            'fishTypes' => FishType::active()->orderBy('name')->get(['id', 'name', 'price_per_pound']),
             'pricing' => [
                 'price_per_pound' => $pricing->pricePerPound,
                 'filleting_fee' => $pricing->filletingFee,
                 'delivery_fee' => $pricing->deliveryFee,
                 'kg_to_lbs_rate' => $pricing->kgToLbsRate,
             ],
+            'discount' => DiscountConfig::current()->toInertiaProps(),
+            'tax' => TaxConfig::current()->toInertiaProps(),
         ]);
     }
 

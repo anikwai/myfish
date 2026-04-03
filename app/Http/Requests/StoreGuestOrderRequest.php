@@ -29,6 +29,7 @@ class StoreGuestOrderRequest extends FormRequest
             'guest_phone' => ['required', 'string', 'max:50'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.fish_type_id' => ['required', 'integer', Rule::exists('fish_types', 'id')->where('is_active', true)],
+            'items.*.cut' => ['nullable', 'string', Rule::in(['whole', 'fillet', 'steak'])],
             'items.*.quantity_kg' => ['required', 'numeric', 'min:0.001'],
             'filleting' => ['required', 'boolean'],
             'delivery' => ['required', 'boolean'],
