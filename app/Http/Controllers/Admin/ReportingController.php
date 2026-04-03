@@ -24,8 +24,8 @@ class ReportingController extends Controller
             default => [Carbon::today(), Carbon::today()->endOfDay()],
         };
 
-        $orders = Order::whereBetween('created_at', [$start, $end])
-            ->whereNotIn('status', ['rejected'])
+        $orders = Order::inDateRange($start, $end)
+            ->excludingStatuses(['rejected'])
             ->with('items')
             ->get();
 
@@ -38,20 +38,20 @@ class ReportingController extends Controller
         $totalKg = $allItems->sum(fn ($i) => (float) $i->quantity_kg);
         $totalPounds = $allItems->sum(fn ($i) => (float) $i->quantity_pounds);
 
-        $topFishTypes = OrderItem::whereHas('order', function ($q) use ($start, $end) {
-            $q->whereBetween('created_at', [$start, $end])
-                ->whereNotIn('status', ['rejected']);
-        })
-            ->with('fishType:id,name')
+        $topFishTypes = OrderItem::query()
+            ->selectRaw('order_items.fish_type_id, fish_types.name, COUNT(DISTINCT order_items.order_id) as order_count, ROUND(SUM(order_items.quantity_kg), 3) as total_kg')
+            ->join('fish_types', 'fish_types.id', '=', 'order_items.fish_type_id')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->whereBetween('orders.created_at', [$start, $end])
+            ->whereNotIn('orders.status', ['rejected'])
+            ->groupBy('order_items.fish_type_id', 'fish_types.name')
+            ->orderByDesc('order_count')
             ->get()
-            ->groupBy('fish_type_id')
-            ->map(fn ($items) => [
-                'name' => $items->first()->fishType->name,
-                'order_count' => $items->pluck('order_id')->unique()->count(),
-                'total_kg' => round($items->sum(fn ($i) => (float) $i->quantity_kg), 3),
-            ])
-            ->sortByDesc('order_count')
-            ->values();
+            ->map(fn ($item) => [
+                'name' => $item->name,
+                'order_count' => (int) $item->order_count,
+                'total_kg' => (float) $item->total_kg,
+            ]);
 
         $stockHistory = InventoryAdjustment::whereBetween('created_at', [$start, $end])
             ->latest('created_at')
