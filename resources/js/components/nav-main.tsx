@@ -1,5 +1,5 @@
-import { Link } from '@inertiajs/react';
 import { HugeiconsIcon } from '@hugeicons/react';
+import { Link } from '@inertiajs/react';
 import {
     SidebarGroup,
     SidebarGroupLabel,
@@ -10,7 +10,13 @@ import {
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import type { NavItem } from '@/types';
 
-export function NavMain({ items = [], label = 'Platform' }: { items: NavItem[]; label?: string }) {
+export function NavMain({
+    items = [],
+    label = 'Platform',
+}: {
+    items: NavItem[];
+    label?: string;
+}) {
     const { isCurrentUrl } = useCurrentUrl();
 
     return (
@@ -25,7 +31,9 @@ export function NavMain({ items = [], label = 'Platform' }: { items: NavItem[]; 
                             tooltip={{ children: item.title }}
                         >
                             <Link href={item.href} prefetch>
-                                {item.icon && <HugeiconsIcon icon={item.icon} size={18} />}
+                                {item.icon && (
+                                    <HugeiconsIcon icon={item.icon} size={18} />
+                                )}
                                 <span>{item.title}</span>
                             </Link>
                         </SidebarMenuButton>

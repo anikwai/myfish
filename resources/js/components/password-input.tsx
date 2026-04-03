@@ -1,5 +1,5 @@
-import { HugeiconsIcon } from '@hugeicons/react';
 import { EyeIcon, ViewOffSlashIcon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import type { ComponentProps, Ref } from 'react';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
@@ -27,7 +27,10 @@ export default function PasswordInput({
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                 tabIndex={-1}
             >
-                <HugeiconsIcon icon={showPassword ? ViewOffSlashIcon : EyeIcon} size={16} />
+                <HugeiconsIcon
+                    icon={showPassword ? ViewOffSlashIcon : EyeIcon}
+                    size={16}
+                />
             </button>
         </div>
     );

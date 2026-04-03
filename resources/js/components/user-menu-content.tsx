@@ -1,6 +1,6 @@
-import { Link, router } from '@inertiajs/react';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { Logout01Icon, Settings01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Link, router } from '@inertiajs/react';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,

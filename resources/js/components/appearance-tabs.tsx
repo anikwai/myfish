@@ -1,5 +1,10 @@
-import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react';
-import { ComputerIcon, Moon01Icon, Sun01Icon } from '@hugeicons/core-free-icons';
+import {
+    ComputerIcon,
+    Moon01Icon,
+    Sun01Icon,
+} from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
+import type { IconSvgElement } from '@hugeicons/react';
 import type { HTMLAttributes } from 'react';
 import type { Appearance } from '@/hooks/use-appearance';
 import { useAppearance } from '@/hooks/use-appearance';

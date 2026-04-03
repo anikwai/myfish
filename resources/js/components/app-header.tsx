@@ -1,5 +1,3 @@
-import { Link, usePage } from '@inertiajs/react';
-import { HugeiconsIcon } from '@hugeicons/react';
 import {
     BookOpen01Icon,
     DashboardSquare01Icon,
@@ -7,6 +5,8 @@ import {
     Menu01Icon,
     Search01Icon,
 } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Link, usePage } from '@inertiajs/react';
 import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Breadcrumbs } from '@/components/breadcrumbs';
@@ -89,7 +89,10 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     size="icon"
                                     className="mr-2 h-[34px] w-[34px]"
                                 >
-                                    <HugeiconsIcon icon={Menu01Icon} size={20} />
+                                    <HugeiconsIcon
+                                        icon={Menu01Icon}
+                                        size={20}
+                                    />
                                 </Button>
                             </SheetTrigger>
                             <SheetContent
@@ -112,7 +115,10 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     className="flex items-center space-x-2 font-medium"
                                                 >
                                                     {item.icon && (
-                                                        <HugeiconsIcon icon={item.icon} size={20} />
+                                                        <HugeiconsIcon
+                                                            icon={item.icon}
+                                                            size={20}
+                                                        />
                                                     )}
                                                     <span>{item.title}</span>
                                                 </Link>
@@ -129,7 +135,10 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     className="flex items-center space-x-2 font-medium"
                                                 >
                                                     {item.icon && (
-                                                        <HugeiconsIcon icon={item.icon} size={20} />
+                                                        <HugeiconsIcon
+                                                            icon={item.icon}
+                                                            size={20}
+                                                        />
                                                     )}
                                                     <span>{item.title}</span>
                                                 </a>
@@ -170,7 +179,11 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                             )}
                                         >
                                             {item.icon && (
-                                                <HugeiconsIcon icon={item.icon} size={16} className="mr-2" />
+                                                <HugeiconsIcon
+                                                    icon={item.icon}
+                                                    size={16}
+                                                    className="mr-2"
+                                                />
                                             )}
                                             {item.title}
                                         </Link>
@@ -190,7 +203,11 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 size="icon"
                                 className="group h-9 w-9 cursor-pointer"
                             >
-                                <HugeiconsIcon icon={Search01Icon} size={20} className="opacity-80 group-hover:opacity-100" />
+                                <HugeiconsIcon
+                                    icon={Search01Icon}
+                                    size={20}
+                                    className="opacity-80 group-hover:opacity-100"
+                                />
                             </Button>
                             <div className="ml-1 hidden gap-1 lg:flex">
                                 {rightNavItems.map((item) => (
@@ -206,7 +223,11 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                                     {item.title}
                                                 </span>
                                                 {item.icon && (
-                                                    <HugeiconsIcon icon={item.icon} size={20} className="opacity-80 group-hover:opacity-100" />
+                                                    <HugeiconsIcon
+                                                        icon={item.icon}
+                                                        size={20}
+                                                        className="opacity-80 group-hover:opacity-100"
+                                                    />
                                                 )}
                                             </a>
                                         </TooltipTrigger>

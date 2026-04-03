@@ -1,4 +1,3 @@
-import { Link, usePage } from '@inertiajs/react';
 import {
     AnalyticsUpIcon,
     ClipboardIcon,
@@ -8,6 +7,7 @@ import {
     Settings02Icon,
     ShoppingBag01Icon,
 } from '@hugeicons/core-free-icons';
+import { Link, usePage } from '@inertiajs/react';
 
 import Admin from '@/actions/App/Http/Controllers/Admin';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
@@ -69,7 +69,9 @@ const adminNavItems: NavItem[] = [
 
 export function AppSidebar() {
     const { auth } = usePage().props;
-    const isAdminOrStaff = auth.user?.roles?.some((r: string) => ['admin', 'staff'].includes(r)) ?? false;
+    const isAdminOrStaff =
+        auth.user?.roles?.some((r: string) => ['admin', 'staff'].includes(r)) ??
+        false;
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -87,7 +89,9 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={userNavItems} label="Menu" />
-                {isAdminOrStaff && <NavMain items={adminNavItems} label="Admin" />}
+                {isAdminOrStaff && (
+                    <NavMain items={adminNavItems} label="Admin" />
+                )}
             </SidebarContent>
 
             <SidebarFooter>

@@ -1,7 +1,11 @@
+import {
+    CheckmarkCircle01Icon,
+    Copy01Icon,
+    QrCode01Icon,
+} from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { Form } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { CheckmarkCircle01Icon, Copy01Icon, QrCode01Icon } from '@hugeicons/core-free-icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AlertError from '@/components/alert-error';
 import InputError from '@/components/input-error';
@@ -44,7 +48,11 @@ function GridScanIcon() {
                         />
                     ))}
                 </div>
-                <HugeiconsIcon icon={QrCode01Icon} size={24} className="relative z-20 text-foreground" />
+                <HugeiconsIcon
+                    icon={QrCode01Icon}
+                    size={24}
+                    className="relative z-20 text-foreground"
+                />
             </div>
         </div>
     );
@@ -65,7 +73,8 @@ function TwoFactorSetupStep({
 }) {
     const { resolvedAppearance } = useAppearance();
     const [copiedText, copy] = useClipboard();
-    const iconData = copiedText === manualSetupKey ? CheckmarkCircle01Icon : Copy01Icon;
+    const iconData =
+        copiedText === manualSetupKey ? CheckmarkCircle01Icon : Copy01Icon;
 
     return (
         <>
@@ -127,7 +136,10 @@ function TwoFactorSetupStep({
                                         onClick={() => copy(manualSetupKey)}
                                         className="border-l border-border px-3 hover:bg-muted"
                                     >
-                                        <HugeiconsIcon icon={iconData} size={16} />
+                                        <HugeiconsIcon
+                                            icon={iconData}
+                                            size={16}
+                                        />
                                     </button>
                                 </>
                             )}
