@@ -10,7 +10,9 @@ import { login } from '@/routes';
 import { store } from '@/routes/register';
 
 export default function Register() {
-    const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+    const params = new URLSearchParams(
+        typeof window !== 'undefined' ? window.location.search : '',
+    );
     const prefill = {
         name: params.get('name') ?? '',
         email: params.get('email') ?? '',

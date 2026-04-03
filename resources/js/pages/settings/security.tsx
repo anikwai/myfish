@@ -1,7 +1,7 @@
 import { Transition } from '@headlessui/react';
-import { Form, Head } from '@inertiajs/react';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { Shield01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Form, Head } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
 import Heading from '@/components/heading';
@@ -212,7 +212,10 @@ export default function Security({
                                     <Button
                                         onClick={() => setShowSetupModal(true)}
                                     >
-                                        <HugeiconsIcon icon={Shield01Icon} size={16} />
+                                        <HugeiconsIcon
+                                            icon={Shield01Icon}
+                                            size={16}
+                                        />
                                         Continue setup
                                     </Button>
                                 ) : (

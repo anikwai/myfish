@@ -1,7 +1,7 @@
 // Components
-import { Form, Head } from '@inertiajs/react';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { Loading01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Form, Head } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -46,7 +46,11 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                     data-test="email-password-reset-link-button"
                                 >
                                     {processing && (
-                                        <HugeiconsIcon icon={Loading01Icon} size={16} className="animate-spin" />
+                                        <HugeiconsIcon
+                                            icon={Loading01Icon}
+                                            size={16}
+                                            className="animate-spin"
+                                        />
                                     )}
                                     Email password reset link
                                 </Button>

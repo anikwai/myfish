@@ -96,11 +96,16 @@ export function computeDiscountSbd(
     }
 
     const base = Math.round(orderSubtotalBeforeDiscount * 100) / 100;
-    if (discount.min_order_sbd != null && base < Math.round(discount.min_order_sbd * 100) / 100) {
+
+    if (
+        discount.min_order_sbd != null &&
+        base < Math.round(discount.min_order_sbd * 100) / 100
+    ) {
         return 0;
     }
 
     let raw = 0;
+
     if (discount.mode === 'fixed') {
         raw = Math.min(discount.fixed_sbd, base);
     } else if (discount.mode === 'percent') {
@@ -117,7 +122,10 @@ export function computeDiscountSbd(
 }
 
 /** Mirrors {@see \App\Values\TaxConfig::amountOn} for checkout preview (exclusive tax). */
-export function computeTaxSbd(taxableExclusiveSubtotal: number, tax: OrderPricingPreviewTax): number {
+export function computeTaxSbd(
+    taxableExclusiveSubtotal: number,
+    tax: OrderPricingPreviewTax,
+): number {
     if (tax.mode === 'off') {
         return 0;
     }
@@ -127,20 +135,31 @@ export function computeTaxSbd(taxableExclusiveSubtotal: number, tax: OrderPricin
     return Math.round(base * (tax.percent / 100) * 100) / 100;
 }
 
-function runCoreLinesPhase(input: OrderPricingPreviewInput): OrderPricingPreviewFishLine[] {
+function runCoreLinesPhase(
+    input: OrderPricingPreviewInput,
+): OrderPricingPreviewFishLine[] {
     return input.items
         .filter((item) => parseFloat(item.quantity_kg) > 0)
         .map((item) => {
             const ft = input.fishTypes.find((f) => f.id === item.fish_type_id);
             const kg = parseFloat(item.quantity_kg);
-            const rate = effectivePricePerPound(ft?.price_per_pound, input.pricing.price_per_pound);
-            const subtotalSbd = lineFishSubtotalSbd(kg, input.pricing.kg_to_lbs_rate, rate);
+            const rate = effectivePricePerPound(
+                ft?.price_per_pound,
+                input.pricing.price_per_pound,
+            );
+            const subtotalSbd = lineFishSubtotalSbd(
+                kg,
+                input.pricing.kg_to_lbs_rate,
+                rate,
+            );
 
             return { name: ft?.name ?? '—', subtotalSbd };
         });
 }
 
-function runFeeAdjustmentsPhase(input: OrderPricingPreviewInput): OrderPricingPreviewAdjustment[] {
+function runFeeAdjustmentsPhase(
+    input: OrderPricingPreviewInput,
+): OrderPricingPreviewAdjustment[] {
     const out: OrderPricingPreviewAdjustment[] = [];
 
     if (input.filleting) {
@@ -167,13 +186,20 @@ function runFinalizePhase(
     adjustments: OrderPricingPreviewAdjustment[],
     discount: OrderPricingPreviewDiscount,
     tax: OrderPricingPreviewTax,
-): { fishSubtotalSbd: number; discountSbd: number; taxSbd: number; grandTotalSbd: number } {
+): {
+    fishSubtotalSbd: number;
+    discountSbd: number;
+    taxSbd: number;
+    grandTotalSbd: number;
+} {
     const fishRaw = fishLines.reduce((s, l) => s + l.subtotalSbd, 0);
     const fishSubtotalSbd = Math.round(fishRaw * 100) / 100;
     const adjSum = adjustments.reduce((s, a) => s + a.amountSbd, 0);
-    const subtotalBeforeDiscountSbd = Math.round((fishSubtotalSbd + adjSum) * 100) / 100;
+    const subtotalBeforeDiscountSbd =
+        Math.round((fishSubtotalSbd + adjSum) * 100) / 100;
     const discountSbd = computeDiscountSbd(subtotalBeforeDiscountSbd, discount);
-    const afterDiscountSbd = Math.round((subtotalBeforeDiscountSbd - discountSbd) * 100) / 100;
+    const afterDiscountSbd =
+        Math.round((subtotalBeforeDiscountSbd - discountSbd) * 100) / 100;
     const taxSbd = computeTaxSbd(afterDiscountSbd, tax);
     const grandTotalSbd = Math.round((afterDiscountSbd + taxSbd) * 100) / 100;
 
@@ -181,18 +207,16 @@ function runFinalizePhase(
 }
 
 /** Client-side preview using the same phase order as the server `OrderPricingPipeline`. */
-export function buildOrderPricingPreview(input: OrderPricingPreviewInput): OrderPricingPreviewResult {
+export function buildOrderPricingPreview(
+    input: OrderPricingPreviewInput,
+): OrderPricingPreviewResult {
     const discount = input.discount ?? DEFAULT_DISCOUNT;
     const tax: OrderPricingPreviewTax = { ...DEFAULT_TAX, ...input.tax };
     const taxLabel = tax.label.trim() || 'Tax';
     const fishLines = runCoreLinesPhase(input);
     const adjustments = runFeeAdjustmentsPhase(input);
-    const { fishSubtotalSbd, discountSbd, taxSbd, grandTotalSbd } = runFinalizePhase(
-        fishLines,
-        adjustments,
-        discount,
-        tax,
-    );
+    const { fishSubtotalSbd, discountSbd, taxSbd, grandTotalSbd } =
+        runFinalizePhase(fishLines, adjustments, discount, tax);
 
     const ratesExplainer =
         `Standard rates (for reference): default $${input.pricing.price_per_pound.toFixed(2)}/lb; ` +

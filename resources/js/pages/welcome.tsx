@@ -59,7 +59,9 @@ export default function Welcome({
             <div className="min-h-screen bg-background">
                 <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                     <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-                        <span className="text-xl font-bold tracking-tight text-primary sm:text-2xl">MyFish</span>
+                        <span className="text-xl font-bold tracking-tight text-primary sm:text-2xl">
+                            MyFish
+                        </span>
                         <nav className="flex items-center gap-2 sm:gap-3">
                             {isLoggedIn ? (
                                 <Button asChild size="sm">
@@ -72,7 +74,9 @@ export default function Welcome({
                                     </Button>
                                     {canRegister && (
                                         <Button size="sm" asChild>
-                                            <Link href={register()}>Register</Link>
+                                            <Link href={register()}>
+                                                Register
+                                            </Link>
                                         </Button>
                                     )}
                                 </>
@@ -83,8 +87,12 @@ export default function Welcome({
 
                 <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
                     <div className="mb-6 sm:mb-8">
-                        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Place an order</h1>
-                        <p className="mt-1 text-sm text-muted-foreground">Fresh fish, Solomon Islands</p>
+                        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                            Place an order
+                        </h1>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            Fresh fish, Solomon Islands
+                        </p>
                     </div>
 
                     <ConversationalOrderFlow
@@ -106,7 +114,9 @@ export default function Welcome({
 
                 <footer className="border-t py-8">
                     <div className="mx-auto max-w-6xl px-4 text-center sm:px-6 lg:px-8">
-                        <p className="text-sm text-muted-foreground">MyFish — Fresh fish, Solomon Islands</p>
+                        <p className="text-sm text-muted-foreground">
+                            MyFish — Fresh fish, Solomon Islands
+                        </p>
                     </div>
                 </footer>
             </div>
