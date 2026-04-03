@@ -4,6 +4,7 @@ import OrderController from "@/actions/App/Http/Controllers/OrderController";
 import Heading from "@/components/heading";
 import InputError from "@/components/input-error";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -184,30 +185,24 @@ export default function CreateOrder({
 
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <input
+              <Checkbox
                 id="filleting"
-                type="checkbox"
                 checked={data.filleting}
-                onChange={(e) => setData("filleting", e.target.checked)}
-                className="h-4 w-4"
+                onCheckedChange={(v) => setData("filleting", v === true)}
               />
               <Label htmlFor="filleting">
-                Filleting (+$
-                {pricing.filleting_fee.toFixed(2)} SBD)
+                Filleting (+${pricing.filleting_fee.toFixed(2)} SBD)
               </Label>
             </div>
 
             <div className="flex items-center gap-3">
-              <input
+              <Checkbox
                 id="delivery"
-                type="checkbox"
                 checked={data.delivery}
-                onChange={(e) => setData("delivery", e.target.checked)}
-                className="h-4 w-4"
+                onCheckedChange={(v) => setData("delivery", v === true)}
               />
               <Label htmlFor="delivery">
-                Delivery (+$
-                {pricing.delivery_fee.toFixed(2)} SBD)
+                Delivery (+${pricing.delivery_fee.toFixed(2)} SBD)
               </Label>
             </div>
 
