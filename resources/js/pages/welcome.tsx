@@ -1,129 +1,103 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, usePage } from "@inertiajs/react";
 
-import { ConversationalOrderFlow } from '@/components/orders/ConversationalOrderFlow';
-import { WeightConverterDialog } from '@/components/WeightConverterDialog';
-import { Button } from '@/components/ui/button';
-import { dashboard, login, register } from '@/routes';
+import { ConversationalOrderFlow } from "@/components/orders/ConversationalOrderFlow";
+import { DotPattern } from "@/components/ui/dot-pattern";
+import { WelcomeClients } from "@/components/welcome/clients";
+import { WelcomeFooter } from "@/components/welcome/footer";
+import { WelcomeHeader } from "@/components/welcome/header";
+import { WelcomeReviews } from "@/components/welcome/reviews";
+import { cn } from "@/lib/utils";
 
 type FishType = { id: number; name: string; price_per_pound: number | null };
+
 type Pricing = {
-    price_per_pound: number;
-    filleting_fee: number;
-    delivery_fee: number;
-    kg_to_lbs_rate: number;
+  price_per_pound: number;
+  filleting_fee: number;
+  delivery_fee: number;
+  kg_to_lbs_rate: number;
 };
+
 type Discount = {
-    mode: 'off' | 'fixed' | 'percent';
-    fixed_sbd: number;
-    percent: number;
-    max_sbd: number | null;
-    min_order_sbd: number | null;
+  mode: "off" | "fixed" | "percent";
+  fixed_sbd: number;
+  percent: number;
+  max_sbd: number | null;
+  min_order_sbd: number | null;
 };
 
 type Tax = {
-    mode: 'off' | 'percent';
-    percent: number;
-    label: string;
+  mode: "off" | "percent";
+  percent: number;
+  label: string;
 };
+
 type AuthUser = {
-    id: number;
-    name: string;
-    email: string;
-    phone: string | null;
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
 } | null;
 
 export default function Welcome({
-    fishTypes,
-    pricing,
-    discount,
-    tax,
-    canRegister = true,
+  fishTypes,
+  pricing,
+  discount,
+  tax,
+  canRegister = true,
 }: {
-    fishTypes: FishType[];
-    pricing: Pricing;
-    discount: Discount;
-    tax: Tax;
-    canRegister?: boolean;
+  fishTypes: FishType[];
+  pricing: Pricing;
+  discount: Discount;
+  tax: Tax;
+  canRegister?: boolean;
 }) {
-    const { auth } = usePage<{ auth: { user: AuthUser } }>().props;
-    const isLoggedIn = Boolean(auth?.user);
+  const { auth } = usePage<{ auth: { user: AuthUser } }>().props;
+  const isLoggedIn = Boolean(auth?.user);
 
-    return (
-        <>
-            <Head title="Place an order — MyFish">
-                <meta
-                    name="description"
-                    content="Order fresh fish online in Solomon Islands. Filleting and delivery available."
-                />
-            </Head>
+  return (
+    <>
+      <Head title="Place an order — MyFish">
+        <meta
+          name="description"
+          content="Order fresh fish online in Solomon Islands. Filleting and delivery available."
+        />
+      </Head>
 
-            <div className="min-h-screen bg-background">
-                <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                    <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-                        <span className="text-xl font-bold tracking-tight text-primary sm:text-2xl">
-                            MyFish
-                        </span>
-                        <nav className="flex items-center gap-2 sm:gap-3">
-                            {isLoggedIn ? (
-                                <Button asChild size="sm">
-                                    <Link href={dashboard()}>Dashboard</Link>
-                                </Button>
-                            ) : (
-                                <>
-                                    <Button variant="ghost" size="sm" asChild>
-                                        <Link href={login()}>Log in</Link>
-                                    </Button>
-                                    {canRegister && (
-                                        <Button size="sm" asChild>
-                                            <Link href={register()}>
-                                                Register
-                                            </Link>
-                                        </Button>
-                                    )}
-                                </>
-                            )}
-                        </nav>
-                    </div>
-                </header>
+      <div className="relative flex min-h-screen flex-col bg-background overflow-hidden">
+        <DotPattern
+          className={cn(
+            "[mask-image:radial-gradient(300px_circle_at_center,white,transparent)]"
+          )}
+        />
 
-                <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-                    <div className="mb-6 sm:mb-8">
-                        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                            Place an order
-                        </h1>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                            Fresh fish, Solomon Islands
-                        </p>
-                    </div>
+        <WelcomeHeader isLoggedIn={isLoggedIn} canRegister={canRegister} />
 
-                    <ConversationalOrderFlow
-                        fishTypes={fishTypes}
-                        pricing={pricing}
-                        discount={discount}
-                        tax={tax}
-                        authenticatedContact={
-                            auth?.user
-                                ? {
-                                      name: auth.user.name,
-                                      email: auth.user.email,
-                                      phone: auth.user.phone,
-                                  }
-                                : undefined
-                        }
-                    />
-                </main>
+        <main className="mx-auto w-full max-w-5xl grow px-4 py-16 sm:px-6 sm:py-24 lg:px-8 lg:py-32">
+          <div className="relative rounded-xl bg-background">
+            <ConversationalOrderFlow
+              fishTypes={fishTypes}
+              pricing={pricing}
+              discount={discount}
+              tax={tax}
+              authenticatedContact={
+                auth?.user
+                  ? {
+                      name: auth.user.name,
+                      email: auth.user.email,
+                      phone: auth.user.phone,
+                    }
+                  : undefined
+              }
+            />
+          </div>
 
-                <footer className="border-t py-8">
-                    <div className="mx-auto max-w-6xl px-4 text-center sm:px-6 lg:px-8">
-                        <p className="text-sm text-muted-foreground">
-                            MyFish — Fresh fish, Solomon Islands
-                        </p>
-                        <div className="mt-2">
-                            <WeightConverterDialog kgToLbsRate={pricing.kg_to_lbs_rate} />
-                        </div>
-                    </div>
-                </footer>
-            </div>
-        </>
-    );
+          <WelcomeClients />
+
+          <WelcomeReviews />
+        </main>
+
+        <WelcomeFooter kgToLbsRate={pricing.kg_to_lbs_rate} />
+      </div>
+    </>
+  );
 }
