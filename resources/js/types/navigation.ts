@@ -1,5 +1,5 @@
-import type { InertiaLinkProps } from '@inertiajs/react';
 import type { IconSvgElement } from '@hugeicons/react';
+import type { InertiaLinkProps } from '@inertiajs/react';
 
 export type BreadcrumbItem = {
     title: string;
