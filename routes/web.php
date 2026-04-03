@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuestOrderController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -10,6 +11,9 @@ Route::get('/', WelcomeController::class)->name('home');
 
 Route::post('orders/guest', [GuestOrderController::class, 'store'])->name('guest-orders.store');
 Route::get('orders/guest/{order}', [GuestOrderController::class, 'show'])->name('guest-orders.show');
+
+Route::get('reviews/{order}', [ReviewController::class, 'show'])->name('reviews.show')->middleware('signed');
+Route::post('reviews/{order}', [ReviewController::class, 'store'])->name('reviews.store')->middleware('signed');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');

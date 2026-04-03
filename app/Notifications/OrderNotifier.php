@@ -30,6 +30,7 @@ final class OrderNotifier
 
         if ($newStatus === 'delivered') {
             $this->sendReceipt($order);
+            $this->sendReviewInvite($order);
         }
     }
 
@@ -42,6 +43,20 @@ final class OrderNotifier
         } elseif ($order->guest_email) {
             Notification::route('mail', $order->guest_email)
                 ->notify(new InvoiceNotification($order));
+        }
+    }
+
+    public function sendReviewInvite(Order $order): void
+    {
+        if ($order->review()->exists()) {
+            return;
+        }
+
+        if ($order->user) {
+            $order->user->notify(new ReviewInviteNotification($order));
+        } elseif ($order->guest_email) {
+            Notification::route('mail', $order->guest_email)
+                ->notify(new ReviewInviteNotification($order));
         }
     }
 

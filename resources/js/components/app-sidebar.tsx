@@ -7,6 +7,7 @@ import {
   Package01Icon,
   Settings02Icon,
   ShoppingBag01Icon,
+  StarIcon,
 } from "@hugeicons/core-free-icons";
 import { Link, usePage } from "@inertiajs/react";
 
@@ -26,6 +27,7 @@ import {
 } from "@/components/ui/sidebar";
 import { dashboard } from "@/routes";
 import { edit as editBusiness } from "@/routes/admin/business";
+import { index as reviewsIndex } from "@/routes/admin/reviews";
 import type { NavItem } from "@/types";
 
 const userNavItems: NavItem[] = [
@@ -66,6 +68,11 @@ const adminNavItems: NavItem[] = [
     title: "Business",
     href: editBusiness(),
     icon: Building04Icon,
+  },
+  {
+    title: "Reviews",
+    href: reviewsIndex(),
+    icon: StarIcon,
   },
   {
     title: "Reports",

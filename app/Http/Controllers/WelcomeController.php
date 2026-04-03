@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\FishType;
+use App\Models\Review;
 use App\Values\DiscountConfig;
 use App\Values\PricingConfig;
 use App\Values\TaxConfig;
@@ -28,6 +29,11 @@ class WelcomeController extends Controller
             'discount' => DiscountConfig::current()->toInertiaProps(),
             'tax' => TaxConfig::current()->toInertiaProps(),
             'canRegister' => Features::enabled(Features::registration()),
+            'reviews' => Review::latest()->limit(10)->get(['id', 'reviewer_name', 'rating', 'comment', 'created_at']),
+            'reviewStats' => [
+                'average' => round((float) Review::avg('rating'), 1),
+                'total' => Review::count(),
+            ],
         ]);
     }
 }

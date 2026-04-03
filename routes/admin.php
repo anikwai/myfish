@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PricingController;
 use App\Http\Controllers\Admin\ReportingController;
+use App\Http\Controllers\Admin\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -22,6 +23,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('fish-types', [FishTypeController::class, 'index'])->name('fish-types.index');
     Route::post('fish-types', [FishTypeController::class, 'store'])->name('fish-types.store');
     Route::patch('fish-types/{fishType}', [FishTypeController::class, 'update'])->name('fish-types.update');
+
+    Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
 
 Route::middleware(['auth', 'verified', 'role:admin|staff'])->prefix('admin')->name('admin.')->group(function () {

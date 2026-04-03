@@ -31,6 +31,19 @@ type Tax = {
   label: string;
 };
 
+type ReviewItem = {
+  id: number;
+  reviewer_name: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+};
+
+type ReviewStats = {
+  average: number;
+  total: number;
+};
+
 type AuthUser = {
   id: number;
   name: string;
@@ -44,12 +57,16 @@ export default function Welcome({
   discount,
   tax,
   canRegister = true,
+  reviews,
+  reviewStats,
 }: {
   fishTypes: FishType[];
   pricing: Pricing;
   discount: Discount;
   tax: Tax;
   canRegister?: boolean;
+  reviews: ReviewItem[];
+  reviewStats: ReviewStats;
 }) {
   const { auth } = usePage<{ auth: { user: AuthUser } }>().props;
   const isLoggedIn = Boolean(auth?.user);
@@ -93,7 +110,7 @@ export default function Welcome({
 
           <WelcomeClients />
 
-          <WelcomeReviews />
+          <WelcomeReviews reviews={reviews} stats={reviewStats} />
         </main>
 
         <WelcomeFooter kgToLbsRate={pricing.kg_to_lbs_rate} />
