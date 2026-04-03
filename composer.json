@@ -59,6 +59,9 @@
         "lint:check": [
             "pint --parallel --test"
         ],
+        "wayfinder:generate": [
+            "@php artisan wayfinder:generate --with-form --no-interaction"
+        ],
         "ci:check": [
             "Composer\\Config::disableProcessTimeout",
             "npm run lint:check",
