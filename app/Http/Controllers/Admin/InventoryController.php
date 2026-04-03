@@ -22,7 +22,7 @@ class InventoryController extends Controller
             ->with('user:id,name')
             ->latest('created_at')
             ->limit(50)
-            ->get();
+            ->get(['id', 'user_id', 'type', 'delta_kg', 'reason', 'created_at']);
 
         $lastAdjustment = $adjustments->first();
         $stockKg = (float) $inventory->stock_kg;
