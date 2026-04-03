@@ -9,7 +9,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import InputError from "@/components/input-error";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { store } from "@/routes/reviews";
 
 type Order = {
   id: number;
@@ -57,9 +56,11 @@ function StarPicker({
 export default function Review({
   order,
   already_reviewed,
+  store_url,
 }: {
   order: Order;
   already_reviewed: boolean;
+  store_url: string;
 }) {
   const { props } = usePage<{ flash: { status?: string } }>();
   const submitted =
@@ -72,7 +73,7 @@ export default function Review({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    post(store.url({ order: order.id }), { preserveScroll: true });
+    post(store_url, { preserveScroll: true });
   }
 
   return (

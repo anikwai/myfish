@@ -6,6 +6,7 @@ use App\Http\Requests\StoreReviewRequest;
 use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,12 +16,15 @@ class ReviewController extends Controller
     {
         abort_unless($request->hasValidSignature(), 403);
 
+        $expires = now()->addDays(30);
+
         return Inertia::render('orders/review', [
             'order' => [
                 'id' => $order->id,
                 'customer_name' => $order->customerName(),
             ],
             'already_reviewed' => $order->review()->exists(),
+            'store_url' => URL::temporarySignedRoute('reviews.store', $expires, ['order' => $order->id]),
         ]);
     }
 
@@ -42,7 +46,6 @@ class ReviewController extends Controller
             'reviewer_name' => $reviewerName,
         ]);
 
-        return redirect()->route('reviews.show', $order)
-            ->with('status', 'review-submitted');
+        return redirect()->back()->with('status', 'review-submitted');
     }
 }
