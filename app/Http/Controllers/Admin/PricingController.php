@@ -39,10 +39,12 @@ class PricingController extends Controller
         DiscountConfig::saveFromValidated($data);
         TaxConfig::saveFromValidated($data);
 
+        $validIds = FishType::pluck('id')->all();
+
         foreach ($data['species_prices'] ?? [] as $fishTypeId => $price) {
             $id = (int) $fishTypeId;
 
-            if ($id < 1 || ! FishType::query()->whereKey($id)->exists()) {
+            if ($id < 1 || ! in_array($id, $validIds, true)) {
                 continue;
             }
 
