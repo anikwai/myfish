@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable(['user_id', 'order_id', 'type', 'delta_kg', 'reason'])]
 class InventoryAdjustment extends Model
 {
-    const UPDATED_AT = null;
+    public const UPDATED_AT = null;
 
     /**
      * @return array<string, string>
