@@ -22,7 +22,7 @@ final class FishOrderLinesCalculator
         foreach ($items as $item) {
             $fishType = $fishTypes->get((int) $item['fish_type_id']);
             if ($fishType === null) {
-                throw new \InvalidArgumentException('Unknown fish_type_id '.$item['fish_type_id']);
+                throw new \InvalidArgumentException("Unknown fish_type_id {$item['fish_type_id']}");
             }
 
             $pricePerPound = $fishType->effectivePrice((float) $pricing->pricePerPound);
