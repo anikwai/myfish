@@ -15,14 +15,4 @@ return new class extends Migration
             $table->decimal('tax_sbd', 10, 2)->default(0);
         });
     }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('tax_sbd');
-        });
-    }
 };

@@ -15,14 +15,4 @@ return new class extends Migration
             $table->string('string_value', 255)->nullable();
         });
     }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('settings', function (Blueprint $table) {
-            $table->dropColumn('string_value');
-        });
-    }
 };

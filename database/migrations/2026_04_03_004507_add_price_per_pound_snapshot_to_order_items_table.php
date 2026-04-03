@@ -20,14 +20,4 @@ return new class extends Migration
             'price_per_pound_snapshot' => DB::raw('(select o.price_per_pound_snapshot from orders o where o.id = order_items.order_id)'),
         ]);
     }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('order_items', function (Blueprint $table) {
-            $table->dropColumn('price_per_pound_snapshot');
-        });
-    }
 };

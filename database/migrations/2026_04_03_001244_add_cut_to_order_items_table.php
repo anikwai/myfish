@@ -15,14 +15,4 @@ return new class extends Migration
             $table->string('cut')->nullable()->after('fish_type_id');
         });
     }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('order_items', function (Blueprint $table): void {
-            $table->dropColumn('cut');
-        });
-    }
 };

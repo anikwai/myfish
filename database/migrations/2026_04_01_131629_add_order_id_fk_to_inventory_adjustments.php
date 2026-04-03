@@ -15,14 +15,4 @@ return new class extends Migration
             $table->foreign('order_id')->references('id')->on('orders')->nullOnDelete();
         });
     }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('inventory_adjustments', function (Blueprint $table) {
-            $table->dropForeign(['order_id']);
-        });
-    }
 };

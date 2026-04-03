@@ -15,14 +15,4 @@ return new class extends Migration
             $table->string('tax_label_snapshot', 100)->nullable();
         });
     }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('tax_label_snapshot');
-        });
-    }
 };

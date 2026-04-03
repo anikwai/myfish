@@ -15,14 +15,4 @@ return new class extends Migration
             $table->decimal('kg_to_lbs_rate_snapshot', 10, 5)->default(2.20462)->after('quantity_pounds');
         });
     }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('order_items', function (Blueprint $table) {
-            $table->dropColumn('kg_to_lbs_rate_snapshot');
-        });
-    }
 };

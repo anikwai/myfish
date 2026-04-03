@@ -16,15 +16,4 @@ return new class extends Migration
             $table->index('guest_email');
         });
     }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropIndex(['guest_email']);
-            $table->dropColumn('guest_email');
-        });
-    }
 };

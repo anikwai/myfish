@@ -15,14 +15,4 @@ return new class extends Migration
             $table->decimal('price_per_pound', 10, 2)->nullable()->after('is_active');
         });
     }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('fish_types', function (Blueprint $table) {
-            $table->dropColumn('price_per_pound');
-        });
-    }
 };

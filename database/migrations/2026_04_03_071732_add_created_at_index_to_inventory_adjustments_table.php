@@ -15,14 +15,4 @@ return new class extends Migration
             $table->index('created_at');
         });
     }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('inventory_adjustments', function (Blueprint $table): void {
-            $table->dropIndex(['created_at']);
-        });
-    }
 };
