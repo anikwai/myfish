@@ -1,6 +1,10 @@
 import { Head, useForm, usePage } from "@inertiajs/react";
 import { useState } from "react";
-import { StarIcon, StarOffIcon } from "@hugeicons/core-free-icons";
+import {
+  StarHalfIcon,
+  StarIcon,
+  StarOffIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import InputError from "@/components/input-error";
 import { Button } from "@/components/ui/button";
