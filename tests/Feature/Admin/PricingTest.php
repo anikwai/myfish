@@ -226,6 +226,19 @@ test('pricing update requires positive numeric values', function (): void {
         ->assertSessionHasErrors(['price_per_pound', 'filleting_fee', 'delivery_fee', 'kg_to_lbs_rate']);
 });
 
+test('kg_to_lbs_rate must be greater than zero', function (): void {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->patch(route('admin.pricing.update'), [
+            'price_per_pound' => 25.00,
+            'filleting_fee' => 10.00,
+            'delivery_fee' => 5.00,
+            'kg_to_lbs_rate' => 0,
+        ])
+        ->assertSessionHasErrors(['kg_to_lbs_rate']);
+});
+
 test('clients cannot update pricing settings', function (): void {
     $client = User::factory()->client()->create();
 
