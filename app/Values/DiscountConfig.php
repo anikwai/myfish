@@ -107,7 +107,7 @@ final readonly class DiscountConfig
         ) {
             $v = $data[$inputKey] ?? null;
             if ($v === null || $v === '') {
-                Setting::query()->where('key', $settingKey)->delete();
+                Setting::remove($settingKey);
             } else {
                 Setting::set($settingKey, (float) $v);
             }

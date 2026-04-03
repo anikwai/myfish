@@ -78,7 +78,7 @@ final readonly class TaxConfig
         if (array_key_exists('tax_label', $data)) {
             $labelInput = trim((string) $data['tax_label']);
             if ($labelInput === '') {
-                Setting::query()->where('key', 'tax_label')->delete();
+                Setting::remove('tax_label');
             } else {
                 Setting::setString('tax_label', mb_substr($labelInput, 0, 100));
             }
