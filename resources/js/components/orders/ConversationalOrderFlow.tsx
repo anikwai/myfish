@@ -1,6 +1,7 @@
+import { CheckmarkCircle02Icon, MinusSignIcon, PlusSignIcon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { useForm } from '@inertiajs/react';
-import { CheckCircle2, Minus, Plus } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import GuestOrderController from '@/actions/App/Http/Controllers/GuestOrderController';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
@@ -11,8 +12,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import {
+    buildOrderPricingPreview,
+    type OrderPricingPreviewDiscount,
+    type OrderPricingPreviewTax,
+} from '@/lib/order-pricing-preview';
+import { cn } from '@/lib/utils';
 
-type FishType = { id: number; name: string };
+type FishType = { id: number; name: string; price_per_pound: number | null };
 type Pricing = {
     price_per_pound: number;
     filleting_fee: number;
@@ -24,8 +31,9 @@ type AuthenticatedContact = {
     email: string;
     phone: string | null;
 };
+type Cut = 'whole' | 'fillet' | 'steak';
 type FormData = {
-    items: { fish_type_id: number; quantity_kg: string }[];
+    items: { fish_type_id: number; quantity_kg: string; cut: Cut }[];
     filleting: boolean;
     delivery: boolean;
     delivery_location: string;
@@ -34,10 +42,13 @@ type FormData = {
     guest_phone: string;
 };
 type Step = 0 | 1 | 2 | 3;
+type OrderingFor = 'individual' | 'business';
 
 export interface ConversationalOrderFlowProps {
     fishTypes: FishType[];
     pricing: Pricing;
+    discount: OrderPricingPreviewDiscount;
+    tax: OrderPricingPreviewTax;
     authenticatedContact?: AuthenticatedContact;
 }
 
@@ -57,7 +68,7 @@ function StepChip({
             className="animate-in fade-in slide-in-from-top-2 duration-200 motion-reduce:animate-none flex w-full items-center justify-between rounded-lg border bg-muted/50 px-4 py-3 text-sm transition-colors hover:bg-muted"
         >
             <div className="flex min-w-0 items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
+                <HugeiconsIcon icon={CheckmarkCircle02Icon} size={16} className="shrink-0 text-primary" />
                 <span className="shrink-0 text-muted-foreground">{stepName}:</span>
                 <span className="truncate font-medium">{label}</span>
             </div>
@@ -66,54 +77,39 @@ function StepChip({
     );
 }
 
-function PricingSummary({
-    fishTypes,
-    data,
-    pricing,
-}: {
-    fishTypes: FishType[];
-    data: FormData;
-    pricing: Pricing;
-}) {
-    const lines = data.items
-        .filter((item) => parseFloat(item.quantity_kg) > 0)
-        .map((item) => {
-            const ft = fishTypes.find((f) => f.id === item.fish_type_id);
-            const kg = parseFloat(item.quantity_kg);
-            const sub = kg * pricing.kg_to_lbs_rate * pricing.price_per_pound;
-
-            return { name: ft?.name ?? '—', sub };
-        });
-
-    const fishSubtotal = lines.reduce((s, l) => s + l.sub, 0);
-    const filletingCharge = data.filleting ? pricing.filleting_fee : 0;
-    const deliveryCharge = data.delivery ? pricing.delivery_fee : 0;
-    const grandTotal = fishSubtotal + filletingCharge + deliveryCharge;
-
+function PricingSummary({ preview }: { preview: ReturnType<typeof buildOrderPricingPreview> }) {
     return (
         <div className="space-y-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Order summary</p>
             <div className="space-y-1">
-                {lines.length > 0 ? (
-                    lines.map((l, i) => (
+                {preview.fishLines.length > 0 ? (
+                    preview.fishLines.map((l, i) => (
                         <div key={i} className="flex justify-between text-sm">
                             <span className="text-muted-foreground">{l.name}</span>
-                            <span className="font-mono">${l.sub.toFixed(2)}</span>
+                            <span className="font-mono">${l.subtotalSbd.toFixed(2)}</span>
                         </div>
                     ))
                 ) : (
                     <p className="text-sm text-muted-foreground">No fish selected</p>
                 )}
-                {filletingCharge > 0 && (
+                {preview.adjustments.map((adj) => (
+                    <div key={adj.code} className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">{adj.label}</span>
+                        <span className="font-mono">+${adj.amountSbd.toFixed(2)}</span>
+                    </div>
+                ))}
+                {preview.discountSbd > 0 && (
                     <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Filleting</span>
-                        <span className="font-mono">+${filletingCharge.toFixed(2)}</span>
+                        <span className="text-muted-foreground">Discount</span>
+                        <span className="font-mono text-emerald-700 dark:text-emerald-400">
+                            −${preview.discountSbd.toFixed(2)}
+                        </span>
                     </div>
                 )}
-                {deliveryCharge > 0 && (
+                {preview.taxSbd > 0 && (
                     <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Delivery</span>
-                        <span className="font-mono">+${deliveryCharge.toFixed(2)}</span>
+                        <span className="text-muted-foreground">{preview.taxLabel}</span>
+                        <span className="font-mono">+${preview.taxSbd.toFixed(2)}</span>
                     </div>
                 )}
             </div>
@@ -121,25 +117,12 @@ function PricingSummary({
             <div className="flex items-baseline justify-between">
                 <span className="font-semibold">Total</span>
                 <span className="font-mono text-xl font-bold text-primary">
-                    ${grandTotal.toFixed(2)}{' '}
+                    ${preview.grandTotalSbd.toFixed(2)}{' '}
                     <span className="text-xs font-normal text-muted-foreground">SBD</span>
                 </span>
             </div>
             <Separator />
-            <div className="space-y-1 text-xs text-muted-foreground">
-                <div className="flex justify-between">
-                    <span>Price per pound</span>
-                    <span>${pricing.price_per_pound.toFixed(2)} SBD</span>
-                </div>
-                <div className="flex justify-between">
-                    <span>Filleting fee</span>
-                    <span>${pricing.filleting_fee.toFixed(2)} SBD</span>
-                </div>
-                <div className="flex justify-between">
-                    <span>Delivery fee</span>
-                    <span>${pricing.delivery_fee.toFixed(2)} SBD</span>
-                </div>
-            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">{preview.ratesExplainer}</p>
         </div>
     );
 }
@@ -151,13 +134,17 @@ const STEP_ANNOUNCEMENTS: Record<Step, string> = {
     3: 'Step 4 of 4: Review your order',
 };
 
-export function ConversationalOrderFlow({ fishTypes, pricing, authenticatedContact }: ConversationalOrderFlowProps) {
+export function ConversationalOrderFlow({ fishTypes, pricing, discount, tax, authenticatedContact }: ConversationalOrderFlowProps) {
     const [activeStep, setActiveStep] = useState<Step>(0);
+    const [orderingFor, setOrderingFor] = useState<OrderingFor>('individual');
+    const [selectedFishIds, setSelectedFishIds] = useState<number[]>([]);
     const activeCardRef = useRef<HTMLDivElement>(null);
     const liveRegionRef = useRef<HTMLDivElement>(null);
 
+    const increment = orderingFor === 'individual' ? 0.5 : 1;
+
     const { data, setData, post, transform, processing, errors } = useForm<FormData>({
-        items: fishTypes.map((ft) => ({ fish_type_id: ft.id, quantity_kg: '' })),
+        items: fishTypes.map((ft) => ({ fish_type_id: ft.id, quantity_kg: '', cut: 'whole' satisfies Cut })),
         filleting: false,
         delivery: false,
         delivery_location: '',
@@ -168,14 +155,21 @@ export function ConversationalOrderFlow({ fishTypes, pricing, authenticatedConta
 
     const isLoggedIn = authenticatedContact !== undefined;
 
-    const fishSubtotal = data.items.reduce((sum, item) => {
-        const kg = parseFloat(item.quantity_kg) || 0;
+    const pricingPreview = useMemo(
+        () =>
+            buildOrderPricingPreview({
+                fishTypes,
+                pricing,
+                discount,
+                tax,
+                items: data.items,
+                filleting: data.filleting,
+                delivery: data.delivery,
+            }),
+        [fishTypes, pricing, discount, tax, data.items, data.filleting, data.delivery],
+    );
 
-        return sum + kg * pricing.kg_to_lbs_rate * pricing.price_per_pound;
-    }, 0);
-    const filletingCharge = data.filleting ? pricing.filleting_fee : 0;
-    const deliveryCharge = data.delivery ? pricing.delivery_fee : 0;
-    const grandTotal = fishSubtotal + filletingCharge + deliveryCharge;
+    const grandTotal = pricingPreview.grandTotalSbd;
 
     const hasItems = data.items.some((item) => parseFloat(item.quantity_kg) > 0);
     const deliveryLocationFilled = !data.delivery || data.delivery_location.trim().length > 0;
@@ -189,8 +183,9 @@ export function ConversationalOrderFlow({ fishTypes, pricing, authenticatedConta
             .filter((i) => parseFloat(i.quantity_kg) > 0)
             .map((i) => {
                 const ft = fishTypes.find((f) => f.id === i.fish_type_id);
+                const cutSuffix = i.cut && i.cut !== 'whole' ? ` (${i.cut})` : '';
 
-                return `${ft?.name} ${i.quantity_kg}kg`;
+                return `${ft?.name}${cutSuffix} ${i.quantity_kg}kg`;
             })
             .join(' · ');
     }
@@ -216,6 +211,30 @@ parts.push(`Delivery to ${data.delivery_location}`);
         return `${name} · ${email}`;
     }
 
+    function setCut(index: number, cut: Cut) {
+        const updated = [...data.items];
+        updated[index] = { ...updated[index], cut };
+        setData('items', updated);
+    }
+
+    function toggleFish(id: number) {
+        const isSelected = selectedFishIds.includes(id);
+
+        if (isSelected) {
+            const idx = fishTypes.findIndex((f) => f.id === id);
+
+            if (idx !== -1) {
+                const updated = [...data.items];
+                updated[idx] = { ...updated[idx], quantity_kg: '' };
+                setData('items', updated);
+            }
+
+            setSelectedFishIds((prev) => prev.filter((x) => x !== id));
+        } else {
+            setSelectedFishIds((prev) => [...prev, id]);
+        }
+    }
+
     function adjustQuantity(index: number, delta: number) {
         const updated = [...data.items];
         const current = parseFloat(updated[index].quantity_kg) || 0;
@@ -230,6 +249,7 @@ parts.push(`Delivery to ${data.delivery_location}`);
         }
 
         const card = activeCardRef.current;
+
         if (!card) {
             return;
         }
@@ -302,49 +322,126 @@ parts.push(`Delivery to ${data.delivery_location}`);
 
                             {/* Step 0: Fish selection */}
                             {activeStep === 0 && (
-                                <div className="space-y-4">
-                                    <div>
-                                        <h2 className="text-base font-semibold">What would you like to order?</h2>
-                                        <p className="text-sm text-muted-foreground">
-                                            Tap + to add kilograms for each fish type.
-                                        </p>
-                                    </div>
+                                <div className="space-y-5">
+                                    {/* Ordering for selector */}
                                     <div className="space-y-2">
-                                        {fishTypes.map((ft, i) => {
-                                            const qty = parseFloat(data.items[i]?.quantity_kg) || 0;
-
-                                            return (
-                                                <div
-                                                    key={ft.id}
-                                                    className="flex items-center justify-between rounded-lg border px-4 py-3"
+                                        <p className="text-xs font-medium text-muted-foreground">Ordering for</p>
+                                        <div className="flex gap-2">
+                                            {(
+                                                [
+                                                    { value: 'individual', label: 'Individual' },
+                                                    { value: 'business', label: 'Business' },
+                                                ] as { value: OrderingFor; label: string }[]
+                                            ).map(({ value, label }) => (
+                                                <button
+                                                    key={value}
+                                                    type="button"
+                                                    onClick={() => setOrderingFor(value)}
+                                                    className={cn(
+                                                        'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+                                                        orderingFor === value
+                                                            ? 'border-primary bg-primary text-primary-foreground'
+                                                            : 'border-border bg-background text-muted-foreground hover:bg-muted',
+                                                    )}
                                                 >
-                                                    <span className="font-medium">{ft.name}</span>
-                                                    <div className="flex items-center gap-3">
-                                                        <button
-                                                            type="button"
-                                                            disabled={qty <= 0}
-                                                            onClick={() => adjustQuantity(i, -0.5)}
-                                                            className="flex h-8 w-8 items-center justify-center rounded-full border text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30"
-                                                            aria-label={`Decrease ${ft.name} by 0.5 kg`}
-                                                        >
-                                                            <Minus className="h-3.5 w-3.5" />
-                                                        </button>
-                                                        <span className="w-14 text-center text-sm font-medium tabular-nums">
-                                                            {qty > 0 ? `${qty} kg` : '—'}
-                                                        </span>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => adjustQuantity(i, 0.5)}
-                                                            className="flex h-8 w-8 items-center justify-center rounded-full border text-muted-foreground transition-colors hover:bg-muted"
-                                                            aria-label={`Increase ${ft.name} by 0.5 kg`}
-                                                        >
-                                                            <Plus className="h-3.5 w-3.5" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
+                                                    {label}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
+
+                                    <Separator />
+
+                                    {/* Fish chip selector */}
+                                    <div className="space-y-3">
+                                        <div>
+                                            <h2 className="text-base font-semibold">What would you like to order?</h2>
+                                            <p className="text-sm text-muted-foreground">Select the fish you'd like, then set quantities.</p>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {fishTypes.map((ft) => {
+                                                const selected = selectedFishIds.includes(ft.id);
+
+                                                return (
+                                                    <button
+                                                        key={ft.id}
+                                                        type="button"
+                                                        onClick={() => toggleFish(ft.id)}
+                                                        className={cn(
+                                                            'rounded-full border px-4 py-1.5 text-sm font-medium transition-colors',
+                                                            selected
+                                                                ? 'border-primary bg-primary text-primary-foreground'
+                                                                : 'border-border bg-background hover:bg-muted',
+                                                        )}
+                                                    >
+                                                        {ft.name}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* Quantity panel — only for selected fish */}
+                                    {selectedFishIds.length > 0 && (
+                                        <div className="space-y-2">
+                                            <p className="text-xs font-medium text-muted-foreground">Quantities</p>
+                                            {selectedFishIds.map((id) => {
+                                                const ft = fishTypes.find((f) => f.id === id);
+                                                const idx = fishTypes.findIndex((f) => f.id === id);
+                                                const qty = parseFloat(data.items[idx]?.quantity_kg) || 0;
+                                                const cut = data.items[idx]?.cut ?? 'whole';
+
+                                                return (
+                                                    <div key={id} className="rounded-lg border px-4 py-3 space-y-3">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="font-medium">{ft?.name}</span>
+                                                            <div className="flex items-center gap-3">
+                                                                <button
+                                                                    type="button"
+                                                                    disabled={qty <= 0}
+                                                                    onClick={() => adjustQuantity(idx, -increment)}
+                                                                    className="flex h-8 w-8 items-center justify-center rounded-full border text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30"
+                                                                    aria-label={`Decrease ${ft?.name} by ${increment} kg`}
+                                                                >
+                                                                    <HugeiconsIcon icon={MinusSignIcon} size={14} />
+                                                                </button>
+                                                                <span className="w-16 text-center text-sm font-medium tabular-nums">
+                                                                    {qty > 0 ? `${qty} kg` : '—'}
+                                                                </span>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => adjustQuantity(idx, increment)}
+                                                                    className="flex h-8 w-8 items-center justify-center rounded-full border text-muted-foreground transition-colors hover:bg-muted"
+                                                                    aria-label={`Increase ${ft?.name} by ${increment} kg`}
+                                                                >
+                                                                    <HugeiconsIcon icon={PlusSignIcon} size={14} />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-xs text-muted-foreground">Cut:</span>
+                                                            {(['whole', 'fillet', 'steak'] as Cut[]).map((option) => (
+                                                                <button
+                                                                    key={option}
+                                                                    type="button"
+                                                                    onClick={() => setCut(idx, option)}
+                                                                    className={cn(
+                                                                        'rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize transition-colors',
+                                                                        cut === option
+                                                                            ? 'border-primary bg-primary text-primary-foreground'
+                                                                            : 'border-border bg-background text-muted-foreground hover:bg-muted',
+                                                                    )}
+                                                                >
+                                                                    {option}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+
                                     {errors.items && <p className="text-sm text-destructive">{errors.items}</p>}
                                 </div>
                             )}
@@ -421,20 +518,24 @@ parts.push(`Delivery to ${data.delivery_location}`);
                                     </div>
                                     <div className="space-y-3">
                                         <div className="space-y-1.5">
-                                            <Label htmlFor="guest_name">Name</Label>
+                                            <Label htmlFor="guest_name">
+                                                {orderingFor === 'business' ? 'Business name' : 'Name'}
+                                            </Label>
                                             <Input
                                                 id="guest_name"
                                                 value={data.guest_name}
                                                 readOnly={isLoggedIn}
                                                 className={isLoggedIn ? 'bg-muted' : ''}
                                                 onChange={(e) => setData('guest_name', e.target.value)}
-                                                placeholder="Your name"
+                                                placeholder={orderingFor === 'business' ? 'e.g. Pacific Trading Co.' : 'Your name'}
                                                 autoFocus={!isLoggedIn}
                                             />
                                             <InputError message={errors.guest_name} />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <Label htmlFor="guest_email">Email</Label>
+                                            <Label htmlFor="guest_email">
+                                                {orderingFor === 'business' ? 'Contact email' : 'Email'}
+                                            </Label>
                                             <Input
                                                 id="guest_email"
                                                 type="email"
@@ -447,7 +548,9 @@ parts.push(`Delivery to ${data.delivery_location}`);
                                             <InputError message={errors.guest_email} />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <Label htmlFor="guest_phone">Phone</Label>
+                                            <Label htmlFor="guest_phone">
+                                                {orderingFor === 'business' ? 'Contact phone' : 'Phone'}
+                                            </Label>
                                             <Input
                                                 id="guest_phone"
                                                 type="tel"
@@ -482,7 +585,12 @@ parts.push(`Delivery to ${data.delivery_location}`);
 
                                                     return (
                                                         <div key={item.fish_type_id} className="flex justify-between">
-                                                            <span>{ft?.name}</span>
+                                                            <span>
+                                                                {ft?.name}
+                                                                {item.cut && item.cut !== 'whole' && (
+                                                                    <span className="ml-1.5 text-xs capitalize text-muted-foreground">({item.cut})</span>
+                                                                )}
+                                                            </span>
                                                             <span className="font-mono">{item.quantity_kg} kg</span>
                                                         </div>
                                                     );
@@ -554,7 +662,7 @@ parts.push(`Delivery to ${data.delivery_location}`);
                     <div className="sticky top-24">
                         <Card>
                             <CardContent className="pt-6">
-                                <PricingSummary fishTypes={fishTypes} data={data} pricing={pricing} />
+                                <PricingSummary preview={pricingPreview} />
                             </CardContent>
                         </Card>
                     </div>

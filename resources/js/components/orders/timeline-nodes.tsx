@@ -1,4 +1,5 @@
-import { CheckCircle2, Circle, Clock, XCircle } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { CancelCircleIcon, CheckmarkCircle02Icon, CircleIcon, Clock01Icon } from '@hugeicons/core-free-icons';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -29,9 +30,9 @@ function StepNode({ node, showActor }: { node: StageNode; showActor: boolean }) 
     return (
         <div className={`flex items-center gap-2 py-1 ${isFuture ? 'opacity-40' : ''}`}>
             <div className="shrink-0">
-                {node.state === 'completed' && <CheckCircle2 className="h-4 w-4 text-primary" />}
-                {node.state === 'current' && <Clock className="h-4 w-4 animate-pulse text-primary" />}
-                {isFuture && <Circle className="h-4 w-4 text-muted-foreground" />}
+                {node.state === 'completed' && <HugeiconsIcon icon={CheckmarkCircle02Icon} size={16} className="text-primary" />}
+                {node.state === 'current' && <HugeiconsIcon icon={Clock01Icon} size={16} className="animate-pulse text-primary" />}
+                {isFuture && <HugeiconsIcon icon={CircleIcon} size={16} className="text-muted-foreground" />}
             </div>
             <span className="text-sm font-medium">{node.label}</span>
             {node.log && <LogMeta log={node.log} showActor={showActor} />}
@@ -43,7 +44,7 @@ function OnHoldNode({ node, showActor }: { node: StageNode; showActor: boolean }
     return (
         <div className="flex items-center gap-2 py-1">
             <div className="shrink-0">
-                <Clock className="h-4 w-4 text-amber-500" />
+                <HugeiconsIcon icon={Clock01Icon} size={16} className="text-amber-500" />
             </div>
             <span className="text-sm font-medium text-amber-700 dark:text-amber-400">On hold</span>
             {node.log && <LogMeta log={node.log} showActor={showActor} />}
@@ -56,7 +57,7 @@ function RejectedNode({ node, showActor }: { node: StageNode; showActor: boolean
         <div className="py-1">
             <div className="flex items-center gap-2">
                 <div className="shrink-0">
-                    <XCircle className="h-4 w-4 text-destructive" />
+                    <HugeiconsIcon icon={CancelCircleIcon} size={16} className="text-destructive" />
                 </div>
                 <span className="text-sm font-medium text-destructive">Rejected</span>
                 {node.log && <LogMeta log={node.log} showActor={showActor} />}

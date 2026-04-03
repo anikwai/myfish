@@ -4,11 +4,25 @@ import { ConversationalOrderFlow } from '@/components/orders/ConversationalOrder
 import { Button } from '@/components/ui/button';
 import { dashboard, login, register } from '@/routes';
 
-type FishType = { id: number; name: string };
+type FishType = { id: number; name: string; price_per_pound: number | null };
 type Pricing = {
     price_per_pound: number;
     filleting_fee: number;
     delivery_fee: number;
+    kg_to_lbs_rate: number;
+};
+type Discount = {
+    mode: 'off' | 'fixed' | 'percent';
+    fixed_sbd: number;
+    percent: number;
+    max_sbd: number | null;
+    min_order_sbd: number | null;
+};
+
+type Tax = {
+    mode: 'off' | 'percent';
+    percent: number;
+    label: string;
 };
 type AuthUser = {
     id: number;
@@ -20,10 +34,14 @@ type AuthUser = {
 export default function Welcome({
     fishTypes,
     pricing,
+    discount,
+    tax,
     canRegister = true,
 }: {
     fishTypes: FishType[];
     pricing: Pricing;
+    discount: Discount;
+    tax: Tax;
     canRegister?: boolean;
 }) {
     const { auth } = usePage<{ auth: { user: AuthUser } }>().props;
@@ -72,6 +90,8 @@ export default function Welcome({
                     <ConversationalOrderFlow
                         fishTypes={fishTypes}
                         pricing={pricing}
+                        discount={discount}
+                        tax={tax}
                         authenticatedContact={
                             auth?.user
                                 ? {

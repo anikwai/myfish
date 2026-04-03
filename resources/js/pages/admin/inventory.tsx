@@ -19,10 +19,12 @@ import InventoryController from '@/actions/App/Http/Controllers/Admin/InventoryC
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import { index } from '@/routes/admin/inventory';
@@ -36,26 +38,27 @@ type Adjustment = {
     user: { id: number; name: string };
 };
 
+type LastAdjustment = {
+    user_name: string | null;
+    created_at: string;
+} | null;
+
+// ── Sort icon ────────────────────────────────────────────────────────────────
+
 function SortIcon({ sorted }: { sorted: false | 'asc' | 'desc' }) {
-    if (sorted === 'asc') {
-        return <HugeiconsIcon icon={SortByDown01Icon} data-icon="inline-end" />;
-    }
-    if (sorted === 'desc') {
-        return <HugeiconsIcon icon={SortByUp01Icon} data-icon="inline-end" />;
-    }
-    return <HugeiconsIcon icon={Sorting01Icon} data-icon="inline-end" />;
+    if (sorted === 'asc') return <HugeiconsIcon icon={SortByDown01Icon} size={14} className="ml-1" />;
+    if (sorted === 'desc') return <HugeiconsIcon icon={SortByUp01Icon} size={14} className="ml-1" />;
+    return <HugeiconsIcon icon={Sorting01Icon} size={14} className="ml-1" />;
 }
+
+// ── Datatable columns ────────────────────────────────────────────────────────
 
 const columns: ColumnDef<Adjustment>[] = [
     {
         accessorKey: 'created_at',
         header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            >
-                Date
-                <SortIcon sorted={column.getIsSorted()} />
+            <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+                Date <SortIcon sorted={column.getIsSorted()} />
             </Button>
         ),
         cell: ({ row }) => (
@@ -67,12 +70,8 @@ const columns: ColumnDef<Adjustment>[] = [
     {
         accessorKey: 'type',
         header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            >
-                Type
-                <SortIcon sorted={column.getIsSorted()} />
+            <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+                Type <SortIcon sorted={column.getIsSorted()} />
             </Button>
         ),
         cell: ({ row }) => <span className="capitalize">{row.original.type}</span>,
@@ -80,22 +79,12 @@ const columns: ColumnDef<Adjustment>[] = [
     {
         accessorKey: 'delta_kg',
         header: ({ column }) => (
-            <Button
-                variant="ghost"
-                className="w-full justify-end"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            >
-                Delta (kg)
-                <SortIcon sorted={column.getIsSorted()} />
+            <Button variant="ghost" className="w-full justify-end" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+                Delta (kg) <SortIcon sorted={column.getIsSorted()} />
             </Button>
         ),
         cell: ({ row }) => (
-            <span
-                className={cn(
-                    'block text-right font-mono',
-                    Number(row.original.delta_kg) >= 0 ? 'text-green-600' : 'text-red-600',
-                )}
-            >
+            <span className={cn('block text-right font-mono', Number(row.original.delta_kg) >= 0 ? 'text-green-600' : 'text-red-600')}>
                 {Number(row.original.delta_kg) > 0 ? '+' : ''}
                 {Number(row.original.delta_kg).toFixed(3)}
             </span>
@@ -111,31 +100,33 @@ const columns: ColumnDef<Adjustment>[] = [
         id: 'user',
         accessorFn: (row) => row.user.name,
         header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            >
-                By
-                <SortIcon sorted={column.getIsSorted()} />
+            <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+                By <SortIcon sorted={column.getIsSorted()} />
             </Button>
         ),
-        cell: ({ getValue }) => (
-            <span className="text-muted-foreground">{getValue() as string}</span>
-        ),
+        cell: ({ getValue }) => <span className="text-muted-foreground">{getValue() as string}</span>,
     },
 ];
+
+// ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Inventory({
     stock_kg,
     stock_pounds,
     adjustments,
+    last_adjustment,
     status,
 }: {
     stock_kg: number;
     stock_pounds: number;
     adjustments: Adjustment[];
+    last_adjustment: LastAdjustment;
     status?: string;
 }) {
+    const [showForm, setShowForm] = useState(false);
+    const [deltaValue, setDeltaValue] = useState('');
+
+    // Datatable state
     const [sorting, setSorting] = useState<SortingState>([{ id: 'created_at', desc: true }]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -156,6 +147,14 @@ export default function Inventory({
         initialState: { pagination: { pageSize: 20 } },
     });
 
+    // Live preview calculation
+    const parsedDelta = parseFloat(deltaValue);
+    const newKg = !isNaN(parsedDelta) && deltaValue !== '' ? stock_kg + parsedDelta : null;
+    const conversionRate = stock_kg > 0 ? stock_pounds / stock_kg : 2.20462;
+    const newPounds = newKg !== null ? newKg * conversionRate : null;
+
+    const PRESETS = [10, 25, 50, -10, -25];
+
     return (
         <>
             <Head title="Inventory" />
@@ -163,81 +162,140 @@ export default function Inventory({
             <div className="space-y-8">
                 <Heading title="Inventory" />
 
-                <div className="grid grid-cols-2 gap-4">
-                    <Card>
-                        <CardHeader className="pb-2">
-                            <CardDescription>Current stock</CardDescription>
-                            <CardTitle className="text-2xl">
-                                {Number(stock_kg).toFixed(3)} kg
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm text-muted-foreground">
-                                {Number(stock_pounds).toFixed(3)} lbs
-                            </p>
-                        </CardContent>
-                    </Card>
+                {/* Hero — current stock */}
+                <Card>
+                    <CardContent className="pt-6">
+                        <div className="flex items-end justify-between gap-4">
+                            <div>
+                                <p className="text-sm text-muted-foreground">Current stock</p>
+                                <p className="text-4xl font-bold tracking-tight">
+                                    {Number(stock_kg).toFixed(3)} kg
+                                </p>
+                                <p className="mt-1 text-lg text-muted-foreground">
+                                    {Number(stock_pounds).toFixed(3)} lbs
+                                </p>
+                            </div>
+                            {last_adjustment && (
+                                <p className="text-right text-sm text-muted-foreground">
+                                    Last adjusted{' '}
+                                    {new Date(last_adjustment.created_at).toLocaleString('en-AU', { hour12: false })}
+                                    {last_adjustment.user_name && (
+                                        <> by <span className="font-medium">{last_adjustment.user_name}</span></>
+                                    )}
+                                </p>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Record adjustment toggle */}
+                <div>
+                    {!showForm ? (
+                        <Button onClick={() => setShowForm(true)}>
+                            + Record Adjustment
+                        </Button>
+                    ) : (
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between">
+                                <CardTitle>Record Adjustment</CardTitle>
+                                <Button variant="ghost" size="sm" onClick={() => { setShowForm(false); setDeltaValue(''); }}>
+                                    Cancel
+                                </Button>
+                            </CardHeader>
+                            <Separator />
+                            <CardContent className="pt-6">
+                            <Form
+                                {...InventoryController.adjust.form()}
+                                options={{ preserveScroll: true }}
+                                className="space-y-4"
+                            >
+                                {({ processing, recentlySuccessful, errors }) => (
+                                    <>
+                                        {/* Presets */}
+                                        <div className="flex flex-wrap gap-2">
+                                            {PRESETS.map((preset) => (
+                                                <Button
+                                                    key={preset}
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => setDeltaValue(String(preset))}
+                                                    className={cn(preset < 0 && 'text-red-600')}
+                                                >
+                                                    {preset > 0 ? `+${preset}` : preset} kg
+                                                </Button>
+                                            ))}
+                                        </div>
+
+                                        <div className="grid gap-4 sm:grid-cols-2">
+                                            <div className="grid gap-2">
+                                                <Label htmlFor="delta_kg">Adjustment (kg)</Label>
+                                                <Input
+                                                    id="delta_kg"
+                                                    type="number"
+                                                    step="0.001"
+                                                    name="delta_kg"
+                                                    placeholder="e.g. 50 or -5"
+                                                    value={deltaValue}
+                                                    onChange={(e) => setDeltaValue(e.target.value)}
+                                                    required
+                                                />
+                                                <InputError message={errors.delta_kg} />
+                                            </div>
+
+                                            <div className="grid gap-2">
+                                                <Label htmlFor="reason">Reason</Label>
+                                                <Input
+                                                    id="reason"
+                                                    name="reason"
+                                                    placeholder="e.g. New stock delivery"
+                                                    required
+                                                />
+                                                <InputError message={errors.reason} />
+                                            </div>
+                                        </div>
+
+                                        {/* Live preview */}
+                                        {newKg !== null && (
+                                            <Alert className={cn(
+                                                newKg < 0
+                                                    ? 'border-red-200 bg-red-50 text-red-700'
+                                                    : 'border-green-200 bg-green-50 text-green-700',
+                                            )}>
+                                                New total:{' '}
+                                                <span className="font-semibold">{newKg.toFixed(3)} kg</span>
+                                                {' / '}
+                                                <span className="font-semibold">{newPounds!.toFixed(3)} lbs</span>
+                                                {newKg < 0 && (
+                                                    <span className="ml-2 font-medium">⚠ Stock cannot go below 0</span>
+                                                )}
+                                            </Alert>
+                                        )}
+
+                                        <div className="flex items-center gap-4">
+                                            <Button disabled={processing || (newKg !== null && newKg < 0)}>
+                                                {processing ? 'Saving...' : 'Apply adjustment'}
+                                            </Button>
+
+                                            <Transition
+                                                show={recentlySuccessful || status === 'inventory-updated'}
+                                                enter="transition ease-in-out"
+                                                enterFrom="opacity-0"
+                                                leave="transition ease-in-out"
+                                                leaveTo="opacity-0"
+                                            >
+                                                <p className="text-sm text-muted-foreground">Saved.</p>
+                                            </Transition>
+                                        </div>
+                                    </>
+                                )}
+                            </Form>
+                            </CardContent>
+                        </Card>
+                    )}
                 </div>
 
-                <div className="space-y-4">
-                    <Heading
-                        variant="small"
-                        title="Manual adjustment"
-                        description="Enter a positive value to add stock, negative to reduce."
-                    />
-
-                    <Form
-                        {...InventoryController.adjust.form()}
-                        options={{ preserveScroll: true }}
-                        className="space-y-4"
-                    >
-                        {({ processing, recentlySuccessful, errors }) => (
-                            <>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="delta_kg">Adjustment (kg)</Label>
-                                    <Input
-                                        id="delta_kg"
-                                        type="number"
-                                        step="0.001"
-                                        name="delta_kg"
-                                        placeholder="e.g. 50 or -5"
-                                        required
-                                    />
-                                    <InputError message={errors.delta_kg} />
-                                </div>
-
-                                <div className="grid gap-2">
-                                    <Label htmlFor="reason">Reason</Label>
-                                    <Input
-                                        id="reason"
-                                        name="reason"
-                                        placeholder="e.g. New stock delivery"
-                                        required
-                                    />
-                                    <InputError message={errors.reason} />
-                                </div>
-
-                                <div className="flex items-center gap-4">
-                                    <Button disabled={processing}>Apply adjustment</Button>
-
-                                    <Transition
-                                        show={
-                                            recentlySuccessful ||
-                                            status === 'inventory-updated'
-                                        }
-                                        enter="transition ease-in-out"
-                                        enterFrom="opacity-0"
-                                        leave="transition ease-in-out"
-                                        leaveTo="opacity-0"
-                                    >
-                                        <p className="text-sm text-neutral-600">Saved</p>
-                                    </Transition>
-                                </div>
-                            </>
-                        )}
-                    </Form>
-                </div>
-
+                {/* Adjustment history */}
                 <div className="space-y-4">
                     <div className="flex items-center justify-between gap-3">
                         <Heading
@@ -260,12 +318,7 @@ export default function Inventory({
                                     <TableRow key={headerGroup.id}>
                                         {headerGroup.headers.map((header) => (
                                             <TableHead key={header.id}>
-                                                {header.isPlaceholder
-                                                    ? null
-                                                    : flexRender(
-                                                          header.column.columnDef.header,
-                                                          header.getContext(),
-                                                      )}
+                                                {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                                             </TableHead>
                                         ))}
                                     </TableRow>
@@ -277,10 +330,7 @@ export default function Inventory({
                                         <TableRow key={row.id}>
                                             {row.getVisibleCells().map((cell) => (
                                                 <TableCell key={cell.id}>
-                                                    {flexRender(
-                                                        cell.column.columnDef.cell,
-                                                        cell.getContext(),
-                                                    )}
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                                 </TableCell>
                                             ))}
                                         </TableRow>
@@ -291,9 +341,7 @@ export default function Inventory({
                                             <Empty>
                                                 <EmptyHeader>
                                                     <EmptyTitle>No adjustments</EmptyTitle>
-                                                    <EmptyDescription>
-                                                        No stock changes match your search.
-                                                    </EmptyDescription>
+                                                    <EmptyDescription>No stock changes match your search.</EmptyDescription>
                                                 </EmptyHeader>
                                             </Empty>
                                         </TableCell>
@@ -310,24 +358,11 @@ export default function Inventory({
                                 {table.getFilteredRowModel().rows.length !== 1 ? 's' : ''}
                             </span>
                             <div className="flex items-center gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => table.previousPage()}
-                                    disabled={!table.getCanPreviousPage()}
-                                >
+                                <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
                                     Previous
                                 </Button>
-                                <span>
-                                    Page {table.getState().pagination.pageIndex + 1} of{' '}
-                                    {table.getPageCount()}
-                                </span>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => table.nextPage()}
-                                    disabled={!table.getCanNextPage()}
-                                >
+                                <span>Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}</span>
+                                <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
                                     Next
                                 </Button>
                             </div>

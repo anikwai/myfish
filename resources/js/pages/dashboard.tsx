@@ -1,6 +1,12 @@
-import { Head, Link } from '@inertiajs/react';
+import { Deferred, Head, Link } from '@inertiajs/react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { PackageDelivered01Icon, PlusSignIcon } from '@hugeicons/core-free-icons';
 import Heading from '@/components/heading';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { dashboard } from '@/routes';
 import { create, index, show } from '@/routes/orders';
 
@@ -32,9 +38,15 @@ const STATUS_COLORS: Record<string, string> = {
 export default function Dashboard({
     recentOrders,
     orderCount,
+    activeOrderCount,
+    totalSpend,
+    activeOrder,
 }: {
     recentOrders: Order[];
     orderCount: number;
+    activeOrderCount: number;
+    totalSpend: number;
+    activeOrder: Order | null;
 }) {
     return (
         <>
@@ -44,17 +56,66 @@ export default function Dashboard({
                 <div className="flex items-center justify-between">
                     <Heading title="Dashboard" />
                     <Button asChild>
-                        <Link href={create()}>Place new order</Link>
+                        <Link href={create()}><HugeiconsIcon icon={PlusSignIcon} size={16} />Place new order</Link>
                     </Button>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="rounded-lg border p-4">
-                        <p className="text-sm text-muted-foreground">Total orders</p>
-                        <p className="mt-1 text-2xl font-semibold">{orderCount}</p>
-                    </div>
+                {/* Active order banner */}
+                <Deferred data="activeOrder" fallback={<Skeleton className="h-20 w-full" />}>
+                    {activeOrder && (
+                        <Card className="border-primary/20 bg-primary/5">
+                            <CardContent className="flex items-center justify-between gap-4">
+                                <div className="flex items-center gap-3">
+                                    <HugeiconsIcon icon={PackageDelivered01Icon} size={20} className="text-primary shrink-0" />
+                                    <div>
+                                        <p className="text-sm font-medium">Order #{activeOrder.id} is in progress</p>
+                                        <p className="text-xs text-muted-foreground">
+                                            ${Number(activeOrder.total_sbd).toFixed(2)} SBD
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <Badge className={STATUS_COLORS[activeOrder.status] ?? 'bg-neutral-100'}>
+                                        {STATUS_LABELS[activeOrder.status] ?? activeOrder.status}
+                                    </Badge>
+                                    <Button asChild size="sm" variant="outline">
+                                        <Link href={show(activeOrder)}>Track order</Link>
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+                </Deferred>
+
+                {/* Stats */}
+                <div className="grid gap-4 sm:grid-cols-3">
+                    <Card size="sm">
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">Total orders</p>
+                            <p className="mt-1 text-2xl font-semibold">{orderCount}</p>
+                        </CardContent>
+                    </Card>
+
+                    <Card size="sm">
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">Active orders</p>
+                            <p className="mt-1 text-2xl font-semibold">{activeOrderCount}</p>
+                        </CardContent>
+                    </Card>
+
+                    <Card size="sm">
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">Total spend</p>
+                            <Deferred data="totalSpend" fallback={<Skeleton className="mt-1 h-8 w-24" />}>
+                                <p className="mt-1 text-2xl font-semibold">
+                                    ${Number(totalSpend).toFixed(2)} <span className="text-sm font-normal text-muted-foreground">SBD</span>
+                                </p>
+                            </Deferred>
+                        </CardContent>
+                    </Card>
                 </div>
 
+                {/* Recent orders */}
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
                         <Heading variant="small" title="Recent orders" />
@@ -66,46 +127,44 @@ export default function Dashboard({
                     {recentOrders.length === 0 ? (
                         <p className="text-sm text-muted-foreground">No orders yet.</p>
                     ) : (
-                        <div className="overflow-x-auto rounded-lg border">
-                            <table className="w-full text-sm">
-                                <thead className="border-b bg-muted/50">
-                                    <tr>
-                                        <th className="px-4 py-2 text-left font-medium">Order</th>
-                                        <th className="px-4 py-2 text-left font-medium">Status</th>
-                                        <th className="px-4 py-2 text-right font-medium">Total (SBD)</th>
-                                        <th className="px-4 py-2 text-left font-medium">Date</th>
-                                        <th className="px-4 py-2" />
-                                    </tr>
-                                </thead>
-                                <tbody>
+                        <div className="overflow-hidden rounded-lg border">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Order</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-right">Total (SBD)</TableHead>
+                                        <TableHead>Date</TableHead>
+                                        <TableHead />
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
                                     {recentOrders.map((order) => (
-                                        <tr key={order.id} className="border-b last:border-0">
-                                            <td className="px-4 py-2">#{order.id}</td>
-                                            <td className="px-4 py-2">
-                                                <span
-                                                    className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[order.status] ?? 'bg-neutral-100'}`}
-                                                >
+                                        <TableRow key={order.id}>
+                                            <TableCell>#{order.id}</TableCell>
+                                            <TableCell>
+                                                <Badge className={STATUS_COLORS[order.status] ?? 'bg-neutral-100'}>
                                                     {STATUS_LABELS[order.status] ?? order.status}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-2 text-right font-mono">
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-right font-mono">
                                                 ${Number(order.total_sbd).toFixed(2)}
-                                            </td>
-                                            <td className="px-4 py-2 text-muted-foreground">
+                                            </TableCell>
+                                            <TableCell className="text-muted-foreground">
                                                 {new Date(order.created_at).toLocaleDateString('en-AU')}
-                                            </td>
-                                            <td className="px-4 py-2">
+                                            </TableCell>
+                                            <TableCell>
                                                 <Link
                                                     href={show(order)}
                                                     className="text-primary underline-offset-4 hover:underline"
                                                 >
                                                     View
                                                 </Link>
-                                            </td>
-                                        </tr>
+                                            </TableCell>
+                                        </TableRow>
                                     ))}
-                                </tbody>
-                            </table>
+                                </TableBody>
+                            </Table>
                         </div>
                     )}
                 </div>

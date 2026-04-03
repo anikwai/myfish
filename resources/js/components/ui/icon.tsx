@@ -1,14 +1,14 @@
-import type { LucideIcon } from 'lucide-react';
+import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react';
 
 interface IconProps {
-    iconNode?: LucideIcon | null;
+    iconNode?: IconSvgElement | null;
     className?: string;
 }
 
-export function Icon({ iconNode: IconComponent, className }: IconProps) {
-    if (!IconComponent) {
+export function Icon({ iconNode, className }: IconProps) {
+    if (!iconNode) {
         return null;
     }
 
-    return <IconComponent className={className} />;
+    return <HugeiconsIcon icon={iconNode} className={className} />;
 }

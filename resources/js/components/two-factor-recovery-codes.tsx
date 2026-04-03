@@ -1,5 +1,6 @@
 import { Form } from '@inertiajs/react';
-import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { EyeIcon, LockPasswordIcon, Refresh01Icon, ViewOffSlashIcon } from '@hugeicons/core-free-icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import AlertError from '@/components/alert-error';
 import { Button } from '@/components/ui/button';
@@ -50,13 +51,13 @@ export default function TwoFactorRecoveryCodes({
         }
     }, [recoveryCodesList.length, fetchRecoveryCodes]);
 
-    const RecoveryCodeIconComponent = codesAreVisible ? EyeOff : Eye;
+    const recoveryCodeIcon = codesAreVisible ? ViewOffSlashIcon : EyeIcon;
 
     return (
         <Card>
             <CardHeader>
                 <CardTitle className="flex gap-3">
-                    <LockKeyhole className="size-4" aria-hidden="true" />
+                    <HugeiconsIcon icon={LockPasswordIcon} size={16} aria-hidden="true" />
                     2FA recovery codes
                 </CardTitle>
                 <CardDescription>
@@ -72,10 +73,7 @@ export default function TwoFactorRecoveryCodes({
                         aria-expanded={codesAreVisible}
                         aria-controls="recovery-codes-section"
                     >
-                        <RecoveryCodeIconComponent
-                            className="size-4"
-                            aria-hidden="true"
-                        />
+                        <HugeiconsIcon icon={recoveryCodeIcon} size={16} aria-hidden="true" />
                         {codesAreVisible ? 'Hide' : 'View'} recovery codes
                     </Button>
 
@@ -92,7 +90,7 @@ export default function TwoFactorRecoveryCodes({
                                     disabled={processing}
                                     aria-describedby="regenerate-warning"
                                 >
-                                    <RefreshCw /> Regenerate codes
+                                    <HugeiconsIcon icon={Refresh01Icon} size={16} /> Regenerate codes
                                 </Button>
                             )}
                         </Form>

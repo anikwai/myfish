@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { useEffect, useRef, useState } from 'react';
+import { Head, InfiniteScroll, Link, router } from '@inertiajs/react';
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -7,13 +7,11 @@ import {
     VisibilityState,
     flexRender,
     getCoreRowModel,
-    getFilteredRowModel,
-    getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
 } from '@tanstack/react-table';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { SortByDown01Icon, SortByUp01Icon, Sorting01Icon } from '@hugeicons/core-free-icons';
+import { PlusSignIcon, SortByDown01Icon, SortByUp01Icon, Sorting01Icon } from '@hugeicons/core-free-icons';
 import AdminOrderController from '@/actions/App/Http/Controllers/Admin/OrderController';
 import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
@@ -49,6 +47,10 @@ type Order = {
     created_at: string;
     guest_name: string | null;
     user: { id: number; name: string } | null;
+};
+
+type PaginatedOrders = {
+    data: Order[];
 };
 
 function SortIcon({ sorted }: { sorted: false | 'asc' | 'desc' }) {
@@ -155,34 +157,54 @@ const columns: ColumnDef<Order>[] = [
 export default function AdminOrders({
     orders,
     filterStatus,
+    search,
     statuses,
 }: {
-    orders: Order[];
+    orders: PaginatedOrders;
     filterStatus: string | null;
+    search: string;
     statuses: string[];
 }) {
     const [sorting, setSorting] = useState<SortingState>([{ id: 'created_at', desc: true }]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-    const [globalFilter, setGlobalFilter] = useState('');
+    const [searchValue, setSearchValue] = useState(search);
+    const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const table = useReactTable({
-        data: orders,
+        data: orders.data,
         columns,
-        state: { sorting, columnFilters, columnVisibility, globalFilter },
+        state: { sorting, columnFilters, columnVisibility },
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         onColumnVisibilityChange: setColumnVisibility,
-        onGlobalFilterChange: setGlobalFilter,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        initialState: { pagination: { pageSize: 20 } },
     });
 
+    useEffect(() => {
+        if (searchTimer.current) {
+            clearTimeout(searchTimer.current);
+        }
+        searchTimer.current = setTimeout(() => {
+            const params: Record<string, string> = {};
+            if (filterStatus) params.status = filterStatus;
+            if (searchValue) params.search = searchValue;
+            router.get(index(), params, { preserveState: true, reset: ['orders'] });
+        }, 300);
+
+        return () => {
+            if (searchTimer.current) {
+                clearTimeout(searchTimer.current);
+            }
+        };
+    }, [searchValue]);
+
     function applyFilter(status: string | null) {
-        router.get(index(), status ? { status } : {}, { preserveState: true });
+        const params: Record<string, string> = {};
+        if (status) params.status = status;
+        if (searchValue) params.search = searchValue;
+        router.get(index(), params, { preserveState: true, reset: ['orders'] });
     }
 
     return (
@@ -194,7 +216,7 @@ export default function AdminOrders({
                     <Heading title="Orders" />
                     <Button asChild variant="outline">
                         <Link href={AdminOrderController.createGuest.url()}>
-                            New guest order
+                            <HugeiconsIcon icon={PlusSignIcon} size={16} />New guest order
                         </Link>
                     </Button>
                 </div>
@@ -224,92 +246,63 @@ export default function AdminOrders({
 
                     <Input
                         placeholder="Search by customer or order #..."
-                        value={globalFilter}
-                        onChange={(e) => setGlobalFilter(e.target.value)}
+                        value={searchValue}
+                        onChange={(e) => setSearchValue(e.target.value)}
                         className="w-64"
                     />
                 </div>
 
-                <div className="overflow-hidden rounded-md border">
-                    <Table>
-                        <TableHeader>
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <TableRow key={headerGroup.id}>
-                                    {headerGroup.headers.map((header) => (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                      header.column.columnDef.header,
-                                                      header.getContext(),
-                                                  )}
-                                        </TableHead>
-                                    ))}
-                                </TableRow>
-                            ))}
-                        </TableHeader>
-                        <TableBody>
-                            {table.getRowModel().rows.length ? (
-                                table.getRowModel().rows.map((row) => (
-                                    <TableRow key={row.id}>
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext(),
-                                                )}
-                                            </TableCell>
+                <InfiniteScroll data="orders">
+                    <div className="overflow-hidden rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                {table.getHeaderGroups().map((headerGroup) => (
+                                    <TableRow key={headerGroup.id}>
+                                        {headerGroup.headers.map((header) => (
+                                            <TableHead key={header.id}>
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : flexRender(
+                                                          header.column.columnDef.header,
+                                                          header.getContext(),
+                                                      )}
+                                            </TableHead>
                                         ))}
                                     </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={columns.length}>
-                                        <Empty>
-                                            <EmptyHeader>
-                                                <EmptyTitle>No orders found</EmptyTitle>
-                                                <EmptyDescription>
-                                                    No orders match the current filter.
-                                                </EmptyDescription>
-                                            </EmptyHeader>
-                                        </Empty>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
-
-                {table.getPageCount() > 1 && (
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>
-                            {table.getFilteredRowModel().rows.length} order
-                            {table.getFilteredRowModel().rows.length !== 1 ? 's' : ''}
-                        </span>
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => table.previousPage()}
-                                disabled={!table.getCanPreviousPage()}
-                            >
-                                Previous
-                            </Button>
-                            <span>
-                                Page {table.getState().pagination.pageIndex + 1} of{' '}
-                                {table.getPageCount()}
-                            </span>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => table.nextPage()}
-                                disabled={!table.getCanNextPage()}
-                            >
-                                Next
-                            </Button>
-                        </div>
+                                ))}
+                            </TableHeader>
+                            <TableBody>
+                                {table.getRowModel().rows.length ? (
+                                    table.getRowModel().rows.map((row) => (
+                                        <TableRow key={row.id}>
+                                            {row.getVisibleCells().map((cell) => (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(
+                                                        cell.column.columnDef.cell,
+                                                        cell.getContext(),
+                                                    )}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={columns.length}>
+                                            <Empty>
+                                                <EmptyHeader>
+                                                    <EmptyTitle>No orders found</EmptyTitle>
+                                                    <EmptyDescription>
+                                                        No orders match the current filter.
+                                                    </EmptyDescription>
+                                                </EmptyHeader>
+                                            </Empty>
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
                     </div>
-                )}
+                </InfiniteScroll>
             </div>
         </>
     );

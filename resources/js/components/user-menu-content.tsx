@@ -1,5 +1,6 @@
 import { Link, router } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Logout01Icon, Settings01Icon } from '@hugeicons/core-free-icons';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -40,7 +41,7 @@ export function UserMenuContent({ user }: Props) {
                         prefetch
                         onClick={cleanup}
                     >
-                        <Settings className="mr-2" />
+                        <HugeiconsIcon icon={Settings01Icon} className="mr-2" />
                         Settings
                     </Link>
                 </DropdownMenuItem>
@@ -54,7 +55,7 @@ export function UserMenuContent({ user }: Props) {
                     onClick={handleLogout}
                     data-test="logout-button"
                 >
-                    <LogOut className="mr-2" />
+                    <HugeiconsIcon icon={Logout01Icon} className="mr-2" />
                     Log out
                 </Link>
             </DropdownMenuItem>

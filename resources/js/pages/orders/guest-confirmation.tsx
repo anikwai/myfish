@@ -9,6 +9,7 @@ type FishType = { id: number; name: string };
 type OrderItem = {
     id: number;
     fish_type: FishType;
+    cut: string | null;
     quantity_kg: string;
     quantity_pounds: string;
     subtotal_sbd: string;
@@ -24,6 +25,9 @@ type Order = {
     delivery_location: string | null;
     filleting_fee_snapshot: string;
     delivery_fee_snapshot: string;
+    discount_sbd: string;
+    tax_sbd: string;
+    tax_label_snapshot: string | null;
     total_sbd: string;
     rejection_reason: string | null;
     created_at: string;
@@ -150,6 +154,9 @@ export default function GuestConfirmation({
                                         >
                                             <span>
                                                 {item.fish_type.name}
+                                                {item.cut && item.cut !== 'whole' && (
+                                                    <span className="ml-1.5 text-xs capitalize text-muted-foreground">({item.cut})</span>
+                                                )}
                                             </span>
                                             <span className="font-mono text-muted-foreground">
                                                 {Number(
@@ -193,6 +200,24 @@ export default function GuestConfirmation({
                                                     order.delivery_fee_snapshot,
                                                 ).toFixed(2)}{' '}
                                                 SBD
+                                            </span>
+                                        </div>
+                                    )}
+                                    {Number(order.discount_sbd) > 0 && (
+                                        <div className="flex justify-between">
+                                            <span className="text-muted-foreground">Discount</span>
+                                            <span className="font-mono text-emerald-700 dark:text-emerald-400">
+                                                −${Number(order.discount_sbd).toFixed(2)} SBD
+                                            </span>
+                                        </div>
+                                    )}
+                                    {Number(order.tax_sbd) > 0 && (
+                                        <div className="flex justify-between">
+                                            <span className="text-muted-foreground">
+                                                {order.tax_label_snapshot?.trim() || 'Tax'}
+                                            </span>
+                                            <span className="font-mono">
+                                                +${Number(order.tax_sbd).toFixed(2)} SBD
                                             </span>
                                         </div>
                                     )}

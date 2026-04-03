@@ -1,11 +1,18 @@
+import { PackageDelivered01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { Head, router, useForm, usePoll } from '@inertiajs/react';
 import AdminOrderController from '@/actions/App/Http/Controllers/Admin/OrderController';
-import { OrderTimeline, type StatusLog } from '@/components/orders/OrderTimeline';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
+import { OrderTimeline  } from '@/components/orders/OrderTimeline';
+import type {StatusLog} from '@/components/orders/OrderTimeline';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { index } from '@/routes/admin/orders';
 
 const STATUS_LABELS: Record<string, string> = {
@@ -38,8 +45,10 @@ type FishType = { id: number; name: string };
 type OrderItem = {
     id: number;
     fish_type: FishType;
+    cut: string | null;
     quantity_kg: string;
     quantity_pounds: string;
+    price_per_pound_snapshot: string;
     subtotal_sbd: string;
 };
 type Order = {
@@ -50,6 +59,9 @@ type Order = {
     delivery_location: string | null;
     filleting_fee_snapshot: string;
     delivery_fee_snapshot: string;
+    discount_sbd: string;
+    tax_sbd: string;
+    tax_label_snapshot: string | null;
     total_sbd: string;
     rejection_reason: string | null;
     created_at: string;
@@ -103,82 +115,72 @@ export default function AdminOrderShow({
                             )}
                         </p>
                     </div>
-                    <span
-                        className={`inline-flex rounded-full px-3 py-1 text-sm font-medium ${STATUS_COLORS[order.status] ?? 'bg-neutral-100'}`}
-                    >
+                    <Badge className={STATUS_COLORS[order.status] ?? 'bg-neutral-100'}>
+                        {order.status === 'delivered' && <HugeiconsIcon icon={PackageDelivered01Icon} size={12} />}
                         {STATUS_LABELS[order.status] ?? order.status}
-                    </span>
+                    </Badge>
                 </div>
 
-                <div className="rounded-lg border p-4">
-                    <OrderTimeline
-                        logs={statusLogs}
-                        currentStatus={order.status}
-                        rejectionReason={order.rejection_reason}
-                        showActor
-                    />
-                </div>
+                <Card>
+                    <CardContent>
+                        <OrderTimeline
+                            logs={statusLogs}
+                            currentStatus={order.status}
+                            rejectionReason={order.rejection_reason}
+                            showActor
+                        />
+                    </CardContent>
+                </Card>
 
-                <div className="overflow-x-auto rounded-lg border">
-                    <table className="w-full text-sm">
-                        <thead className="border-b bg-muted/50">
-                            <tr>
-                                <th className="px-4 py-2 text-left font-medium">
-                                    Fish
-                                </th>
-                                <th className="px-4 py-2 text-right font-medium">
-                                    kg
-                                </th>
-                                <th className="px-4 py-2 text-right font-medium">
-                                    lbs
-                                </th>
-                                <th className="px-4 py-2 text-right font-medium">
-                                    Subtotal (SBD)
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <div className="overflow-hidden rounded-lg border">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Fish</TableHead>
+                                <TableHead className="text-right">kg</TableHead>
+                                <TableHead className="text-right">lbs</TableHead>
+                                <TableHead className="text-right">$/lb</TableHead>
+                                <TableHead className="text-right">Subtotal (SBD)</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
                             {order.items.map((item) => (
-                                <tr
-                                    key={item.id}
-                                    className="border-b last:border-0"
-                                >
-                                    <td className="px-4 py-2">
-                                        {item.fish_type.name}
-                                    </td>
-                                    <td className="px-4 py-2 text-right font-mono">
+                                <TableRow key={item.id}>
+                                    <TableCell>
+                                    {item.fish_type.name}
+                                    {item.cut && item.cut !== 'whole' && (
+                                        <span className="ml-1.5 text-xs capitalize text-muted-foreground">({item.cut})</span>
+                                    )}
+                                </TableCell>
+                                    <TableCell className="text-right font-mono">
                                         {Number(item.quantity_kg).toFixed(3)}
-                                    </td>
-                                    <td className="px-4 py-2 text-right font-mono text-muted-foreground">
-                                        {Number(item.quantity_pounds).toFixed(
-                                            3,
-                                        )}
-                                    </td>
-                                    <td className="px-4 py-2 text-right font-mono">
+                                    </TableCell>
+                                    <TableCell className="text-right font-mono text-muted-foreground">
+                                        {Number(item.quantity_pounds).toFixed(3)}
+                                    </TableCell>
+                                    <TableCell className="text-right font-mono text-muted-foreground">
+                                        {Number(item.price_per_pound_snapshot).toFixed(2)}
+                                    </TableCell>
+                                    <TableCell className="text-right font-mono">
                                         {Number(item.subtotal_sbd).toFixed(2)}
-                                    </td>
-                                </tr>
+                                    </TableCell>
+                                </TableRow>
                             ))}
-                        </tbody>
-                    </table>
+                        </TableBody>
+                    </Table>
                 </div>
 
-                <div className="rounded-lg border p-4 space-y-1 text-sm max-w-xs ml-auto">
+                <div className="space-y-1 max-w-xs ml-auto">
                     {order.filleting && (
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">
-                                Filleting
-                            </span>
+                        <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Filleting</span>
                             <span className="font-mono">
-                                +$
-                                {Number(order.filleting_fee_snapshot).toFixed(
-                                    2,
-                                )}
+                                +${Number(order.filleting_fee_snapshot).toFixed(2)}
                             </span>
                         </div>
                     )}
                     {order.delivery && (
-                        <div className="flex justify-between">
+                        <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">
                                 Delivery
                                 {order.delivery_location && (
@@ -186,14 +188,28 @@ export default function AdminOrderShow({
                                 )}
                             </span>
                             <span className="font-mono">
-                                +$
-                                {Number(order.delivery_fee_snapshot).toFixed(
-                                    2,
-                                )}
+                                +${Number(order.delivery_fee_snapshot).toFixed(2)}
                             </span>
                         </div>
                     )}
-                    <div className="flex justify-between border-t pt-1 font-semibold">
+                    {Number(order.discount_sbd) > 0 && (
+                        <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Discount</span>
+                            <span className="font-mono text-emerald-700 dark:text-emerald-400">
+                                −${Number(order.discount_sbd).toFixed(2)}
+                            </span>
+                        </div>
+                    )}
+                    {Number(order.tax_sbd) > 0 && (
+                        <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">
+                                {order.tax_label_snapshot?.trim() || 'Tax'}
+                            </span>
+                            <span className="font-mono">+${Number(order.tax_sbd).toFixed(2)}</span>
+                        </div>
+                    )}
+                    <Separator />
+                    <div className="flex justify-between text-sm font-semibold">
                         <span>Total</span>
                         <span className="font-mono">
                             ${Number(order.total_sbd).toFixed(2)} SBD
@@ -202,49 +218,52 @@ export default function AdminOrderShow({
                 </div>
 
                 {allowedTransitions.length > 0 && (
-                    <div className="space-y-3 rounded-lg border p-4">
-                        <p className="text-sm font-medium">Update status</p>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Update status</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            {allowedTransitions.includes('rejected') && (
+                                <div className="grid gap-2">
+                                    <Label htmlFor="rejection_reason">
+                                        Rejection reason (optional)
+                                    </Label>
+                                    <Input
+                                        id="rejection_reason"
+                                        value={data.rejection_reason}
+                                        onChange={(e) =>
+                                            setData(
+                                                'rejection_reason',
+                                                e.target.value,
+                                            )
+                                        }
+                                        placeholder="e.g. Out of stock"
+                                    />
+                                    <InputError
+                                        message={errors.rejection_reason}
+                                    />
+                                </div>
+                            )}
 
-                        {allowedTransitions.includes('rejected') && (
-                            <div className="grid gap-2">
-                                <Label htmlFor="rejection_reason">
-                                    Rejection reason (optional)
-                                </Label>
-                                <Input
-                                    id="rejection_reason"
-                                    value={data.rejection_reason}
-                                    onChange={(e) =>
-                                        setData(
-                                            'rejection_reason',
-                                            e.target.value,
-                                        )
-                                    }
-                                    placeholder="e.g. Out of stock"
-                                />
-                                <InputError
-                                    message={errors.rejection_reason}
-                                />
+                            <div className="flex flex-wrap gap-2">
+                                {allowedTransitions.map((t) => (
+                                    <Button
+                                        key={t}
+                                        variant={
+                                            t === 'rejected'
+                                                ? 'destructive'
+                                                : 'default'
+                                        }
+                                        onClick={() => transition(t)}
+                                    >
+                                        {TRANSITION_LABELS[t] ?? t}
+                                    </Button>
+                                ))}
                             </div>
-                        )}
 
-                        <div className="flex flex-wrap gap-2">
-                            {allowedTransitions.map((t) => (
-                                <Button
-                                    key={t}
-                                    variant={
-                                        t === 'rejected'
-                                            ? 'destructive'
-                                            : 'default'
-                                    }
-                                    onClick={() => transition(t)}
-                                >
-                                    {TRANSITION_LABELS[t] ?? t}
-                                </Button>
-                            ))}
-                        </div>
-
-                        <InputError message={errors.status} />
-                    </div>
+                            <InputError message={errors.status} />
+                        </CardContent>
+                    </Card>
                 )}
 
                 <p className="text-xs text-muted-foreground">

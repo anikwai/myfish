@@ -1,19 +1,37 @@
 import { Head, useForm } from '@inertiajs/react';
+import { useMemo } from 'react';
 import AdminOrderController from '@/actions/App/Http/Controllers/Admin/OrderController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { buildOrderPricingPreview } from '@/lib/order-pricing-preview';
+import { effectivePricePerPound, lineFishSubtotalSbd } from '@/lib/pricing';
 import { index } from '@/routes/admin/orders';
 
-type FishType = { id: number; name: string };
+type FishType = { id: number; name: string; price_per_pound: number | null };
 type Pricing = {
     price_per_pound: number;
     filleting_fee: number;
     delivery_fee: number;
     kg_to_lbs_rate: number;
 };
+
+type Discount = {
+    mode: 'off' | 'fixed' | 'percent';
+    fixed_sbd: number;
+    percent: number;
+    max_sbd: number | null;
+    min_order_sbd: number | null;
+};
+
+type Tax = {
+    mode: 'off' | 'percent';
+    percent: number;
+    label: string;
+};
+
 type FormData = {
     guest_name: string;
     guest_phone: string;
@@ -26,9 +44,13 @@ type FormData = {
 export default function GuestOrder({
     fishTypes,
     pricing,
+    discount,
+    tax,
 }: {
     fishTypes: FishType[];
     pricing: Pricing;
+    discount: Discount;
+    tax: Tax;
 }) {
     const { data, setData, post, processing, errors } = useForm<FormData>({
         guest_name: '',
@@ -39,16 +61,19 @@ export default function GuestOrder({
         delivery_location: '',
     });
 
-    const totalPounds = data.items.reduce((sum, item) => {
-        const kg = parseFloat(item.quantity_kg) || 0;
-
-        return sum + kg * pricing.kg_to_lbs_rate;
-    }, 0);
-
-    const subtotal = totalPounds * pricing.price_per_pound;
-    const filletingCharge = data.filleting ? pricing.filleting_fee : 0;
-    const deliveryCharge = data.delivery ? pricing.delivery_fee : 0;
-    const grandTotal = subtotal + filletingCharge + deliveryCharge;
+    const preview = useMemo(
+        () =>
+            buildOrderPricingPreview({
+                fishTypes,
+                pricing,
+                discount,
+                tax,
+                items: data.items,
+                filleting: data.filleting,
+                delivery: data.delivery,
+            }),
+        [fishTypes, pricing, discount, tax, data.items, data.filleting, data.delivery],
+    );
 
     const hasItems = data.items.some((item) => parseFloat(item.quantity_kg) > 0);
 
@@ -107,7 +132,11 @@ export default function GuestOrder({
                                 {fishTypes.map((ft, i) => {
                                     const kg = parseFloat(data.items[i]?.quantity_kg) || 0;
                                     const lbs = kg * pricing.kg_to_lbs_rate;
-                                    const sub = lbs * pricing.price_per_pound;
+                                    const rate = effectivePricePerPound(
+                                        ft.price_per_pound,
+                                        pricing.price_per_pound,
+                                    );
+                                    const sub = lineFishSubtotalSbd(kg, pricing.kg_to_lbs_rate, rate);
 
                                     return (
                                         <tr key={ft.id} className="border-b last:border-0">
@@ -161,23 +190,31 @@ export default function GuestOrder({
                     <div className="rounded-lg border p-4 space-y-1 text-sm">
                         <div className="flex justify-between">
                             <span className="text-muted-foreground">Fish subtotal</span>
-                            <span className="font-mono">${subtotal.toFixed(2)} SBD</span>
+                            <span className="font-mono">${preview.fishSubtotalSbd.toFixed(2)} SBD</span>
                         </div>
-                        {data.filleting && (
+                        {preview.adjustments.map((adj) => (
+                            <div key={adj.code} className="flex justify-between">
+                                <span className="text-muted-foreground">{adj.label}</span>
+                                <span className="font-mono">+${adj.amountSbd.toFixed(2)} SBD</span>
+                            </div>
+                        ))}
+                        {preview.discountSbd > 0 && (
                             <div className="flex justify-between">
-                                <span className="text-muted-foreground">Filleting</span>
-                                <span className="font-mono">+${filletingCharge.toFixed(2)} SBD</span>
+                                <span className="text-muted-foreground">Discount</span>
+                                <span className="font-mono text-emerald-700 dark:text-emerald-400">
+                                    −${preview.discountSbd.toFixed(2)} SBD
+                                </span>
                             </div>
                         )}
-                        {data.delivery && (
+                        {preview.taxSbd > 0 && (
                             <div className="flex justify-between">
-                                <span className="text-muted-foreground">Delivery</span>
-                                <span className="font-mono">+${deliveryCharge.toFixed(2)} SBD</span>
+                                <span className="text-muted-foreground">{preview.taxLabel}</span>
+                                <span className="font-mono">+${preview.taxSbd.toFixed(2)} SBD</span>
                             </div>
                         )}
                         <div className="flex justify-between border-t pt-1 font-semibold">
                             <span>Total</span>
-                            <span className="font-mono">${grandTotal.toFixed(2)} SBD</span>
+                            <span className="font-mono">${preview.grandTotalSbd.toFixed(2)} SBD</span>
                         </div>
                     </div>
 

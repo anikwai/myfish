@@ -1,5 +1,13 @@
 import { Link, usePage } from '@inertiajs/react';
-import { ClipboardList, Fish, LayoutGrid, Package, Settings2, ShoppingBag, TrendingUp } from 'lucide-react';
+import {
+    AnalyticsUpIcon,
+    ClipboardIcon,
+    DashboardSquare01Icon,
+    FishFoodIcon,
+    Package01Icon,
+    Settings02Icon,
+    ShoppingBag01Icon,
+} from '@hugeicons/core-free-icons';
 
 import Admin from '@/actions/App/Http/Controllers/Admin';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
@@ -22,12 +30,12 @@ const userNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
-        icon: LayoutGrid,
+        icon: DashboardSquare01Icon,
     },
     {
         title: 'My orders',
         href: OrderController.index.url(),
-        icon: ShoppingBag,
+        icon: ShoppingBag01Icon,
     },
 ];
 
@@ -35,27 +43,27 @@ const adminNavItems: NavItem[] = [
     {
         title: 'Orders',
         href: Admin.OrderController.index.url(),
-        icon: ClipboardList,
+        icon: ClipboardIcon,
     },
     {
         title: 'Inventory',
         href: Admin.InventoryController.index.url(),
-        icon: Package,
+        icon: Package01Icon,
     },
     {
         title: 'Fish types',
         href: Admin.FishTypeController.index.url(),
-        icon: Fish,
+        icon: FishFoodIcon,
     },
     {
         title: 'Pricing',
         href: Admin.PricingController.edit.url(),
-        icon: Settings2,
+        icon: Settings02Icon,
     },
     {
         title: 'Reports',
         href: Admin.ReportingController.index.url(),
-        icon: TrendingUp,
+        icon: AnalyticsUpIcon,
     },
 ];
 

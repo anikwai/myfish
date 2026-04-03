@@ -1,4 +1,6 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, InfiniteScroll, Link, router } from '@inertiajs/react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { PlusSignIcon } from '@hugeicons/core-free-icons';
 import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,6 +14,10 @@ type Order = {
     status: string;
     total_sbd: string;
     created_at: string;
+};
+
+type PaginatedOrders = {
+    data: Order[];
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -32,7 +38,23 @@ const STATUS_COLORS: Record<string, string> = {
     delivered: 'bg-neutral-100 text-neutral-600',
 };
 
-export default function OrderIndex({ orders }: { orders: Order[] }) {
+const FILTER_TABS = [
+    { key: null, label: 'All' },
+    { key: 'active', label: 'Active' },
+    { key: 'delivered', label: 'Delivered' },
+];
+
+export default function OrderIndex({
+    orders,
+    filterStatus,
+}: {
+    orders: PaginatedOrders;
+    filterStatus: string | null;
+}) {
+    function applyFilter(status: string | null) {
+        router.get(index(), status ? { status } : {}, { preserveState: true });
+    }
+
     return (
         <>
             <Head title="My orders" />
@@ -41,60 +63,82 @@ export default function OrderIndex({ orders }: { orders: Order[] }) {
                 <div className="flex items-center justify-between">
                     <Heading title="My orders" />
                     <Button asChild>
-                        <Link href={create()}>Place new order</Link>
+                        <Link href={create()}><HugeiconsIcon icon={PlusSignIcon} size={16} />Place new order</Link>
                     </Button>
                 </div>
 
-                {orders.length === 0 ? (
+                <div className="flex gap-2">
+                    {FILTER_TABS.map((tab) => (
+                        <Button
+                            key={tab.key ?? 'all'}
+                            size="sm"
+                            variant={filterStatus === tab.key ? 'default' : 'secondary'}
+                            className="rounded-full"
+                            onClick={() => applyFilter(tab.key)}
+                        >
+                            {tab.label}
+                        </Button>
+                    ))}
+                </div>
+
+                {orders.data.length === 0 ? (
                     <Empty>
                         <EmptyHeader>
                             <EmptyTitle>No orders yet</EmptyTitle>
-                            <EmptyDescription>You haven't placed any orders yet.</EmptyDescription>
+                            <EmptyDescription>
+                                {filterStatus
+                                    ? 'No orders match the current filter.'
+                                    : "You haven't placed any orders yet."}
+                            </EmptyDescription>
                         </EmptyHeader>
                     </Empty>
                 ) : (
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Order</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className="text-right">Total (SBD)</TableHead>
-                                <TableHead>Date</TableHead>
-                                <TableHead />
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {orders.map((order) => (
-                                <TableRow key={order.id}>
-                                    <TableCell>#{order.id}</TableCell>
-                                    <TableCell>
-                                        <Badge
-                                            className={cn(
-                                                'rounded-full',
-                                                STATUS_COLORS[order.status] ?? 'bg-neutral-100 text-neutral-600',
-                                            )}
-                                        >
-                                            {STATUS_LABELS[order.status] ?? order.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right font-mono">
-                                        ${Number(order.total_sbd).toFixed(2)}
-                                    </TableCell>
-                                    <TableCell className="text-muted-foreground">
-                                        {new Date(order.created_at).toLocaleDateString('en-AU')}
-                                    </TableCell>
-                                    <TableCell>
-                                        <Link
-                                            href={show(order)}
-                                            className="text-primary underline-offset-4 hover:underline"
-                                        >
-                                            View
-                                        </Link>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                    <InfiniteScroll data="orders">
+                        <div className="overflow-hidden rounded-lg border">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Order</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-right">Total (SBD)</TableHead>
+                                        <TableHead>Date</TableHead>
+                                        <TableHead />
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {orders.data.map((order) => (
+                                        <TableRow key={order.id}>
+                                            <TableCell>#{order.id}</TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    className={cn(
+                                                        'rounded-full',
+                                                        STATUS_COLORS[order.status] ?? 'bg-neutral-100 text-neutral-600',
+                                                    )}
+                                                >
+                                                    {STATUS_LABELS[order.status] ?? order.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-right font-mono">
+                                                ${Number(order.total_sbd).toFixed(2)}
+                                            </TableCell>
+                                            <TableCell className="text-muted-foreground">
+                                                {new Date(order.created_at).toLocaleDateString('en-AU')}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Link
+                                                    href={show(order)}
+                                                    className="text-primary underline-offset-4 hover:underline"
+                                                >
+                                                    View
+                                                </Link>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </InfiniteScroll>
                 )}
             </div>
         </>
