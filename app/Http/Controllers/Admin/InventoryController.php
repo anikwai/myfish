@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\WeightUnit;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\InventoryAdjustmentRequest;
 use App\Models\Inventory;
+use App\Values\PricingConfig;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -14,6 +16,7 @@ class InventoryController extends Controller
     public function index(): Response
     {
         $inventory = Inventory::current();
+        $pricing = PricingConfig::current();
 
         $adjustments = $inventory->adjustments()
             ->with('user:id,name')
@@ -22,10 +25,12 @@ class InventoryController extends Controller
             ->get();
 
         $lastAdjustment = $adjustments->first();
+        $stockKg = (float) $inventory->stock_kg;
 
         return Inertia::render('admin/inventory', [
-            'stock_kg' => (float) $inventory->stock_kg,
-            'stock_pounds' => $inventory->stockPounds(),
+            'stock_kg' => $stockKg,
+            'stock_pounds' => round(WeightUnit::Kg->convertTo(WeightUnit::Lbs, $stockKg, $pricing->kgToLbsRate), 3),
+            'kg_to_lbs_rate' => $pricing->kgToLbsRate,
             'adjustments' => $adjustments,
             'last_adjustment' => $lastAdjustment ? [
                 'user_name' => $lastAdjustment->user?->name,

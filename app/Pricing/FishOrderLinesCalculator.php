@@ -2,6 +2,7 @@
 
 namespace App\Pricing;
 
+use App\Enums\WeightUnit;
 use App\Models\FishType;
 use App\Values\PricingConfig;
 use Illuminate\Support\Collection;
@@ -25,7 +26,7 @@ final class FishOrderLinesCalculator
             }
 
             $pricePerPound = $fishType->effectivePrice((float) $pricing->pricePerPound);
-            $pounds = round($item['quantity_kg'] * $pricing->kgToLbsRate, 3);
+            $pounds = round(WeightUnit::Kg->convertTo(WeightUnit::Lbs, $item['quantity_kg'], $pricing->kgToLbsRate), 3);
             $subtotal = round($pounds * $pricePerPound, 2);
             $fishSubtotal += $subtotal;
 

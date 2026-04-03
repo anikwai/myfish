@@ -53,12 +53,4 @@ class Inventory extends Model
             'reason' => $reason,
         ]);
     }
-
-    /**
-     * Equivalent stock in pounds.
-     */
-    public function stockPounds(): float
-    {
-        return round((float) $this->stock_kg * 2.20462, 3);
-    }
 }
