@@ -1,6 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 
 import { ConversationalOrderFlow } from '@/components/orders/ConversationalOrderFlow';
+import { WeightConverterDialog } from '@/components/WeightConverterDialog';
 import { Button } from '@/components/ui/button';
 import { dashboard, login, register } from '@/routes';
 
@@ -117,6 +118,9 @@ export default function Welcome({
                         <p className="text-sm text-muted-foreground">
                             MyFish — Fresh fish, Solomon Islands
                         </p>
+                        <div className="mt-2">
+                            <WeightConverterDialog kgToLbsRate={pricing.kg_to_lbs_rate} />
+                        </div>
                     </div>
                 </footer>
             </div>
