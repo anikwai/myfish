@@ -22,7 +22,7 @@ use Tests\TestCase;
 uses(TestCase::class, RefreshDatabase::class);
 
 test('pipeline matches single species order totals at default pricing', function (): void {
-    $tuna = new FishType(['id' => 1, 'name' => 'Tuna', 'price_per_pound' => null]);
+    $tuna = (new FishType)->forceFill(['id' => 1, 'name' => 'Tuna', 'price_per_pound' => null]);
     $pricing = new PricingConfig(25.0, 10.0, 5.0, 2.20462);
 
     $snapshot = OrderPricingPipeline::default()->run(new PricingContext(
@@ -42,7 +42,7 @@ test('pipeline matches single species order totals at default pricing', function
 });
 
 test('pipeline adds optional flat fees after fish subtotal', function (): void {
-    $tuna = new FishType(['id' => 1, 'name' => 'Tuna', 'price_per_pound' => null]);
+    $tuna = (new FishType)->forceFill(['id' => 1, 'name' => 'Tuna', 'price_per_pound' => null]);
     $pricing = new PricingConfig(25.0, 10.0, 5.0, 2.20462);
 
     $snapshot = OrderPricingPipeline::default()->run(new PricingContext(
@@ -60,7 +60,7 @@ test('pipeline adds optional flat fees after fish subtotal', function (): void {
 });
 
 test('pipeline applies species override per line', function (): void {
-    $tuna = new FishType(['id' => 1, 'name' => 'Tuna', 'price_per_pound' => 60.0]);
+    $tuna = (new FishType)->forceFill(['id' => 1, 'name' => 'Tuna', 'price_per_pound' => 60.0]);
     $pricing = new PricingConfig(25.0, 10.0, 5.0, 2.20462);
 
     $snapshot = OrderPricingPipeline::default()->run(new PricingContext(
@@ -89,7 +89,7 @@ test('pipeline rejects unknown fish type id', function (): void {
 });
 
 test('pipeline applies injected fixed discount after fees', function (): void {
-    $tuna = new FishType(['id' => 1, 'name' => 'Tuna', 'price_per_pound' => null]);
+    $tuna = (new FishType)->forceFill(['id' => 1, 'name' => 'Tuna', 'price_per_pound' => null]);
     $pricing = new PricingConfig(25.0, 10.0, 5.0, 2.20462);
 
     $pipeline = new OrderPricingPipeline(
@@ -125,7 +125,7 @@ test('pipeline applies fixed discount from settings', function (): void {
     Setting::set('discount_fixed_sbd', 10.0);
     Setting::set('discount_percent', 0.0);
 
-    $tuna = new FishType(['id' => 1, 'name' => 'Tuna', 'price_per_pound' => null]);
+    $tuna = (new FishType)->forceFill(['id' => 1, 'name' => 'Tuna', 'price_per_pound' => null]);
     $pricing = new PricingConfig(25.0, 10.0, 5.0, 2.20462);
 
     $snapshot = OrderPricingPipeline::default()->run(new PricingContext(
@@ -145,7 +145,7 @@ test('pipeline applies exclusive percent tax from settings', function (): void {
     Setting::set('tax_mode', 1.0);
     Setting::set('tax_percent', 10.0);
 
-    $tuna = new FishType(['id' => 1, 'name' => 'Tuna', 'price_per_pound' => null]);
+    $tuna = (new FishType)->forceFill(['id' => 1, 'name' => 'Tuna', 'price_per_pound' => null]);
     $pricing = new PricingConfig(25.0, 10.0, 5.0, 2.20462);
 
     $snapshot = OrderPricingPipeline::default()->run(new PricingContext(
@@ -168,7 +168,7 @@ test('pipeline applies tax on subtotal after discount', function (): void {
     Setting::set('tax_mode', 1.0);
     Setting::set('tax_percent', 10.0);
 
-    $tuna = new FishType(['id' => 1, 'name' => 'Tuna', 'price_per_pound' => null]);
+    $tuna = (new FishType)->forceFill(['id' => 1, 'name' => 'Tuna', 'price_per_pound' => null]);
     $pricing = new PricingConfig(25.0, 10.0, 5.0, 2.20462);
 
     $snapshot = OrderPricingPipeline::default()->run(new PricingContext(
