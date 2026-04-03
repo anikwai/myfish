@@ -1,8 +1,11 @@
 <?php
 
+use App\Models\Business;
 use App\Models\User;
 use App\Values\BusinessConfig;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 beforeEach(function (): void {
     $this->seed(RoleSeeder::class);
@@ -77,4 +80,48 @@ test('non-admin cannot update business settings', function (): void {
             'business_name' => 'Hacker',
         ])
         ->assertForbidden();
+});
+
+test('admin can upload a business logo', function (): void {
+    Storage::fake('public');
+
+    $admin = User::factory()->admin()->create();
+    $file = UploadedFile::fake()->image('logo.png', 200, 200);
+
+    $this->actingAs($admin)
+        ->post(route('admin.business.logo.store'), ['logo' => $file])
+        ->assertRedirect(route('admin.business.edit'));
+
+    expect(Business::instance()->getFirstMedia('logo'))->not->toBeNull();
+});
+
+test('admin can remove the business logo', function (): void {
+    Storage::fake('public');
+
+    $admin = User::factory()->admin()->create();
+    $file = UploadedFile::fake()->image('logo.png', 200, 200);
+    Business::instance()->addMedia($file)->toMediaCollection('logo');
+
+    $this->actingAs($admin)
+        ->delete(route('admin.business.logo.destroy'))
+        ->assertRedirect(route('admin.business.edit'));
+
+    expect(Business::instance()->getFirstMedia('logo'))->toBeNull();
+});
+
+test('logo upload requires an image file', function (): void {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->post(route('admin.business.logo.store'), ['logo' => 'not-a-file'])
+        ->assertSessionHasErrors(['logo']);
+});
+
+test('logo url is included in business config', function (): void {
+    Storage::fake('public');
+
+    $file = UploadedFile::fake()->image('logo.png', 200, 200);
+    Business::instance()->addMedia($file)->toMediaCollection('logo');
+
+    expect(BusinessConfig::current()->logo_url)->not->toBeNull();
 });

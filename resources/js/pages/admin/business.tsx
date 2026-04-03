@@ -1,5 +1,6 @@
 import { Transition } from "@headlessui/react";
-import { Form, Head } from "@inertiajs/react";
+import { Form, Head, router, useForm } from "@inertiajs/react";
+import { useRef } from "react";
 import BusinessController from "@/actions/App/Http/Controllers/Admin/BusinessController";
 import Heading from "@/components/heading";
 import InputError from "@/components/input-error";
@@ -21,6 +22,7 @@ type Business = {
   address: string;
   phone: string;
   email: string;
+  logo_url: string | null;
 };
 
 export default function Business({
@@ -30,6 +32,26 @@ export default function Business({
   business: Business;
   status?: string;
 }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const logoForm = useForm<{ logo: File | null }>({ logo: null });
+
+  function handleLogoSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    logoForm.post(BusinessController.storeLogo.url(), {
+      forceFormData: true,
+      onSuccess: () => {
+        logoForm.reset();
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      },
+    });
+  }
+
+  function handleLogoRemove() {
+    router.delete(BusinessController.destroyLogo.url());
+  }
+
   return (
     <>
       <Head title="Business settings" />
@@ -142,6 +164,66 @@ export default function Business({
             </>
           )}
         </Form>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Logo</CardTitle>
+            <CardDescription>
+              Displayed on invoices and receipts. PNG or JPG, max 2 MB.
+            </CardDescription>
+          </CardHeader>
+          <Separator />
+          <CardContent className="space-y-4 pt-6">
+            {business.logo_url && (
+              <div className="flex items-center gap-4">
+                <img
+                  src={business.logo_url}
+                  alt="Business logo"
+                  className="h-16 w-auto rounded border object-contain p-1"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleLogoRemove}
+                >
+                  Remove logo
+                </Button>
+              </div>
+            )}
+
+            <form onSubmit={handleLogoSubmit} className="flex items-end gap-3">
+              <div className="grid gap-2">
+                <Label htmlFor="logo">
+                  {business.logo_url ? "Replace logo" : "Upload logo"}
+                </Label>
+                <Input
+                  id="logo"
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={(e) =>
+                    logoForm.setData("logo", e.target.files?.[0] ?? null)
+                  }
+                  className="w-64"
+                />
+                <InputError message={logoForm.errors.logo} />
+              </div>
+              <Button
+                type="submit"
+                disabled={logoForm.processing || !logoForm.data.logo}
+              >
+                Upload
+              </Button>
+            </form>
+
+            {(status === "logo-updated" || status === "logo-removed") && (
+              <p className="text-sm text-neutral-600">
+                {status === "logo-updated" ? "Logo updated" : "Logo removed"}
+              </p>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </>
   );

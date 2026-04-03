@@ -16,6 +16,8 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
     Route::get('business', [BusinessController::class, 'edit'])->name('business.edit');
     Route::patch('business', [BusinessController::class, 'update'])->name('business.update');
+    Route::post('business/logo', [BusinessController::class, 'storeLogo'])->name('business.logo.store');
+    Route::delete('business/logo', [BusinessController::class, 'destroyLogo'])->name('business.logo.destroy');
 
     Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
     Route::post('inventory/adjustments', [InventoryController::class, 'adjust'])->name('inventory.adjust');
