@@ -55,7 +55,10 @@ export default function GuestOrder({
     const { data, setData, post, processing, errors } = useForm<FormData>({
         guest_name: '',
         guest_phone: '',
-        items: fishTypes.map((ft) => ({ fish_type_id: ft.id, quantity_kg: '' })),
+        items: fishTypes.map((ft) => ({
+            fish_type_id: ft.id,
+            quantity_kg: '',
+        })),
         filleting: false,
         delivery: false,
         delivery_location: '',
@@ -72,10 +75,20 @@ export default function GuestOrder({
                 filleting: data.filleting,
                 delivery: data.delivery,
             }),
-        [fishTypes, pricing, discount, tax, data.items, data.filleting, data.delivery],
+        [
+            fishTypes,
+            pricing,
+            discount,
+            tax,
+            data.items,
+            data.filleting,
+            data.delivery,
+        ],
     );
 
-    const hasItems = data.items.some((item) => parseFloat(item.quantity_kg) > 0);
+    const hasItems = data.items.some(
+        (item) => parseFloat(item.quantity_kg) > 0,
+    );
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -99,7 +112,9 @@ export default function GuestOrder({
                             <Input
                                 id="guest_name"
                                 value={data.guest_name}
-                                onChange={(e) => setData('guest_name', e.target.value)}
+                                onChange={(e) =>
+                                    setData('guest_name', e.target.value)
+                                }
                                 placeholder="Full name"
                                 required
                             />
@@ -110,7 +125,9 @@ export default function GuestOrder({
                             <Input
                                 id="guest_phone"
                                 value={data.guest_phone}
-                                onChange={(e) => setData('guest_phone', e.target.value)}
+                                onChange={(e) =>
+                                    setData('guest_phone', e.target.value)
+                                }
                                 placeholder="+677 ..."
                                 required
                             />
@@ -122,39 +139,77 @@ export default function GuestOrder({
                         <table className="w-full text-sm">
                             <thead className="border-b bg-muted/50">
                                 <tr>
-                                    <th className="px-4 py-2 text-left font-medium">Fish type</th>
-                                    <th className="px-4 py-2 text-right font-medium">Quantity (kg)</th>
-                                    <th className="px-4 py-2 text-right font-medium">Pounds</th>
-                                    <th className="px-4 py-2 text-right font-medium">Subtotal (SBD)</th>
+                                    <th className="px-4 py-2 text-left font-medium">
+                                        Fish type
+                                    </th>
+                                    <th className="px-4 py-2 text-right font-medium">
+                                        Quantity (kg)
+                                    </th>
+                                    <th className="px-4 py-2 text-right font-medium">
+                                        Pounds
+                                    </th>
+                                    <th className="px-4 py-2 text-right font-medium">
+                                        Subtotal (SBD)
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {fishTypes.map((ft, i) => {
-                                    const kg = parseFloat(data.items[i]?.quantity_kg) || 0;
+                                    const kg =
+                                        parseFloat(
+                                            data.items[i]?.quantity_kg,
+                                        ) || 0;
                                     const lbs = kg * pricing.kg_to_lbs_rate;
                                     const rate = effectivePricePerPound(
                                         ft.price_per_pound,
                                         pricing.price_per_pound,
                                     );
-                                    const sub = lineFishSubtotalSbd(kg, pricing.kg_to_lbs_rate, rate);
+                                    const sub = lineFishSubtotalSbd(
+                                        kg,
+                                        pricing.kg_to_lbs_rate,
+                                        rate,
+                                    );
 
                                     return (
-                                        <tr key={ft.id} className="border-b last:border-0">
-                                            <td className="px-4 py-2">{ft.name}</td>
+                                        <tr
+                                            key={ft.id}
+                                            className="border-b last:border-0"
+                                        >
+                                            <td className="px-4 py-2">
+                                                {ft.name}
+                                            </td>
                                             <td className="px-4 py-2">
                                                 <Input
                                                     type="number"
                                                     step="0.001"
                                                     min="0"
                                                     className="w-28 text-right"
-                                                    value={data.items[i]?.quantity_kg}
+                                                    value={
+                                                        data.items[i]
+                                                            ?.quantity_kg
+                                                    }
                                                     onChange={(e) => {
-                                                        const updated = [...data.items];
-                                                        updated[i] = { ...updated[i], quantity_kg: e.target.value };
-                                                        setData('items', updated);
+                                                        const updated = [
+                                                            ...data.items,
+                                                        ];
+                                                        updated[i] = {
+                                                            ...updated[i],
+                                                            quantity_kg:
+                                                                e.target.value,
+                                                        };
+                                                        setData(
+                                                            'items',
+                                                            updated,
+                                                        );
                                                     }}
                                                 />
-                                                <InputError message={errors[`items.${i}.quantity_kg` as keyof typeof errors]} />
+                                                <InputError
+                                                    message={
+                                                        errors[
+                                                            `items.${i}.quantity_kg` as keyof typeof errors
+                                                        ]
+                                                    }
+                                                />
                                             </td>
                                             <td className="px-4 py-2 text-right font-mono text-muted-foreground">
                                                 {lbs > 0 ? lbs.toFixed(3) : '—'}
@@ -171,36 +226,86 @@ export default function GuestOrder({
 
                     <div className="space-y-3">
                         <div className="flex items-center gap-3">
-                            <input id="filleting" type="checkbox" checked={data.filleting} onChange={(e) => setData('filleting', e.target.checked)} className="h-4 w-4" />
-                            <Label htmlFor="filleting">Filleting (+${pricing.filleting_fee.toFixed(2)} SBD)</Label>
+                            <input
+                                id="filleting"
+                                type="checkbox"
+                                checked={data.filleting}
+                                onChange={(e) =>
+                                    setData('filleting', e.target.checked)
+                                }
+                                className="h-4 w-4"
+                            />
+                            <Label htmlFor="filleting">
+                                Filleting (+${pricing.filleting_fee.toFixed(2)}{' '}
+                                SBD)
+                            </Label>
                         </div>
                         <div className="flex items-center gap-3">
-                            <input id="delivery" type="checkbox" checked={data.delivery} onChange={(e) => setData('delivery', e.target.checked)} className="h-4 w-4" />
-                            <Label htmlFor="delivery">Delivery (+${pricing.delivery_fee.toFixed(2)} SBD)</Label>
+                            <input
+                                id="delivery"
+                                type="checkbox"
+                                checked={data.delivery}
+                                onChange={(e) =>
+                                    setData('delivery', e.target.checked)
+                                }
+                                className="h-4 w-4"
+                            />
+                            <Label htmlFor="delivery">
+                                Delivery (+${pricing.delivery_fee.toFixed(2)}{' '}
+                                SBD)
+                            </Label>
                         </div>
                         {data.delivery && (
                             <div className="ml-7 grid gap-2">
-                                <Label htmlFor="delivery_location">Delivery location</Label>
-                                <Input id="delivery_location" value={data.delivery_location} onChange={(e) => setData('delivery_location', e.target.value)} placeholder="e.g. Near the market" required />
-                                <InputError message={errors.delivery_location} />
+                                <Label htmlFor="delivery_location">
+                                    Delivery location
+                                </Label>
+                                <Input
+                                    id="delivery_location"
+                                    value={data.delivery_location}
+                                    onChange={(e) =>
+                                        setData(
+                                            'delivery_location',
+                                            e.target.value,
+                                        )
+                                    }
+                                    placeholder="e.g. Near the market"
+                                    required
+                                />
+                                <InputError
+                                    message={errors.delivery_location}
+                                />
                             </div>
                         )}
                     </div>
 
-                    <div className="rounded-lg border p-4 space-y-1 text-sm">
+                    <div className="space-y-1 rounded-lg border p-4 text-sm">
                         <div className="flex justify-between">
-                            <span className="text-muted-foreground">Fish subtotal</span>
-                            <span className="font-mono">${preview.fishSubtotalSbd.toFixed(2)} SBD</span>
+                            <span className="text-muted-foreground">
+                                Fish subtotal
+                            </span>
+                            <span className="font-mono">
+                                ${preview.fishSubtotalSbd.toFixed(2)} SBD
+                            </span>
                         </div>
                         {preview.adjustments.map((adj) => (
-                            <div key={adj.code} className="flex justify-between">
-                                <span className="text-muted-foreground">{adj.label}</span>
-                                <span className="font-mono">+${adj.amountSbd.toFixed(2)} SBD</span>
+                            <div
+                                key={adj.code}
+                                className="flex justify-between"
+                            >
+                                <span className="text-muted-foreground">
+                                    {adj.label}
+                                </span>
+                                <span className="font-mono">
+                                    +${adj.amountSbd.toFixed(2)} SBD
+                                </span>
                             </div>
                         ))}
                         {preview.discountSbd > 0 && (
                             <div className="flex justify-between">
-                                <span className="text-muted-foreground">Discount</span>
+                                <span className="text-muted-foreground">
+                                    Discount
+                                </span>
                                 <span className="font-mono text-emerald-700 dark:text-emerald-400">
                                     −${preview.discountSbd.toFixed(2)} SBD
                                 </span>
@@ -208,17 +313,25 @@ export default function GuestOrder({
                         )}
                         {preview.taxSbd > 0 && (
                             <div className="flex justify-between">
-                                <span className="text-muted-foreground">{preview.taxLabel}</span>
-                                <span className="font-mono">+${preview.taxSbd.toFixed(2)} SBD</span>
+                                <span className="text-muted-foreground">
+                                    {preview.taxLabel}
+                                </span>
+                                <span className="font-mono">
+                                    +${preview.taxSbd.toFixed(2)} SBD
+                                </span>
                             </div>
                         )}
                         <div className="flex justify-between border-t pt-1 font-semibold">
                             <span>Total</span>
-                            <span className="font-mono">${preview.grandTotalSbd.toFixed(2)} SBD</span>
+                            <span className="font-mono">
+                                ${preview.grandTotalSbd.toFixed(2)} SBD
+                            </span>
                         </div>
                     </div>
 
-                    <Button type="submit" disabled={processing || !hasItems}>Place guest order</Button>
+                    <Button type="submit" disabled={processing || !hasItems}>
+                        Place guest order
+                    </Button>
                 </form>
             </div>
         </>

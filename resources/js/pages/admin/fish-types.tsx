@@ -1,17 +1,18 @@
-import { useState } from 'react';
-import { Deferred, Form, Head, useForm } from '@inertiajs/react';
-import { HugeiconsIcon } from '@hugeicons/react';
 import {
     PencilEdit01Icon,
     SortByDown01Icon,
     SortByUp01Icon,
     Sorting01Icon,
 } from '@hugeicons/core-free-icons';
-import {
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Deferred, Form, Head, useForm } from '@inertiajs/react';
+import type {
     ColumnDef,
     ColumnFiltersState,
     SortingState,
     VisibilityState,
+} from '@tanstack/react-table';
+import {
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
@@ -19,12 +20,19 @@ import {
     getSortedRowModel,
     useReactTable,
 } from '@tanstack/react-table';
+import { useState } from 'react';
 import FishTypeController from '@/actions/App/Http/Controllers/Admin/FishTypeController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import {
     Dialog,
     DialogContent,
@@ -64,10 +72,14 @@ type FishType = {
 };
 
 function SortIcon({ sorted }: { sorted: false | 'asc' | 'desc' }) {
-    if (sorted === 'asc')
+    if (sorted === 'asc') {
         return <HugeiconsIcon icon={SortByDown01Icon} data-icon="inline-end" />;
-    if (sorted === 'desc')
+    }
+
+    if (sorted === 'desc') {
         return <HugeiconsIcon icon={SortByUp01Icon} data-icon="inline-end" />;
+    }
+
     return <HugeiconsIcon icon={Sorting01Icon} data-icon="inline-end" />;
 }
 
@@ -82,7 +94,9 @@ function FishTypesTable({
         { id: 'name', desc: false },
     ]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+        {},
+    );
     const [globalFilter, setGlobalFilter] = useState('');
 
     const columns: ColumnDef<FishType>[] = [
@@ -91,7 +105,9 @@ function FishTypesTable({
             header: ({ column }) => (
                 <Button
                     variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                    onClick={() =>
+                        column.toggleSorting(column.getIsSorted() === 'asc')
+                    }
                 >
                     Name
                     <SortIcon sorted={column.getIsSorted()} />
@@ -124,7 +140,9 @@ function FishTypesTable({
             header: ({ column }) => (
                 <Button
                     variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                    onClick={() =>
+                        column.toggleSorting(column.getIsSorted() === 'asc')
+                    }
                 >
                     Status
                     <SortIcon sorted={column.getIsSorted()} />
@@ -134,7 +152,8 @@ function FishTypesTable({
                 <Badge
                     variant={row.original.is_active ? 'outline' : 'secondary'}
                     className={cn(
-                        row.original.is_active && 'border-green-200 bg-green-50 text-green-700',
+                        row.original.is_active &&
+                            'border-green-200 bg-green-50 text-green-700',
                     )}
                 >
                     {row.original.is_active ? 'Active' : 'Inactive'}
@@ -156,8 +175,14 @@ function FishTypesTable({
                                 name="is_active"
                                 value={row.original.is_active ? '0' : '1'}
                             />
-                            <Button variant="ghost" size="sm" disabled={processing}>
-                                {row.original.is_active ? 'Deactivate' : 'Activate'}
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                disabled={processing}
+                            >
+                                {row.original.is_active
+                                    ? 'Deactivate'
+                                    : 'Activate'}
                             </Button>
                         </>
                     )}
@@ -198,7 +223,8 @@ function FishTypesTable({
         <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between gap-3">
                 <span className="text-sm text-muted-foreground">
-                    {table.getFilteredRowModel().rows.length} of {fishTypes.length} fish type
+                    {table.getFilteredRowModel().rows.length} of{' '}
+                    {fishTypes.length} fish type
                     {fishTypes.length !== 1 ? 's' : ''}
                 </span>
                 <Input
@@ -218,7 +244,11 @@ function FishTypesTable({
                                     <TableHead key={header.id}>
                                         {header.isPlaceholder
                                             ? null
-                                            : flexRender(header.column.columnDef.header, header.getContext())}
+                                            : flexRender(
+                                                  header.column.columnDef
+                                                      .header,
+                                                  header.getContext(),
+                                              )}
                                     </TableHead>
                                 ))}
                             </TableRow>
@@ -230,7 +260,10 @@ function FishTypesTable({
                                 <TableRow key={row.id} className="group">
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext(),
+                                            )}
                                         </TableCell>
                                     ))}
                                 </TableRow>
@@ -256,7 +289,8 @@ function FishTypesTable({
             {table.getPageCount() > 1 && (
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
                     <span>
-                        Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                        Page {table.getState().pagination.pageIndex + 1} of{' '}
+                        {table.getPageCount()}
                     </span>
                     <div className="flex items-center gap-2">
                         <Button
@@ -289,9 +323,19 @@ export default function FishTypes({
     fishTypes?: FishType[];
     status?: string;
 }) {
-    const [editingFishType, setEditingFishType] = useState<FishType | null>(null);
+    const [editingFishType, setEditingFishType] = useState<FishType | null>(
+        null,
+    );
 
-    const { data, setData, patch, processing: editProcessing, errors, reset, clearErrors } = useForm({ name: '' });
+    const {
+        data,
+        setData,
+        patch,
+        processing: editProcessing,
+        errors,
+        reset,
+        clearErrors,
+    } = useForm({ name: '' });
 
     function openEdit(fishType: FishType) {
         setEditingFishType(fishType);
@@ -306,7 +350,10 @@ export default function FishTypes({
 
     function handleRename(e: React.FormEvent) {
         e.preventDefault();
-        if (!editingFishType) return;
+
+        if (!editingFishType) {
+            return;
+        }
 
         patch(FishTypeController.update.url(editingFishType), {
             preserveScroll: true,
@@ -319,13 +366,18 @@ export default function FishTypes({
             <Head title="Fish types" />
 
             <div className="space-y-6">
-                <Heading title="Fish Types" description="Manage the species available for ordering." />
+                <Heading
+                    title="Fish Types"
+                    description="Manage the species available for ordering."
+                />
 
                 {/* Add fish type */}
                 <Card>
                     <CardHeader>
                         <CardTitle>Add New Fish Type</CardTitle>
-                        <CardDescription>New fish types are active by default.</CardDescription>
+                        <CardDescription>
+                            New fish types are active by default.
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Form
@@ -336,7 +388,9 @@ export default function FishTypes({
                             {({ processing, recentlySuccessful, errors }) => (
                                 <>
                                     <div className="grid gap-2">
-                                        <Label htmlFor="name">Fish type name</Label>
+                                        <Label htmlFor="name">
+                                            Fish type name
+                                        </Label>
                                         <Input
                                             id="name"
                                             name="name"
@@ -351,8 +405,11 @@ export default function FishTypes({
                                         {processing ? 'Adding...' : 'Add'}
                                     </Button>
 
-                                    {(recentlySuccessful || status === 'fish-type-created') && (
-                                        <p className="text-sm text-muted-foreground">Added.</p>
+                                    {(recentlySuccessful ||
+                                        status === 'fish-type-created') && (
+                                        <p className="text-sm text-muted-foreground">
+                                            Added.
+                                        </p>
                                     )}
                                 </>
                             )}
@@ -376,9 +433,15 @@ export default function FishTypes({
                                 <TableBody>
                                     {Array.from({ length: 5 }).map((_, i) => (
                                         <TableRow key={i}>
-                                            <TableCell><Skeleton className="h-4 w-36" /></TableCell>
-                                            <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
-                                            <TableCell><Skeleton className="h-7 w-20" /></TableCell>
+                                            <TableCell>
+                                                <Skeleton className="h-4 w-36" />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Skeleton className="h-5 w-16 rounded-full" />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Skeleton className="h-7 w-20" />
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -386,11 +449,21 @@ export default function FishTypes({
                         </div>
                     }
                 >
-                    <FishTypesTable fishTypes={fishTypes ?? []} onEdit={openEdit} />
+                    <FishTypesTable
+                        fishTypes={fishTypes ?? []}
+                        onEdit={openEdit}
+                    />
                 </Deferred>
             </div>
 
-            <Dialog open={editingFishType !== null} onOpenChange={(open) => { if (!open) closeDialog(); }}>
+            <Dialog
+                open={editingFishType !== null}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        closeDialog();
+                    }
+                }}
+            >
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Edit Fish Type</DialogTitle>
@@ -403,7 +476,9 @@ export default function FishTypes({
                                 <Input
                                     id="edit-name"
                                     value={data.name}
-                                    onChange={(e) => setData('name', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('name', e.target.value)
+                                    }
                                     required
                                     autoFocus
                                 />
@@ -412,7 +487,12 @@ export default function FishTypes({
                         </div>
 
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={closeDialog} disabled={editProcessing}>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={closeDialog}
+                                disabled={editProcessing}
+                            >
                                 Cancel
                             </Button>
                             <Button type="submit" disabled={editProcessing}>

@@ -4,15 +4,22 @@ import { Head, router, useForm, usePoll } from '@inertiajs/react';
 import AdminOrderController from '@/actions/App/Http/Controllers/Admin/OrderController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
-import { OrderTimeline  } from '@/components/orders/OrderTimeline';
-import type {StatusLog} from '@/components/orders/OrderTimeline';
+import { OrderTimeline } from '@/components/orders/OrderTimeline';
+import type { StatusLog } from '@/components/orders/OrderTimeline';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { index } from '@/routes/admin/orders';
 
 const STATUS_LABELS: Record<string, string> = {
@@ -97,8 +104,7 @@ export default function AdminOrderShow({
         });
     }
 
-    const customerName =
-        order.user?.name ?? order.guest_name ?? 'Guest';
+    const customerName = order.user?.name ?? order.guest_name ?? 'Guest';
 
     return (
         <>
@@ -115,8 +121,17 @@ export default function AdminOrderShow({
                             )}
                         </p>
                     </div>
-                    <Badge className={STATUS_COLORS[order.status] ?? 'bg-neutral-100'}>
-                        {order.status === 'delivered' && <HugeiconsIcon icon={PackageDelivered01Icon} size={12} />}
+                    <Badge
+                        className={
+                            STATUS_COLORS[order.status] ?? 'bg-neutral-100'
+                        }
+                    >
+                        {order.status === 'delivered' && (
+                            <HugeiconsIcon
+                                icon={PackageDelivered01Icon}
+                                size={12}
+                            />
+                        )}
                         {STATUS_LABELS[order.status] ?? order.status}
                     </Badge>
                 </div>
@@ -138,28 +153,40 @@ export default function AdminOrderShow({
                             <TableRow>
                                 <TableHead>Fish</TableHead>
                                 <TableHead className="text-right">kg</TableHead>
-                                <TableHead className="text-right">lbs</TableHead>
-                                <TableHead className="text-right">$/lb</TableHead>
-                                <TableHead className="text-right">Subtotal (SBD)</TableHead>
+                                <TableHead className="text-right">
+                                    lbs
+                                </TableHead>
+                                <TableHead className="text-right">
+                                    $/lb
+                                </TableHead>
+                                <TableHead className="text-right">
+                                    Subtotal (SBD)
+                                </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {order.items.map((item) => (
                                 <TableRow key={item.id}>
                                     <TableCell>
-                                    {item.fish_type.name}
-                                    {item.cut && item.cut !== 'whole' && (
-                                        <span className="ml-1.5 text-xs capitalize text-muted-foreground">({item.cut})</span>
-                                    )}
-                                </TableCell>
+                                        {item.fish_type.name}
+                                        {item.cut && item.cut !== 'whole' && (
+                                            <span className="ml-1.5 text-xs text-muted-foreground capitalize">
+                                                ({item.cut})
+                                            </span>
+                                        )}
+                                    </TableCell>
                                     <TableCell className="text-right font-mono">
                                         {Number(item.quantity_kg).toFixed(3)}
                                     </TableCell>
                                     <TableCell className="text-right font-mono text-muted-foreground">
-                                        {Number(item.quantity_pounds).toFixed(3)}
+                                        {Number(item.quantity_pounds).toFixed(
+                                            3,
+                                        )}
                                     </TableCell>
                                     <TableCell className="text-right font-mono text-muted-foreground">
-                                        {Number(item.price_per_pound_snapshot).toFixed(2)}
+                                        {Number(
+                                            item.price_per_pound_snapshot,
+                                        ).toFixed(2)}
                                     </TableCell>
                                     <TableCell className="text-right font-mono">
                                         {Number(item.subtotal_sbd).toFixed(2)}
@@ -170,12 +197,17 @@ export default function AdminOrderShow({
                     </Table>
                 </div>
 
-                <div className="space-y-1 max-w-xs ml-auto">
+                <div className="ml-auto max-w-xs space-y-1">
                     {order.filleting && (
                         <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Filleting</span>
+                            <span className="text-muted-foreground">
+                                Filleting
+                            </span>
                             <span className="font-mono">
-                                +${Number(order.filleting_fee_snapshot).toFixed(2)}
+                                +$
+                                {Number(order.filleting_fee_snapshot).toFixed(
+                                    2,
+                                )}
                             </span>
                         </div>
                     )}
@@ -188,13 +220,16 @@ export default function AdminOrderShow({
                                 )}
                             </span>
                             <span className="font-mono">
-                                +${Number(order.delivery_fee_snapshot).toFixed(2)}
+                                +$
+                                {Number(order.delivery_fee_snapshot).toFixed(2)}
                             </span>
                         </div>
                     )}
                     {Number(order.discount_sbd) > 0 && (
                         <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Discount</span>
+                            <span className="text-muted-foreground">
+                                Discount
+                            </span>
                             <span className="font-mono text-emerald-700 dark:text-emerald-400">
                                 −${Number(order.discount_sbd).toFixed(2)}
                             </span>
@@ -205,7 +240,9 @@ export default function AdminOrderShow({
                             <span className="text-muted-foreground">
                                 {order.tax_label_snapshot?.trim() || 'Tax'}
                             </span>
-                            <span className="font-mono">+${Number(order.tax_sbd).toFixed(2)}</span>
+                            <span className="font-mono">
+                                +${Number(order.tax_sbd).toFixed(2)}
+                            </span>
                         </div>
                     )}
                     <Separator />
@@ -267,7 +304,10 @@ export default function AdminOrderShow({
                 )}
 
                 <p className="text-xs text-muted-foreground">
-                    Placed on {new Date(order.created_at).toLocaleString('en-AU', { hour12: false })}
+                    Placed on{' '}
+                    {new Date(order.created_at).toLocaleString('en-AU', {
+                        hour12: false,
+                    })}
                 </p>
             </div>
         </>

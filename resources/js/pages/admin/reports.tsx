@@ -1,10 +1,17 @@
-import { useMemo, useState } from 'react';
-import { Head, router } from '@inertiajs/react';
 import {
+    SortByDown01Icon,
+    SortByUp01Icon,
+    Sorting01Icon,
+} from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Head, router } from '@inertiajs/react';
+import type {
     ColumnDef,
     ColumnFiltersState,
     SortingState,
     VisibilityState,
+} from '@tanstack/react-table';
+import {
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
@@ -12,8 +19,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from '@tanstack/react-table';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { SortByDown01Icon, SortByUp01Icon, Sorting01Icon } from '@hugeicons/core-free-icons';
+import { useState } from 'react';
 import {
     Area,
     AreaChart,
@@ -30,19 +36,37 @@ import {
 import ReportingController from '@/actions/App/Http/Controllers/Admin/ReportingController';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import {
     ChartContainer,
     ChartLegend,
     ChartLegendContent,
     ChartTooltip,
     ChartTooltipContent,
-    type ChartConfig,
 } from '@/components/ui/chart';
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
+import type { ChartConfig } from '@/components/ui/chart';
+import {
+    Empty,
+    EmptyDescription,
+    EmptyHeader,
+    EmptyTitle,
+} from '@/components/ui/empty';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn } from '@/lib/utils';
 import { index } from '@/routes/admin/reports';
@@ -84,9 +108,11 @@ function SortIcon({ sorted }: { sorted: false | 'asc' | 'desc' }) {
     if (sorted === 'asc') {
         return <HugeiconsIcon icon={SortByDown01Icon} data-icon="inline-end" />;
     }
+
     if (sorted === 'desc') {
         return <HugeiconsIcon icon={SortByUp01Icon} data-icon="inline-end" />;
     }
+
     return <HugeiconsIcon icon={Sorting01Icon} data-icon="inline-end" />;
 }
 
@@ -96,7 +122,9 @@ const stockColumns: ColumnDef<StockEntry>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === 'asc')
+                }
             >
                 Date
                 <SortIcon sorted={column.getIsSorted()} />
@@ -104,7 +132,9 @@ const stockColumns: ColumnDef<StockEntry>[] = [
         ),
         cell: ({ row }) => (
             <span className="text-muted-foreground">
-                {new Date(row.original.created_at).toLocaleString('en-AU', { hour12: false })}
+                {new Date(row.original.created_at).toLocaleString('en-AU', {
+                    hour12: false,
+                })}
             </span>
         ),
     },
@@ -113,13 +143,17 @@ const stockColumns: ColumnDef<StockEntry>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === 'asc')
+                }
             >
                 Type
                 <SortIcon sorted={column.getIsSorted()} />
             </Button>
         ),
-        cell: ({ row }) => <span className="capitalize">{row.original.type}</span>,
+        cell: ({ row }) => (
+            <span className="capitalize">{row.original.type}</span>
+        ),
     },
     {
         accessorKey: 'delta_kg',
@@ -127,7 +161,9 @@ const stockColumns: ColumnDef<StockEntry>[] = [
             <Button
                 variant="ghost"
                 className="w-full justify-end"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === 'asc')
+                }
             >
                 Delta (kg)
                 <SortIcon sorted={column.getIsSorted()} />
@@ -137,14 +173,17 @@ const stockColumns: ColumnDef<StockEntry>[] = [
             <span
                 className={cn(
                     'block text-right font-mono',
-                    Number(row.original.delta_kg) >= 0 ? 'text-green-600' : 'text-red-600',
+                    Number(row.original.delta_kg) >= 0
+                        ? 'text-green-600'
+                        : 'text-red-600',
                 )}
             >
                 {Number(row.original.delta_kg) > 0 ? '+' : ''}
                 {Number(row.original.delta_kg).toFixed(3)}
             </span>
         ),
-        sortingFn: (a, b) => Number(a.original.delta_kg) - Number(b.original.delta_kg),
+        sortingFn: (a, b) =>
+            Number(a.original.delta_kg) - Number(b.original.delta_kg),
     },
     {
         accessorKey: 'reason',
@@ -163,7 +202,6 @@ export default function Reports({
     totalPounds,
     topFishTypes,
     stockHistory,
-    kgToLbsRate,
 }: {
     period: Period;
     orderCount: number;
@@ -179,9 +217,13 @@ export default function Reports({
     const fishRevenue = totalRevenue - filletingRevenue - deliveryRevenue;
 
     // Datatable state
-    const [sorting, setSorting] = useState<SortingState>([{ id: 'created_at', desc: true }]);
+    const [sorting, setSorting] = useState<SortingState>([
+        { id: 'created_at', desc: true },
+    ]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+        {},
+    );
     const [globalFilter, setGlobalFilter] = useState('');
 
     const table = useReactTable({
@@ -212,12 +254,24 @@ export default function Reports({
     // Chart data
     const revenueData = [
         { name: 'fish', value: fishRevenue, fill: 'var(--color-fish)' },
-        { name: 'filleting', value: filletingRevenue, fill: 'var(--color-filleting)' },
-        { name: 'delivery', value: deliveryRevenue, fill: 'var(--color-delivery)' },
+        {
+            name: 'filleting',
+            value: filletingRevenue,
+            fill: 'var(--color-filleting)',
+        },
+        {
+            name: 'delivery',
+            value: deliveryRevenue,
+            fill: 'var(--color-delivery)',
+        },
     ].filter((d) => d.value > 0);
 
     const stockChartData = [...stockHistory]
-        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+        .sort(
+            (a, b) =>
+                new Date(a.created_at).getTime() -
+                new Date(b.created_at).getTime(),
+        )
         .map((entry) => ({
             date: new Date(entry.created_at).toLocaleDateString('en-AU'),
             delta_kg: Number(entry.delta_kg),
@@ -229,7 +283,10 @@ export default function Reports({
 
             <div className="space-y-8">
                 <div className="flex items-center justify-between gap-4">
-                    <Heading title="Reports" description="Revenue, orders, and weight summaries." />
+                    <Heading
+                        title="Reports"
+                        description="Revenue, orders, and weight summaries."
+                    />
 
                     <ToggleGroup
                         type="single"
@@ -247,17 +304,32 @@ export default function Reports({
                 {/* Summary cards */}
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <StatCard label="Orders" value={String(orderCount)} />
-                    <StatCard label="Total revenue" value={`$${totalRevenue.toFixed(2)} SBD`} />
-                    <StatCard label="Weight sold" value={`${totalKg.toFixed(3)} kg`} sub={`${totalPounds.toFixed(3)} lbs`} />
-                    <StatCard label="Fish revenue" value={`$${fishRevenue.toFixed(2)} SBD`} sub="excl. fees" />
+                    <StatCard
+                        label="Total revenue"
+                        value={`$${totalRevenue.toFixed(2)} SBD`}
+                    />
+                    <StatCard
+                        label="Weight sold"
+                        value={`${totalKg.toFixed(3)} kg`}
+                        sub={`${totalPounds.toFixed(3)} lbs`}
+                    />
+                    <StatCard
+                        label="Fish revenue"
+                        value={`$${fishRevenue.toFixed(2)} SBD`}
+                        sub="excl. fees"
+                    />
                 </div>
 
                 {/* Revenue breakdown — donut chart */}
                 <div className="grid gap-4 md:grid-cols-2">
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-base">Revenue breakdown</CardTitle>
-                            <CardDescription>Fish sales vs fees</CardDescription>
+                            <CardTitle className="text-base">
+                                Revenue breakdown
+                            </CardTitle>
+                            <CardDescription>
+                                Fish sales vs fees
+                            </CardDescription>
                         </CardHeader>
                         <CardContent>
                             {revenueData.length === 0 ? (
@@ -265,7 +337,10 @@ export default function Reports({
                                     No revenue for this period.
                                 </div>
                             ) : (
-                                <ChartContainer config={revenueConfig} className="mx-auto aspect-square max-h-80">
+                                <ChartContainer
+                                    config={revenueConfig}
+                                    className="mx-auto aspect-square max-h-80"
+                                >
                                     <PieChart accessibilityLayer>
                                         <ChartTooltip
                                             cursor={false}
@@ -288,11 +363,18 @@ export default function Reports({
                                             strokeWidth={5}
                                         >
                                             {revenueData.map((entry) => (
-                                                <Cell key={entry.name} fill={entry.fill} />
+                                                <Cell
+                                                    key={entry.name}
+                                                    fill={entry.fill}
+                                                />
                                             ))}
                                             <Label
                                                 content={({ viewBox }) => {
-                                                    if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                                                    if (
+                                                        viewBox &&
+                                                        'cx' in viewBox &&
+                                                        'cy' in viewBox
+                                                    ) {
                                                         return (
                                                             <text
                                                                 x={viewBox.cx}
@@ -301,15 +383,28 @@ export default function Reports({
                                                                 dominantBaseline="middle"
                                                             >
                                                                 <tspan
-                                                                    x={viewBox.cx}
-                                                                    y={viewBox.cy}
+                                                                    x={
+                                                                        viewBox.cx
+                                                                    }
+                                                                    y={
+                                                                        viewBox.cy
+                                                                    }
                                                                     className="fill-foreground text-2xl font-bold"
                                                                 >
-                                                                    ${totalRevenue.toFixed(0)}
+                                                                    $
+                                                                    {totalRevenue.toFixed(
+                                                                        0,
+                                                                    )}
                                                                 </tspan>
                                                                 <tspan
-                                                                    x={viewBox.cx}
-                                                                    y={(viewBox.cy || 0) + 22}
+                                                                    x={
+                                                                        viewBox.cx
+                                                                    }
+                                                                    y={
+                                                                        (viewBox.cy ||
+                                                                            0) +
+                                                                        22
+                                                                    }
                                                                     className="fill-muted-foreground text-xs"
                                                                 >
                                                                     SBD
@@ -320,28 +415,46 @@ export default function Reports({
                                                 }}
                                             />
                                         </Pie>
-                                        <ChartLegend content={<ChartLegendContent nameKey="name" />} />
+                                        <ChartLegend
+                                            content={
+                                                <ChartLegendContent nameKey="name" />
+                                            }
+                                        />
                                     </PieChart>
                                 </ChartContainer>
                             )}
                             <Separator className="my-4" />
                             <div className="flex flex-col gap-2 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Fish sales</span>
-                                    <span className="font-mono">${fishRevenue.toFixed(2)} SBD</span>
+                                    <span className="text-muted-foreground">
+                                        Fish sales
+                                    </span>
+                                    <span className="font-mono">
+                                        ${fishRevenue.toFixed(2)} SBD
+                                    </span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Filleting fees</span>
-                                    <span className="font-mono">${filletingRevenue.toFixed(2)} SBD</span>
+                                    <span className="text-muted-foreground">
+                                        Filleting fees
+                                    </span>
+                                    <span className="font-mono">
+                                        ${filletingRevenue.toFixed(2)} SBD
+                                    </span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Delivery fees</span>
-                                    <span className="font-mono">${deliveryRevenue.toFixed(2)} SBD</span>
+                                    <span className="text-muted-foreground">
+                                        Delivery fees
+                                    </span>
+                                    <span className="font-mono">
+                                        ${deliveryRevenue.toFixed(2)} SBD
+                                    </span>
                                 </div>
                                 <Separator />
                                 <div className="flex justify-between font-semibold">
                                     <span>Total</span>
-                                    <span className="font-mono">${totalRevenue.toFixed(2)} SBD</span>
+                                    <span className="font-mono">
+                                        ${totalRevenue.toFixed(2)} SBD
+                                    </span>
                                 </div>
                             </div>
                         </CardContent>
@@ -350,19 +463,28 @@ export default function Reports({
                     {/* Top fish types — horizontal bar chart */}
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-base">Top fish types</CardTitle>
-                            <CardDescription>By number of orders</CardDescription>
+                            <CardTitle className="text-base">
+                                Top fish types
+                            </CardTitle>
+                            <CardDescription>
+                                By number of orders
+                            </CardDescription>
                         </CardHeader>
                         <CardContent>
                             {topFishTypes.length === 0 ? (
                                 <Empty>
                                     <EmptyHeader>
                                         <EmptyTitle>No data</EmptyTitle>
-                                        <EmptyDescription>No data for this period.</EmptyDescription>
+                                        <EmptyDescription>
+                                            No data for this period.
+                                        </EmptyDescription>
                                     </EmptyHeader>
                                 </Empty>
                             ) : (
-                                <ChartContainer config={fishTypesConfig} className="max-h-64 w-full">
+                                <ChartContainer
+                                    config={fishTypesConfig}
+                                    className="max-h-64 w-full"
+                                >
                                     <BarChart
                                         accessibilityLayer
                                         data={topFishTypes}
@@ -384,7 +506,9 @@ export default function Reports({
                                             axisLine={false}
                                             allowDecimals={false}
                                         />
-                                        <ChartTooltip content={<ChartTooltipContent />} />
+                                        <ChartTooltip
+                                            content={<ChartTooltipContent />}
+                                        />
                                         <Bar
                                             dataKey="order_count"
                                             fill="var(--color-order_count)"
@@ -399,25 +523,42 @@ export default function Reports({
 
                 {/* Stock history — area chart + datatable */}
                 <div className="space-y-3">
-                    <Heading variant="small" title="Stock history" description="Inventory changes for this period." />
+                    <Heading
+                        variant="small"
+                        title="Stock history"
+                        description="Inventory changes for this period."
+                    />
 
                     {stockHistory.length === 0 ? (
                         <Empty>
                             <EmptyHeader>
                                 <EmptyTitle>No stock changes</EmptyTitle>
-                                <EmptyDescription>No stock changes recorded.</EmptyDescription>
+                                <EmptyDescription>
+                                    No stock changes recorded.
+                                </EmptyDescription>
                             </EmptyHeader>
                         </Empty>
                     ) : (
                         <>
                             <Card>
                                 <CardHeader>
-                                    <CardTitle className="text-base">Stock delta over time</CardTitle>
-                                    <CardDescription>kg added or removed per adjustment</CardDescription>
+                                    <CardTitle className="text-base">
+                                        Stock delta over time
+                                    </CardTitle>
+                                    <CardDescription>
+                                        kg added or removed per adjustment
+                                    </CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <ChartContainer config={stockConfig} className="max-h-52 w-full">
-                                        <AreaChart accessibilityLayer data={stockChartData} margin={{ left: 8, right: 8 }}>
+                                    <ChartContainer
+                                        config={stockConfig}
+                                        className="max-h-52 w-full"
+                                    >
+                                        <AreaChart
+                                            accessibilityLayer
+                                            data={stockChartData}
+                                            margin={{ left: 8, right: 8 }}
+                                        >
                                             <CartesianGrid vertical={false} />
                                             <XAxis
                                                 dataKey="date"
@@ -455,11 +596,15 @@ export default function Reports({
                             </Card>
 
                             <div className="flex items-center justify-between gap-3">
-                                <span className="text-sm text-muted-foreground">All changes</span>
+                                <span className="text-sm text-muted-foreground">
+                                    All changes
+                                </span>
                                 <Input
                                     placeholder="Search reason or type..."
                                     value={globalFilter}
-                                    onChange={(e) => setGlobalFilter(e.target.value)}
+                                    onChange={(e) =>
+                                        setGlobalFilter(e.target.value)
+                                    }
                                     className="w-56"
                                 />
                             </div>
@@ -467,43 +612,71 @@ export default function Reports({
                             <div className="overflow-hidden rounded-md border">
                                 <Table>
                                     <TableHeader>
-                                        {table.getHeaderGroups().map((headerGroup) => (
-                                            <TableRow key={headerGroup.id}>
-                                                {headerGroup.headers.map((header) => (
-                                                    <TableHead key={header.id}>
-                                                        {header.isPlaceholder
-                                                            ? null
-                                                            : flexRender(
-                                                                  header.column.columnDef.header,
-                                                                  header.getContext(),
-                                                              )}
-                                                    </TableHead>
-                                                ))}
-                                            </TableRow>
-                                        ))}
+                                        {table
+                                            .getHeaderGroups()
+                                            .map((headerGroup) => (
+                                                <TableRow key={headerGroup.id}>
+                                                    {headerGroup.headers.map(
+                                                        (header) => (
+                                                            <TableHead
+                                                                key={header.id}
+                                                            >
+                                                                {header.isPlaceholder
+                                                                    ? null
+                                                                    : flexRender(
+                                                                          header
+                                                                              .column
+                                                                              .columnDef
+                                                                              .header,
+                                                                          header.getContext(),
+                                                                      )}
+                                                            </TableHead>
+                                                        ),
+                                                    )}
+                                                </TableRow>
+                                            ))}
                                     </TableHeader>
                                     <TableBody>
                                         {table.getRowModel().rows.length ? (
-                                            table.getRowModel().rows.map((row, i) => (
-                                                <TableRow key={i}>
-                                                    {row.getVisibleCells().map((cell) => (
-                                                        <TableCell key={cell.id}>
-                                                            {flexRender(
-                                                                cell.column.columnDef.cell,
-                                                                cell.getContext(),
-                                                            )}
-                                                        </TableCell>
-                                                    ))}
-                                                </TableRow>
-                                            ))
+                                            table
+                                                .getRowModel()
+                                                .rows.map((row, i) => (
+                                                    <TableRow key={i}>
+                                                        {row
+                                                            .getVisibleCells()
+                                                            .map((cell) => (
+                                                                <TableCell
+                                                                    key={
+                                                                        cell.id
+                                                                    }
+                                                                >
+                                                                    {flexRender(
+                                                                        cell
+                                                                            .column
+                                                                            .columnDef
+                                                                            .cell,
+                                                                        cell.getContext(),
+                                                                    )}
+                                                                </TableCell>
+                                                            ))}
+                                                    </TableRow>
+                                                ))
                                         ) : (
                                             <TableRow>
-                                                <TableCell colSpan={stockColumns.length}>
+                                                <TableCell
+                                                    colSpan={
+                                                        stockColumns.length
+                                                    }
+                                                >
                                                     <Empty>
                                                         <EmptyHeader>
-                                                            <EmptyTitle>No stock changes</EmptyTitle>
+                                                            <EmptyTitle>
+                                                                No stock changes
+                                                            </EmptyTitle>
                                                             <EmptyDescription>
-                                                                No stock changes match your search.
+                                                                No stock changes
+                                                                match your
+                                                                search.
                                                             </EmptyDescription>
                                                         </EmptyHeader>
                                                     </Empty>
@@ -517,21 +690,32 @@ export default function Reports({
                             {table.getPageCount() > 1 && (
                                 <div className="flex items-center justify-between text-sm text-muted-foreground">
                                     <span>
-                                        {table.getFilteredRowModel().rows.length} change
-                                        {table.getFilteredRowModel().rows.length !== 1 ? 's' : ''}
+                                        {
+                                            table.getFilteredRowModel().rows
+                                                .length
+                                        }{' '}
+                                        change
+                                        {table.getFilteredRowModel().rows
+                                            .length !== 1
+                                            ? 's'
+                                            : ''}
                                     </span>
                                     <div className="flex items-center gap-2">
                                         <Button
                                             variant="outline"
                                             size="sm"
                                             onClick={() => table.previousPage()}
-                                            disabled={!table.getCanPreviousPage()}
+                                            disabled={
+                                                !table.getCanPreviousPage()
+                                            }
                                         >
                                             Previous
                                         </Button>
                                         <span>
-                                            Page {table.getState().pagination.pageIndex + 1} of{' '}
-                                            {table.getPageCount()}
+                                            Page{' '}
+                                            {table.getState().pagination
+                                                .pageIndex + 1}{' '}
+                                            of {table.getPageCount()}
                                         </span>
                                         <Button
                                             variant="outline"
@@ -552,7 +736,15 @@ export default function Reports({
     );
 }
 
-function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
+function StatCard({
+    label,
+    value,
+    sub,
+}: {
+    label: string;
+    value: string;
+    sub?: string;
+}) {
     return (
         <Card>
             <CardHeader className="pb-2">
