@@ -1,24 +1,43 @@
-import { useEffect, useRef, useState } from 'react';
-import { Head, InfiniteScroll, Link, router } from '@inertiajs/react';
 import {
+    PlusSignIcon,
+    SortByDown01Icon,
+    SortByUp01Icon,
+    Sorting01Icon,
+} from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Head, InfiniteScroll, Link, router } from '@inertiajs/react';
+import type {
     ColumnDef,
     ColumnFiltersState,
     SortingState,
     VisibilityState,
+} from '@tanstack/react-table';
+import {
     flexRender,
     getCoreRowModel,
     getSortedRowModel,
     useReactTable,
 } from '@tanstack/react-table';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { PlusSignIcon, SortByDown01Icon, SortByUp01Icon, Sorting01Icon } from '@hugeicons/core-free-icons';
+import { useEffect, useRef, useState } from 'react';
 import AdminOrderController from '@/actions/App/Http/Controllers/Admin/OrderController';
 import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
+import {
+    Empty,
+    EmptyDescription,
+    EmptyHeader,
+    EmptyTitle,
+} from '@/components/ui/empty';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import { index, show } from '@/routes/admin/orders';
 
@@ -57,9 +76,11 @@ function SortIcon({ sorted }: { sorted: false | 'asc' | 'desc' }) {
     if (sorted === 'asc') {
         return <HugeiconsIcon icon={SortByDown01Icon} data-icon="inline-end" />;
     }
+
     if (sorted === 'desc') {
         return <HugeiconsIcon icon={SortByUp01Icon} data-icon="inline-end" />;
     }
+
     return <HugeiconsIcon icon={Sorting01Icon} data-icon="inline-end" />;
 }
 
@@ -69,13 +90,17 @@ const columns: ColumnDef<Order>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === 'asc')
+                }
             >
                 Order
                 <SortIcon sorted={column.getIsSorted()} />
             </Button>
         ),
-        cell: ({ row }) => <span className="font-mono">#{row.original.id}</span>,
+        cell: ({ row }) => (
+            <span className="font-mono">#{row.original.id}</span>
+        ),
     },
     {
         id: 'customer',
@@ -83,7 +108,9 @@ const columns: ColumnDef<Order>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === 'asc')
+                }
             >
                 Customer
                 <SortIcon sorted={column.getIsSorted()} />
@@ -98,7 +125,8 @@ const columns: ColumnDef<Order>[] = [
             <Badge
                 className={cn(
                     'rounded-full',
-                    STATUS_COLORS[row.original.status] ?? 'bg-neutral-100 text-neutral-600',
+                    STATUS_COLORS[row.original.status] ??
+                        'bg-neutral-100 text-neutral-600',
                 )}
             >
                 {STATUS_LABELS[row.original.status] ?? row.original.status}
@@ -111,7 +139,9 @@ const columns: ColumnDef<Order>[] = [
             <Button
                 variant="ghost"
                 className="w-full justify-end"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === 'asc')
+                }
             >
                 Total (SBD)
                 <SortIcon sorted={column.getIsSorted()} />
@@ -122,14 +152,17 @@ const columns: ColumnDef<Order>[] = [
                 ${Number(row.original.total_sbd).toFixed(2)}
             </span>
         ),
-        sortingFn: (a, b) => Number(a.original.total_sbd) - Number(b.original.total_sbd),
+        sortingFn: (a, b) =>
+            Number(a.original.total_sbd) - Number(b.original.total_sbd),
     },
     {
         accessorKey: 'created_at',
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === 'asc')
+                }
             >
                 Date
                 <SortIcon sorted={column.getIsSorted()} />
@@ -165,11 +198,17 @@ export default function AdminOrders({
     search: string;
     statuses: string[];
 }) {
-    const [sorting, setSorting] = useState<SortingState>([{ id: 'created_at', desc: true }]);
+    const [sorting, setSorting] = useState<SortingState>([
+        { id: 'created_at', desc: true },
+    ]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+        {},
+    );
     const [searchValue, setSearchValue] = useState(search);
     const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const filterStatusRef = useRef(filterStatus);
+    filterStatusRef.current = filterStatus;
 
     const table = useReactTable({
         data: orders.data,
@@ -186,11 +225,22 @@ export default function AdminOrders({
         if (searchTimer.current) {
             clearTimeout(searchTimer.current);
         }
+
         searchTimer.current = setTimeout(() => {
             const params: Record<string, string> = {};
-            if (filterStatus) params.status = filterStatus;
-            if (searchValue) params.search = searchValue;
-            router.get(index(), params, { preserveState: true, reset: ['orders'] });
+
+            if (filterStatusRef.current) {
+                params.status = filterStatusRef.current;
+            }
+
+            if (searchValue) {
+                params.search = searchValue;
+            }
+
+            router.get(index(), params, {
+                preserveState: true,
+                reset: ['orders'],
+            });
         }, 300);
 
         return () => {
@@ -202,8 +252,15 @@ export default function AdminOrders({
 
     function applyFilter(status: string | null) {
         const params: Record<string, string> = {};
-        if (status) params.status = status;
-        if (searchValue) params.search = searchValue;
+
+        if (status) {
+            params.status = status;
+        }
+
+        if (searchValue) {
+            params.search = searchValue;
+        }
+
         router.get(index(), params, { preserveState: true, reset: ['orders'] });
     }
 
@@ -216,7 +273,8 @@ export default function AdminOrders({
                     <Heading title="Orders" />
                     <Button asChild variant="outline">
                         <Link href={AdminOrderController.createGuest.url()}>
-                            <HugeiconsIcon icon={PlusSignIcon} size={16} />New guest order
+                            <HugeiconsIcon icon={PlusSignIcon} size={16} />
+                            New guest order
                         </Link>
                     </Button>
                 </div>
@@ -235,7 +293,9 @@ export default function AdminOrders({
                             <Button
                                 key={s}
                                 size="sm"
-                                variant={filterStatus === s ? 'default' : 'secondary'}
+                                variant={
+                                    filterStatus === s ? 'default' : 'secondary'
+                                }
                                 className="rounded-full"
                                 onClick={() => applyFilter(s)}
                             >
@@ -263,7 +323,8 @@ export default function AdminOrders({
                                                 {header.isPlaceholder
                                                     ? null
                                                     : flexRender(
-                                                          header.column.columnDef.header,
+                                                          header.column
+                                                              .columnDef.header,
                                                           header.getContext(),
                                                       )}
                                             </TableHead>
@@ -275,14 +336,17 @@ export default function AdminOrders({
                                 {table.getRowModel().rows.length ? (
                                     table.getRowModel().rows.map((row) => (
                                         <TableRow key={row.id}>
-                                            {row.getVisibleCells().map((cell) => (
-                                                <TableCell key={cell.id}>
-                                                    {flexRender(
-                                                        cell.column.columnDef.cell,
-                                                        cell.getContext(),
-                                                    )}
-                                                </TableCell>
-                                            ))}
+                                            {row
+                                                .getVisibleCells()
+                                                .map((cell) => (
+                                                    <TableCell key={cell.id}>
+                                                        {flexRender(
+                                                            cell.column
+                                                                .columnDef.cell,
+                                                            cell.getContext(),
+                                                        )}
+                                                    </TableCell>
+                                                ))}
                                         </TableRow>
                                     ))
                                 ) : (
@@ -290,9 +354,12 @@ export default function AdminOrders({
                                         <TableCell colSpan={columns.length}>
                                             <Empty>
                                                 <EmptyHeader>
-                                                    <EmptyTitle>No orders found</EmptyTitle>
+                                                    <EmptyTitle>
+                                                        No orders found
+                                                    </EmptyTitle>
                                                     <EmptyDescription>
-                                                        No orders match the current filter.
+                                                        No orders match the
+                                                        current filter.
                                                     </EmptyDescription>
                                                 </EmptyHeader>
                                             </Empty>
