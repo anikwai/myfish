@@ -1,5 +1,6 @@
 import { Head, Link, usePage, usePoll } from '@inertiajs/react';
-import { OrderTimeline, type StatusLog } from '@/components/orders/OrderTimeline';
+import { OrderTimeline } from '@/components/orders/OrderTimeline';
+import type { StatusLog } from '@/components/orders/OrderTimeline';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -83,7 +84,7 @@ export default function GuestConfirmation({
                 <main className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
                     {/* Success header */}
                     <div className="mb-8 text-center">
-                        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600 text-xl">
+                        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-xl text-green-600">
                             ✓
                         </div>
                         <h1 className="text-2xl font-bold tracking-tight">
@@ -104,7 +105,7 @@ export default function GuestConfirmation({
                             <CardContent className="pt-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                                             Order
                                         </p>
                                         <p className="text-lg font-semibold">
@@ -135,7 +136,9 @@ export default function GuestConfirmation({
                                 <OrderTimeline
                                     logs={statusLogs}
                                     currentStatus={order.status}
-                                    rejectionReason={order.rejection_reason ?? null}
+                                    rejectionReason={
+                                        order.rejection_reason ?? null
+                                    }
                                 />
                             </CardContent>
                         </Card>
@@ -143,7 +146,7 @@ export default function GuestConfirmation({
                         {/* Order items */}
                         <Card>
                             <CardContent className="pt-6">
-                                <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                <p className="mb-3 text-xs font-medium tracking-wide text-muted-foreground uppercase">
                                     Fish
                                 </p>
                                 <div className="space-y-2">
@@ -154,9 +157,12 @@ export default function GuestConfirmation({
                                         >
                                             <span>
                                                 {item.fish_type.name}
-                                                {item.cut && item.cut !== 'whole' && (
-                                                    <span className="ml-1.5 text-xs capitalize text-muted-foreground">({item.cut})</span>
-                                                )}
+                                                {item.cut &&
+                                                    item.cut !== 'whole' && (
+                                                        <span className="ml-1.5 text-xs text-muted-foreground capitalize">
+                                                            ({item.cut})
+                                                        </span>
+                                                    )}
                                             </span>
                                             <span className="font-mono text-muted-foreground">
                                                 {Number(
@@ -205,19 +211,30 @@ export default function GuestConfirmation({
                                     )}
                                     {Number(order.discount_sbd) > 0 && (
                                         <div className="flex justify-between">
-                                            <span className="text-muted-foreground">Discount</span>
+                                            <span className="text-muted-foreground">
+                                                Discount
+                                            </span>
                                             <span className="font-mono text-emerald-700 dark:text-emerald-400">
-                                                −${Number(order.discount_sbd).toFixed(2)} SBD
+                                                −$
+                                                {Number(
+                                                    order.discount_sbd,
+                                                ).toFixed(2)}{' '}
+                                                SBD
                                             </span>
                                         </div>
                                     )}
                                     {Number(order.tax_sbd) > 0 && (
                                         <div className="flex justify-between">
                                             <span className="text-muted-foreground">
-                                                {order.tax_label_snapshot?.trim() || 'Tax'}
+                                                {order.tax_label_snapshot?.trim() ||
+                                                    'Tax'}
                                             </span>
                                             <span className="font-mono">
-                                                +${Number(order.tax_sbd).toFixed(2)} SBD
+                                                +$
+                                                {Number(order.tax_sbd).toFixed(
+                                                    2,
+                                                )}{' '}
+                                                SBD
                                             </span>
                                         </div>
                                     )}
@@ -225,9 +242,7 @@ export default function GuestConfirmation({
                                         <span>Total</span>
                                         <span className="font-mono">
                                             $
-                                            {Number(order.total_sbd).toFixed(
-                                                2,
-                                            )}{' '}
+                                            {Number(order.total_sbd).toFixed(2)}{' '}
                                             SBD
                                         </span>
                                     </div>
@@ -262,7 +277,8 @@ export default function GuestConfirmation({
                                                 query: {
                                                     name: order.guest_name,
                                                     email: order.guest_email,
-                                                    phone: order.guest_phone ?? '',
+                                                    phone:
+                                                        order.guest_phone ?? '',
                                                 },
                                             })}
                                         >
@@ -279,7 +295,10 @@ export default function GuestConfirmation({
 
                         <p className="text-center text-xs text-muted-foreground">
                             Placed on{' '}
-                            {new Date(order.created_at).toLocaleString('en-AU', { hour12: false })}
+                            {new Date(order.created_at).toLocaleString(
+                                'en-AU',
+                                { hour12: false },
+                            )}
                         </p>
                     </div>
                 </main>

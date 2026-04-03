@@ -2,12 +2,19 @@ import { PackageDelivered01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Head, usePage, usePoll } from '@inertiajs/react';
 import Heading from '@/components/heading';
-import { OrderTimeline  } from '@/components/orders/OrderTimeline';
-import type {StatusLog} from '@/components/orders/OrderTimeline';
+import { OrderTimeline } from '@/components/orders/OrderTimeline';
+import type { StatusLog } from '@/components/orders/OrderTimeline';
 import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { index } from '@/routes/orders';
 
 type FishType = { id: number; name: string };
@@ -55,7 +62,13 @@ const STATUS_COLORS: Record<string, string> = {
     delivered: 'bg-neutral-100 text-neutral-600',
 };
 
-export default function ShowOrder({ order, statusLogs }: { order: Order; statusLogs: StatusLog[] }) {
+export default function ShowOrder({
+    order,
+    statusLogs,
+}: {
+    order: Order;
+    statusLogs: StatusLog[];
+}) {
     const { props } = usePage<{ flash: { stock_warning?: boolean } }>();
     const stockWarning = props.flash?.stock_warning;
 
@@ -68,8 +81,18 @@ export default function ShowOrder({ order, statusLogs }: { order: Order; statusL
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <Heading title={`Order #${order.id}`} />
-                    <Badge className={STATUS_COLORS[order.status] ?? 'bg-neutral-100 text-neutral-600'}>
-                        {order.status === 'delivered' && <HugeiconsIcon icon={PackageDelivered01Icon} size={12} />}
+                    <Badge
+                        className={
+                            STATUS_COLORS[order.status] ??
+                            'bg-neutral-100 text-neutral-600'
+                        }
+                    >
+                        {order.status === 'delivered' && (
+                            <HugeiconsIcon
+                                icon={PackageDelivered01Icon}
+                                size={12}
+                            />
+                        )}
                         {STATUS_LABELS[order.status] ?? order.status}
                     </Badge>
                 </div>
@@ -91,64 +114,86 @@ export default function ShowOrder({ order, statusLogs }: { order: Order; statusL
                     </CardContent>
                 </Card>
 
-                <div className="rounded-lg border overflow-hidden">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Fish</TableHead>
-                            <TableHead className="text-right">kg</TableHead>
-                            <TableHead className="text-right">lbs</TableHead>
-                            <TableHead className="text-right">$/lb</TableHead>
-                            <TableHead className="text-right">Subtotal (SBD)</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {order.items.map((item) => (
-                            <TableRow key={item.id}>
-                                <TableCell>
-                                {item.fish_type.name}
-                                {item.cut && item.cut !== 'whole' && (
-                                    <span className="ml-1.5 text-xs capitalize text-muted-foreground">({item.cut})</span>
-                                )}
-                            </TableCell>
-                                <TableCell className="text-right font-mono">
-                                    {Number(item.quantity_kg).toFixed(3)}
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-muted-foreground">
-                                    {Number(item.quantity_pounds).toFixed(3)}
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-muted-foreground">
-                                    {Number(item.price_per_pound_snapshot).toFixed(2)}
-                                </TableCell>
-                                <TableCell className="text-right font-mono">
-                                    {Number(item.subtotal_sbd).toFixed(2)}
-                                </TableCell>
+                <div className="overflow-hidden rounded-lg border">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Fish</TableHead>
+                                <TableHead className="text-right">kg</TableHead>
+                                <TableHead className="text-right">
+                                    lbs
+                                </TableHead>
+                                <TableHead className="text-right">
+                                    $/lb
+                                </TableHead>
+                                <TableHead className="text-right">
+                                    Subtotal (SBD)
+                                </TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                        </TableHeader>
+                        <TableBody>
+                            {order.items.map((item) => (
+                                <TableRow key={item.id}>
+                                    <TableCell>
+                                        {item.fish_type.name}
+                                        {item.cut && item.cut !== 'whole' && (
+                                            <span className="ml-1.5 text-xs text-muted-foreground capitalize">
+                                                ({item.cut})
+                                            </span>
+                                        )}
+                                    </TableCell>
+                                    <TableCell className="text-right font-mono">
+                                        {Number(item.quantity_kg).toFixed(3)}
+                                    </TableCell>
+                                    <TableCell className="text-right font-mono text-muted-foreground">
+                                        {Number(item.quantity_pounds).toFixed(
+                                            3,
+                                        )}
+                                    </TableCell>
+                                    <TableCell className="text-right font-mono text-muted-foreground">
+                                        {Number(
+                                            item.price_per_pound_snapshot,
+                                        ).toFixed(2)}
+                                    </TableCell>
+                                    <TableCell className="text-right font-mono">
+                                        {Number(item.subtotal_sbd).toFixed(2)}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
                 </div>
 
-                <div className="space-y-1 max-w-xs ml-auto">
+                <div className="ml-auto max-w-xs space-y-1">
                     {order.filleting && (
                         <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Filleting</span>
+                            <span className="text-muted-foreground">
+                                Filleting
+                            </span>
                             <span className="font-mono">
-                                +${Number(order.filleting_fee_snapshot).toFixed(2)}
+                                +$
+                                {Number(order.filleting_fee_snapshot).toFixed(
+                                    2,
+                                )}
                             </span>
                         </div>
                     )}
                     {order.delivery && (
                         <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Delivery</span>
+                            <span className="text-muted-foreground">
+                                Delivery
+                            </span>
                             <span className="font-mono">
-                                +${Number(order.delivery_fee_snapshot).toFixed(2)}
+                                +$
+                                {Number(order.delivery_fee_snapshot).toFixed(2)}
                             </span>
                         </div>
                     )}
                     {Number(order.discount_sbd) > 0 && (
                         <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Discount</span>
+                            <span className="text-muted-foreground">
+                                Discount
+                            </span>
                             <span className="font-mono text-emerald-700 dark:text-emerald-400">
                                 −${Number(order.discount_sbd).toFixed(2)}
                             </span>
@@ -159,7 +204,9 @@ export default function ShowOrder({ order, statusLogs }: { order: Order; statusL
                             <span className="text-muted-foreground">
                                 {order.tax_label_snapshot?.trim() || 'Tax'}
                             </span>
-                            <span className="font-mono">+${Number(order.tax_sbd).toFixed(2)}</span>
+                            <span className="font-mono">
+                                +${Number(order.tax_sbd).toFixed(2)}
+                            </span>
                         </div>
                     )}
                     <div className="flex justify-between text-sm font-semibold">
@@ -181,7 +228,9 @@ export default function ShowOrder({ order, statusLogs }: { order: Order; statusL
 
                 <p className="text-xs text-muted-foreground">
                     Placed on{' '}
-                    {new Date(order.created_at).toLocaleString('en-AU', { hour12: false })}
+                    {new Date(order.created_at).toLocaleString('en-AU', {
+                        hour12: false,
+                    })}
                 </p>
             </div>
         </>

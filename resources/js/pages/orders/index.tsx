@@ -1,11 +1,23 @@
-import { Head, InfiniteScroll, Link, router } from '@inertiajs/react';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { PlusSignIcon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Head, InfiniteScroll, Link, router } from '@inertiajs/react';
 import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+    Empty,
+    EmptyDescription,
+    EmptyHeader,
+    EmptyTitle,
+} from '@/components/ui/empty';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import { create, index, show } from '@/routes/orders';
 
@@ -63,7 +75,10 @@ export default function OrderIndex({
                 <div className="flex items-center justify-between">
                     <Heading title="My orders" />
                     <Button asChild>
-                        <Link href={create()}><HugeiconsIcon icon={PlusSignIcon} size={16} />Place new order</Link>
+                        <Link href={create()}>
+                            <HugeiconsIcon icon={PlusSignIcon} size={16} />
+                            Place new order
+                        </Link>
                     </Button>
                 </div>
 
@@ -72,7 +87,11 @@ export default function OrderIndex({
                         <Button
                             key={tab.key ?? 'all'}
                             size="sm"
-                            variant={filterStatus === tab.key ? 'default' : 'secondary'}
+                            variant={
+                                filterStatus === tab.key
+                                    ? 'default'
+                                    : 'secondary'
+                            }
                             className="rounded-full"
                             onClick={() => applyFilter(tab.key)}
                         >
@@ -100,7 +119,9 @@ export default function OrderIndex({
                                     <TableRow>
                                         <TableHead>Order</TableHead>
                                         <TableHead>Status</TableHead>
-                                        <TableHead className="text-right">Total (SBD)</TableHead>
+                                        <TableHead className="text-right">
+                                            Total (SBD)
+                                        </TableHead>
                                         <TableHead>Date</TableHead>
                                         <TableHead />
                                     </TableRow>
@@ -113,17 +134,27 @@ export default function OrderIndex({
                                                 <Badge
                                                     className={cn(
                                                         'rounded-full',
-                                                        STATUS_COLORS[order.status] ?? 'bg-neutral-100 text-neutral-600',
+                                                        STATUS_COLORS[
+                                                            order.status
+                                                        ] ??
+                                                            'bg-neutral-100 text-neutral-600',
                                                     )}
                                                 >
-                                                    {STATUS_LABELS[order.status] ?? order.status}
+                                                    {STATUS_LABELS[
+                                                        order.status
+                                                    ] ?? order.status}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="text-right font-mono">
-                                                ${Number(order.total_sbd).toFixed(2)}
+                                                $
+                                                {Number(
+                                                    order.total_sbd,
+                                                ).toFixed(2)}
                                             </TableCell>
                                             <TableCell className="text-muted-foreground">
-                                                {new Date(order.created_at).toLocaleDateString('en-AU')}
+                                                {new Date(
+                                                    order.created_at,
+                                                ).toLocaleDateString('en-AU')}
                                             </TableCell>
                                             <TableCell>
                                                 <Link

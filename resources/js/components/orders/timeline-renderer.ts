@@ -33,12 +33,23 @@ export function buildTimeline(
         const log = byStatus[status];
         const isCompleted = !!log;
         const isCurrent = currentStatus === status;
-        const state = isCompleted ? 'completed' : isCurrent ? 'current' : 'future';
+        const state = isCompleted
+            ? 'completed'
+            : isCurrent
+              ? 'current'
+              : 'future';
 
         const isLast = index === happySteps.length - 1;
         const showConnector = !isLast || isOnHold || isRejected;
 
-        nodes.push({ kind: 'step', status, label: STEP_LABELS[status], state, log, showConnector });
+        nodes.push({
+            kind: 'step',
+            status,
+            label: STEP_LABELS[status],
+            state,
+            log,
+            showConnector,
+        });
 
         // Insert on_hold detour immediately after 'placed'
         if (status === 'placed' && isOnHold && byStatus['on_hold']) {

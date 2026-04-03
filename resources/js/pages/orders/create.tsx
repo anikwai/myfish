@@ -50,15 +50,16 @@ export default function CreateOrder({
     discount: Discount;
     tax: Tax;
 }) {
-    const { data, setData, post, transform, processing, errors } = useForm<FormData>({
-        items: fishTypes.map((ft) => ({
-            fish_type_id: ft.id,
-            quantity_kg: '',
-        })),
-        filleting: false,
-        delivery: false,
-        delivery_location: '',
-    });
+    const { data, setData, post, transform, processing, errors } =
+        useForm<FormData>({
+            items: fishTypes.map((ft) => ({
+                fish_type_id: ft.id,
+                quantity_kg: '',
+            })),
+            filleting: false,
+            delivery: false,
+            delivery_location: '',
+        });
 
     const preview = useMemo(
         () =>
@@ -71,7 +72,15 @@ export default function CreateOrder({
                 filleting: data.filleting,
                 delivery: data.delivery,
             }),
-        [fishTypes, pricing, discount, tax, data.items, data.filleting, data.delivery],
+        [
+            fishTypes,
+            pricing,
+            discount,
+            tax,
+            data.items,
+            data.filleting,
+            data.delivery,
+        ],
     );
 
     const hasItems = data.items.some(
@@ -127,7 +136,11 @@ export default function CreateOrder({
                                         ft.price_per_pound,
                                         pricing.price_per_pound,
                                     );
-                                    const sub = lineFishSubtotalSbd(kg, pricing.kg_to_lbs_rate, rate);
+                                    const sub = lineFishSubtotalSbd(
+                                        kg,
+                                        pricing.kg_to_lbs_rate,
+                                        rate,
+                                    );
 
                                     return (
                                         <tr
@@ -171,14 +184,10 @@ export default function CreateOrder({
                                                 />
                                             </td>
                                             <td className="px-4 py-2 text-right font-mono text-muted-foreground">
-                                                {lbs > 0
-                                                    ? lbs.toFixed(3)
-                                                    : '—'}
+                                                {lbs > 0 ? lbs.toFixed(3) : '—'}
                                             </td>
                                             <td className="px-4 py-2 text-right font-mono">
-                                                {sub > 0
-                                                    ? sub.toFixed(2)
-                                                    : '—'}
+                                                {sub > 0 ? sub.toFixed(2) : '—'}
                                             </td>
                                         </tr>
                                     );
@@ -245,7 +254,7 @@ export default function CreateOrder({
                         )}
                     </div>
 
-                    <div className="rounded-lg border p-4 space-y-1 text-sm">
+                    <div className="space-y-1 rounded-lg border p-4 text-sm">
                         <div className="flex justify-between">
                             <span className="text-muted-foreground">
                                 Fish subtotal
@@ -255,14 +264,23 @@ export default function CreateOrder({
                             </span>
                         </div>
                         {preview.adjustments.map((adj) => (
-                            <div key={adj.code} className="flex justify-between">
-                                <span className="text-muted-foreground">{adj.label}</span>
-                                <span className="font-mono">+${adj.amountSbd.toFixed(2)} SBD</span>
+                            <div
+                                key={adj.code}
+                                className="flex justify-between"
+                            >
+                                <span className="text-muted-foreground">
+                                    {adj.label}
+                                </span>
+                                <span className="font-mono">
+                                    +${adj.amountSbd.toFixed(2)} SBD
+                                </span>
                             </div>
                         ))}
                         {preview.discountSbd > 0 && (
                             <div className="flex justify-between">
-                                <span className="text-muted-foreground">Discount</span>
+                                <span className="text-muted-foreground">
+                                    Discount
+                                </span>
                                 <span className="font-mono text-emerald-700 dark:text-emerald-400">
                                     −${preview.discountSbd.toFixed(2)} SBD
                                 </span>
@@ -270,8 +288,12 @@ export default function CreateOrder({
                         )}
                         {preview.taxSbd > 0 && (
                             <div className="flex justify-between">
-                                <span className="text-muted-foreground">{preview.taxLabel}</span>
-                                <span className="font-mono">+${preview.taxSbd.toFixed(2)} SBD</span>
+                                <span className="text-muted-foreground">
+                                    {preview.taxLabel}
+                                </span>
+                                <span className="font-mono">
+                                    +${preview.taxSbd.toFixed(2)} SBD
+                                </span>
                             </div>
                         )}
                         <div className="flex justify-between border-t pt-1 font-semibold">

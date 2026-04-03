@@ -1,5 +1,5 @@
-import { buildTimeline } from './timeline-renderer';
 import { TimelineRow } from './timeline-nodes';
+import { buildTimeline } from './timeline-renderer';
 import type { StatusLog } from './timeline-types';
 
 export type { StatusLog };
@@ -11,13 +11,22 @@ type OrderTimelineProps = {
     showActor?: boolean;
 };
 
-export function OrderTimeline({ logs, currentStatus, rejectionReason, showActor = false }: OrderTimelineProps) {
+export function OrderTimeline({
+    logs,
+    currentStatus,
+    rejectionReason,
+    showActor = false,
+}: OrderTimelineProps) {
     const nodes = buildTimeline(logs, currentStatus, rejectionReason);
 
     return (
         <div>
             {nodes.map((node, i) => (
-                <TimelineRow key={`${node.status}-${i}`} node={node} showActor={showActor} />
+                <TimelineRow
+                    key={`${node.status}-${i}`}
+                    node={node}
+                    showActor={showActor}
+                />
             ))}
         </div>
     );
