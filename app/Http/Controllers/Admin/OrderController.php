@@ -67,7 +67,7 @@ class OrderController extends Controller
         $data = $request->validated();
         $newStatus = $data['status'];
 
-        $order->load('items');
+        $order->load(['user:id,name', 'items.fishType', 'statusLogs.user:id,name']);
 
         DB::transaction(function () use ($order, $newStatus, $data, $request): void {
             $order->transitionTo($newStatus, $data['rejection_reason'] ?? null, $request->user());

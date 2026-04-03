@@ -14,7 +14,7 @@ class FishTypeController extends Controller
     public function index(): Response
     {
         return Inertia::render('admin/fish-types', [
-            'fishTypes' => Inertia::defer(fn () => FishType::orderBy('name')->get()),
+            'fishTypes' => Inertia::defer(fn () => FishType::orderBy('name')->get(['id', 'name', 'is_active', 'price_per_pound'])),
         ]);
     }
 
