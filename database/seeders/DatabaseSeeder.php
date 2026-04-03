@@ -2,10 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Enums\WeightUnit;
 use App\Models\FishType;
 use App\Models\Inventory;
 use App\Models\Order;
 use App\Models\User;
+use App\Values\PricingConfig;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -54,6 +56,8 @@ class DatabaseSeeder extends Seeder
 
         // ── Orders for the client ───────────────────────────────────────────
 
+        $kgToLbsRate = PricingConfig::current()->kgToLbsRate;
+
         $feeSnapshots = [
             'filleting_fee_snapshot' => 10.00,
             'delivery_fee_snapshot' => 5.00,
@@ -80,11 +84,13 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => now()->subDays(10 - $i),
             ]);
 
+            $quantityPounds = round(WeightUnit::Kg->convertTo(WeightUnit::Lbs, 2.5 + $i, $kgToLbsRate), 3);
+
             $order->items()->create([
                 'fish_type_id' => $fishTypes[$i % $fishTypes->count()]->id,
                 'quantity_kg' => 2.5 + $i,
-                'quantity_pounds' => round((2.5 + $i) * 2.20462, 3),
-                'subtotal_sbd' => round((2.5 + $i) * 2.20462 * 25.00, 2),
+                'quantity_pounds' => $quantityPounds,
+                'subtotal_sbd' => round($quantityPounds * 25.00, 2),
                 'price_per_pound_snapshot' => 25.00,
             ]);
         }
@@ -110,7 +116,7 @@ class DatabaseSeeder extends Seeder
         $guestOrder->items()->create([
             'fish_type_id' => $fishTypes->first()->id,
             'quantity_kg' => 1.0,
-            'quantity_pounds' => 2.205,
+            'quantity_pounds' => round(WeightUnit::Kg->convertTo(WeightUnit::Lbs, 1.0, $kgToLbsRate), 3),
             'subtotal_sbd' => 55.13,
             'price_per_pound_snapshot' => 25.00,
         ]);
