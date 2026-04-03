@@ -74,7 +74,7 @@ class OrderController extends Controller
         /** @var string[] */
         $activeStatuses = ['placed', 'confirmed', 'on_hold', 'packed'];
 
-        $query = Order::where('user_id', $request->user()->id)->latest();
+        $query = Order::forUser($request->user()->id)->latest();
 
         $filterStatus = $request->input('status');
 

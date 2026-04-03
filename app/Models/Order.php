@@ -5,10 +5,12 @@ namespace App\Models;
 use App\Notifications\OrderNotifier;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 
 #[Fillable([
@@ -102,6 +104,34 @@ class Order extends Model
         ]);
 
         app(OrderNotifier::class)->statusChanged($this, $newStatus);
+    }
+
+    /**
+     * @param  Builder<Order>  $query
+     * @return Builder<Order>
+     */
+    public function scopeForUser(Builder $query, int $userId): Builder
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    /**
+     * @param  Builder<Order>  $query
+     * @return Builder<Order>
+     */
+    public function scopeInDateRange(Builder $query, Carbon $start, Carbon $end): Builder
+    {
+        return $query->whereBetween('created_at', [$start, $end]);
+    }
+
+    /**
+     * @param  Builder<Order>  $query
+     * @param  string[]  $statuses
+     * @return Builder<Order>
+     */
+    public function scopeExcludingStatuses(Builder $query, array $statuses): Builder
+    {
+        return $query->whereNotIn('status', $statuses);
     }
 
     /**
