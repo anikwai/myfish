@@ -23,5 +23,37 @@ final class OrderNotifier
             Notification::route('mail', $order->guest_email)
                 ->notify(new OrderStatusChangedNotification($order, $newStatus));
         }
+
+        if ($newStatus === 'confirmed') {
+            $this->sendInvoice($order);
+        }
+
+        if ($newStatus === 'delivered') {
+            $this->sendReceipt($order);
+        }
+    }
+
+    public function sendInvoice(Order $order): void
+    {
+        $order->loadMissing(['user', 'items.fishType']);
+
+        if ($order->user) {
+            $order->user->notify(new InvoiceNotification($order));
+        } elseif ($order->guest_email) {
+            Notification::route('mail', $order->guest_email)
+                ->notify(new InvoiceNotification($order));
+        }
+    }
+
+    public function sendReceipt(Order $order): void
+    {
+        $order->loadMissing(['user', 'items.fishType']);
+
+        if ($order->user) {
+            $order->user->notify(new ReceiptNotification($order));
+        } elseif ($order->guest_email) {
+            Notification::route('mail', $order->guest_email)
+                ->notify(new ReceiptNotification($order));
+        }
     }
 }

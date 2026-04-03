@@ -52,6 +52,7 @@ function StarRating({ rating }: { rating: number }) {
       {Array.from({ length: 5 }).map((_, i) => {
         const filled = i < Math.floor(rating);
         const half = !filled && i < rating;
+
         return (
           <HugeiconsIcon
             key={i}

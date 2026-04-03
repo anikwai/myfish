@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\BusinessController;
 use App\Http\Controllers\Admin\FishTypeController;
 use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\OrderController;
@@ -11,6 +12,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('reports', [ReportingController::class, 'index'])->name('reports.index');
     Route::get('pricing', [PricingController::class, 'edit'])->name('pricing.edit');
     Route::patch('pricing', [PricingController::class, 'update'])->name('pricing.update');
+
+    Route::get('business', [BusinessController::class, 'edit'])->name('business.edit');
+    Route::patch('business', [BusinessController::class, 'update'])->name('business.update');
 
     Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
     Route::post('inventory/adjustments', [InventoryController::class, 'adjust'])->name('inventory.adjust');

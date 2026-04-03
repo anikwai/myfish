@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Pricing\OrderPricingPipeline;
+use App\Services\CloudflarePdfService;
 use App\Services\OrderCreator;
 use App\Services\OrderCreatorInterface;
 use Carbon\CarbonImmutable;
@@ -22,6 +23,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(OrderPricingPipeline::class, fn (): OrderPricingPipeline => OrderPricingPipeline::default());
 
         $this->app->bind(OrderCreatorInterface::class, OrderCreator::class);
+
+        $this->app->singleton(CloudflarePdfService::class, fn (): CloudflarePdfService => new CloudflarePdfService(
+            accountId: (string) config('services.cloudflare.account_id'),
+            token: (string) config('services.cloudflare.token'),
+        ));
     }
 
     /**
