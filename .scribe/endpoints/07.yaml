@@ -1,0 +1,468 @@
+name: "Admin - Catalogue"
+description: ""
+endpoints:
+  - custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/fish-types
+    metadata:
+      custom: []
+      groupName: "Admin - Catalogue"
+      groupDescription: ""
+      subgroup: ""
+      subgroupDescription: ""
+      title: ""
+      description: ""
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: "Bearer {YOUR_AUTH_KEY}"
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      - custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: "no-cache, private"
+          content-type: application/json
+          access-control-allow-origin: "*"
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - "Bearer 6g43cv8PD1aE5beadkZfhV6"
+    controller: null
+    method: null
+    route: null
+  - custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/admin/fish-types
+    metadata:
+      custom: []
+      groupName: "Admin - Catalogue"
+      groupDescription: ""
+      subgroup: ""
+      subgroupDescription: ""
+      title: ""
+      description: ""
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: "Bearer {YOUR_AUTH_KEY}"
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: "Must not be greater than 100 characters."
+        required: true
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      price_per_pound:
+        custom: []
+        name: price_per_pound
+        description: "Must be at least 0."
+        required: false
+        example: 39
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      is_active:
+        custom: []
+        name: is_active
+        description: ""
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: b
+      price_per_pound: 39
+      is_active: true
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - "Bearer 6g43cv8PD1aE5beadkZfhV6"
+    controller: null
+    method: null
+    route: null
+  - custom: []
+    httpMethods:
+      - PUT
+      - PATCH
+    uri: "api/v1/admin/fish-types/{id}"
+    metadata:
+      custom: []
+      groupName: "Admin - Catalogue"
+      groupDescription: ""
+      subgroup: ""
+      subgroupDescription: ""
+      title: ""
+      description: ""
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: "Bearer {YOUR_AUTH_KEY}"
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: "The ID of the fish type."
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: "Must not be greater than 100 characters."
+        required: false
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      price_per_pound:
+        custom: []
+        name: price_per_pound
+        description: "Must be at least 0."
+        required: false
+        example: 39
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      is_active:
+        custom: []
+        name: is_active
+        description: ""
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: b
+      price_per_pound: 39
+      is_active: true
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - "Bearer 6g43cv8PD1aE5beadkZfhV6"
+    controller: null
+    method: null
+    route: null
+  - custom: []
+    httpMethods:
+      - DELETE
+    uri: "api/v1/admin/fish-types/{id}"
+    metadata:
+      custom: []
+      groupName: "Admin - Catalogue"
+      groupDescription: ""
+      subgroup: ""
+      subgroupDescription: ""
+      title: ""
+      description: ""
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: "Bearer {YOUR_AUTH_KEY}"
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: "The ID of the fish type."
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - "Bearer 6g43cv8PD1aE5beadkZfhV6"
+    controller: null
+    method: null
+    route: null
+  - custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/inventory
+    metadata:
+      custom: []
+      groupName: "Admin - Catalogue"
+      groupDescription: ""
+      subgroup: ""
+      subgroupDescription: ""
+      title: ""
+      description: ""
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: "Bearer {YOUR_AUTH_KEY}"
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      - custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: "no-cache, private"
+          content-type: application/json
+          access-control-allow-origin: "*"
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - "Bearer 6g43cv8PD1aE5beadkZfhV6"
+    controller: null
+    method: null
+    route: null
+  - custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/admin/inventory/adjustments
+    metadata:
+      custom: []
+      groupName: "Admin - Catalogue"
+      groupDescription: ""
+      subgroup: ""
+      subgroupDescription: ""
+      title: ""
+      description: ""
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: "Bearer {YOUR_AUTH_KEY}"
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      delta_kg:
+        custom: []
+        name: delta_kg
+        description: "Must not be one of <code>0</code>."
+        required: true
+        example: 4326.41688
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      reason:
+        custom: []
+        name: reason
+        description: "Must not be greater than 255 characters."
+        required: true
+        example: m
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      delta_kg: 4326.41688
+      reason: m
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - "Bearer 6g43cv8PD1aE5beadkZfhV6"
+    controller: null
+    method: null
+    route: null
+  - custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/admin/pricing
+    metadata:
+      custom: []
+      groupName: "Admin - Catalogue"
+      groupDescription: ""
+      subgroup: ""
+      subgroupDescription: ""
+      title: ""
+      description: ""
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: "Bearer {YOUR_AUTH_KEY}"
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      - custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: "no-cache, private"
+          content-type: application/json
+          access-control-allow-origin: "*"
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - "Bearer 6g43cv8PD1aE5beadkZfhV6"
+    controller: null
+    method: null
+    route: null
+  - custom: []
+    httpMethods:
+      - PATCH
+    uri: api/v1/admin/pricing
+    metadata:
+      custom: []
+      groupName: "Admin - Catalogue"
+      groupDescription: ""
+      subgroup: ""
+      subgroupDescription: ""
+      title: ""
+      description: ""
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: "Bearer {YOUR_AUTH_KEY}"
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      price_per_pound:
+        custom: []
+        name: price_per_pound
+        description: "Must be at least 0."
+        required: true
+        example: 27
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      filleting_fee:
+        custom: []
+        name: filleting_fee
+        description: "Must be at least 0."
+        required: true
+        example: 39
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      delivery_fee:
+        custom: []
+        name: delivery_fee
+        description: "Must be at least 0."
+        required: true
+        example: 84
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      kg_to_lbs_rate:
+        custom: []
+        name: kg_to_lbs_rate
+        description: ""
+        required: true
+        example: 4326.41688
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      price_per_pound: 27
+      filleting_fee: 39
+      delivery_fee: 84
+      kg_to_lbs_rate: 4326.41688
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - "Bearer 6g43cv8PD1aE5beadkZfhV6"
+    controller: null
+    method: null
+    route: null

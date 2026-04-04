@@ -1,0 +1,1443 @@
+{
+  "variable": [
+    {
+      "id": "baseUrl",
+      "key": "baseUrl",
+      "type": "string",
+      "name": "string",
+      "value": "https:\/\/myfish.test"
+    }
+  ],
+  "info": {
+    "name": "Laravel API Documentation",
+    "_postman_id": "a9c76fe9-a20e-4867-bfa6-105df35ab3f8",
+    "description": "REST API for the myfish mobile application. All authenticated endpoints require a Sanctum Bearer token obtained from the login endpoint.",
+    "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
+  },
+  "item": [
+    {
+      "name": "Admin - Business",
+      "description": "",
+      "item": [
+        {
+          "name": "GET api\/v1\/admin\/business",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/business",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/business"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": [
+            {
+              "header": [
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application\/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                }
+              ],
+              "code": 401,
+              "body": "{\"message\":\"Unauthenticated.\"}",
+              "name": ""
+            }
+          ]
+        },
+        {
+          "name": "PATCH api\/v1\/admin\/business",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/business",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/business"
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"business_name\":\"b\",\"business_address\":\"n\",\"business_phone\":\"g\",\"business_email\":\"rowan.gulgowski@example.com\"}"
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "POST api\/v1\/admin\/business\/logo",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/business\/logo",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/business\/logo"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "multipart\/form-data"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "logo",
+                  "src": [],
+                  "type": "file"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE api\/v1\/admin\/business\/logo",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/business\/logo",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/business\/logo"
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - Catalogue",
+      "description": "",
+      "item": [
+        {
+          "name": "GET api\/v1\/admin\/fish-types",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/fish-types",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/fish-types"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": [
+            {
+              "header": [
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application\/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                }
+              ],
+              "code": 401,
+              "body": "{\"message\":\"Unauthenticated.\"}",
+              "name": ""
+            }
+          ]
+        },
+        {
+          "name": "POST api\/v1\/admin\/fish-types",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/fish-types",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/fish-types"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"b\",\"price_per_pound\":39,\"is_active\":true}"
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "PUT api\/v1\/admin\/fish-types\/{id}",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/fish-types\/:id",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/fish-types\/:id",
+              "variable": [
+                {
+                  "id": "id",
+                  "key": "id",
+                  "value": "1",
+                  "description": "The ID of the fish type."
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"b\",\"price_per_pound\":39,\"is_active\":true}"
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE api\/v1\/admin\/fish-types\/{id}",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/fish-types\/:id",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/fish-types\/:id",
+              "variable": [
+                {
+                  "id": "id",
+                  "key": "id",
+                  "value": "1",
+                  "description": "The ID of the fish type."
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "GET api\/v1\/admin\/inventory",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/inventory",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/inventory"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": [
+            {
+              "header": [
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application\/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                }
+              ],
+              "code": 401,
+              "body": "{\"message\":\"Unauthenticated.\"}",
+              "name": ""
+            }
+          ]
+        },
+        {
+          "name": "POST api\/v1\/admin\/inventory\/adjustments",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/inventory\/adjustments",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/inventory\/adjustments"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"delta_kg\":4326.41688,\"reason\":\"m\"}"
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "GET api\/v1\/admin\/pricing",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/pricing",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/pricing"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": [
+            {
+              "header": [
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application\/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                }
+              ],
+              "code": 401,
+              "body": "{\"message\":\"Unauthenticated.\"}",
+              "name": ""
+            }
+          ]
+        },
+        {
+          "name": "PATCH api\/v1\/admin\/pricing",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/pricing",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/pricing"
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"price_per_pound\":27,\"filleting_fee\":39,\"delivery_fee\":84,\"kg_to_lbs_rate\":4326.41688}"
+            },
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - Orders",
+      "description": "",
+      "item": [
+        {
+          "name": "GET api\/v1\/admin\/orders",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/orders",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/orders"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": [
+            {
+              "header": [
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application\/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                }
+              ],
+              "code": 401,
+              "body": "{\"message\":\"Unauthenticated.\"}",
+              "name": ""
+            }
+          ]
+        },
+        {
+          "name": "POST api\/v1\/admin\/orders\/guest",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/orders\/guest",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/orders\/guest"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"guest_name\":\"b\",\"guest_email\":\"zbailey@example.net\",\"guest_phone\":\"i\",\"items\":[{\"fish_type_id\":16,\"cut\":\"whole\",\"quantity_kg\":39}],\"filleting\":true,\"delivery\":true,\"delivery_location\":\"b\",\"note\":\"n\"}"
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "GET api\/v1\/admin\/orders\/{id}",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/orders\/:id",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/orders\/:id",
+              "variable": [
+                {
+                  "id": "id",
+                  "key": "id",
+                  "value": "1",
+                  "description": "The ID of the order."
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": [
+            {
+              "header": [
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application\/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                }
+              ],
+              "code": 401,
+              "body": "{\"message\":\"Unauthenticated.\"}",
+              "name": ""
+            }
+          ]
+        },
+        {
+          "name": "PATCH api\/v1\/admin\/orders\/{order_id}\/status",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/orders\/:order_id\/status",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/orders\/:order_id\/status",
+              "variable": [
+                {
+                  "id": "order_id",
+                  "key": "order_id",
+                  "value": "1",
+                  "description": "The ID of the order."
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"status\":\"architecto\",\"rejection_reason\":\"n\"}"
+            },
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - Reports",
+      "description": "",
+      "item": [
+        {
+          "name": "GET api\/v1\/admin\/reports",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/reports",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/reports"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": [
+            {
+              "header": [
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application\/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                }
+              ],
+              "code": 401,
+              "body": "{\"message\":\"Unauthenticated.\"}",
+              "name": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Admin - Reviews",
+      "description": "",
+      "item": [
+        {
+          "name": "GET api\/v1\/admin\/reviews",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/reviews",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/reviews"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": [
+            {
+              "header": [
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application\/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                }
+              ],
+              "code": 401,
+              "body": "{\"message\":\"Unauthenticated.\"}",
+              "name": ""
+            }
+          ]
+        },
+        {
+          "name": "DELETE api\/v1\/admin\/reviews\/{id}",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/admin\/reviews\/:id",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/admin\/reviews\/:id",
+              "variable": [
+                {
+                  "id": "id",
+                  "key": "id",
+                  "value": "1",
+                  "description": "The ID of the review."
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "description": "",
+      "item": [
+        {
+          "name": "POST api\/v1\/auth\/register",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/auth\/register",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/auth\/register"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"b\",\"email\":\"zbailey@example.net\",\"phone\":\"i\",\"password\":\"architecto\",\"device_name\":\"n\"}"
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST api\/v1\/auth\/login",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/auth\/login",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/auth\/login"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"gbailey@example.net\",\"password\":\"|]|{+-\",\"device_name\":\"v\"}"
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST api\/v1\/auth\/two-factor",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/auth\/two-factor",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/auth\/two-factor"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"two_factor_token\":\"architecto\",\"code\":\"architecto\",\"recovery_code\":\"architecto\",\"device_name\":\"n\"}"
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST api\/v1\/auth\/forgot-password",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/auth\/forgot-password",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/auth\/forgot-password"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"gbailey@example.net\"}"
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST api\/v1\/auth\/reset-password",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/auth\/reset-password",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/auth\/reset-password"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"token\":\"architecto\",\"email\":\"zbailey@example.net\",\"password\":\"architecto\"}"
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE api\/v1\/auth\/logout",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/auth\/logout",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/auth\/logout"
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Endpoints",
+      "description": "",
+      "item": [
+        {
+          "name": "Authenticate the request for channel access.",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/broadcasting\/auth",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/broadcasting\/auth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Guest Orders",
+      "description": "",
+      "item": [
+        {
+          "name": "POST api\/v1\/orders\/guest",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/orders\/guest",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/orders\/guest"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"guest_name\":\"b\",\"guest_email\":\"zbailey@example.net\",\"guest_phone\":\"i\",\"items\":[{\"fish_type_id\":16,\"cut\":\"steak\",\"quantity_kg\":39}],\"filleting\":true,\"delivery\":true,\"delivery_location\":\"b\",\"note\":\"n\"}"
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "GET api\/v1\/orders\/guest\/{order_id}",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/orders\/guest\/:order_id",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/orders\/guest\/:order_id",
+              "variable": [
+                {
+                  "id": "order_id",
+                  "key": "order_id",
+                  "value": "1",
+                  "description": "The ID of the order."
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [
+            {
+              "header": [
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application\/json"
+                },
+                {
+                  "key": "x-ratelimit-limit",
+                  "value": "60"
+                },
+                {
+                  "key": "x-ratelimit-remaining",
+                  "value": "59"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                }
+              ],
+              "code": 403,
+              "body": "{\n    \"message\": \"\"\n}",
+              "name": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "description": "",
+      "item": [
+        {
+          "name": "GET api\/v1\/notifications",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/notifications",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/notifications"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": [
+            {
+              "header": [
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application\/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                }
+              ],
+              "code": 401,
+              "body": "{\"message\":\"Unauthenticated.\"}",
+              "name": ""
+            }
+          ]
+        },
+        {
+          "name": "POST api\/v1\/notifications\/{notification_id}\/read",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/notifications\/:notification_id\/read",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/notifications\/:notification_id\/read",
+              "variable": [
+                {
+                  "id": "notification_id",
+                  "key": "notification_id",
+                  "value": "architecto",
+                  "description": "The ID of the notification."
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "description": "",
+      "item": [
+        {
+          "name": "GET api\/v1\/orders",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/orders",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/orders"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": [
+            {
+              "header": [
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application\/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                }
+              ],
+              "code": 401,
+              "body": "{\"message\":\"Unauthenticated.\"}",
+              "name": ""
+            }
+          ]
+        },
+        {
+          "name": "POST api\/v1\/orders",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/orders",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/orders"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"items\":[{\"fish_type_id\":16,\"cut\":\"steak\",\"quantity_kg\":39}],\"filleting\":true,\"delivery\":false,\"delivery_location\":\"b\",\"note\":\"n\"}"
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "GET api\/v1\/orders\/{id}",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/orders\/:id",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/orders\/:id",
+              "variable": [
+                {
+                  "id": "id",
+                  "key": "id",
+                  "value": "1",
+                  "description": "The ID of the order."
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": [
+            {
+              "header": [
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application\/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                }
+              ],
+              "code": 401,
+              "body": "{\"message\":\"Unauthenticated.\"}",
+              "name": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "description": "",
+      "item": [
+        {
+          "name": "GET api\/v1\/profile",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/profile",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/profile"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": null,
+            "description": ""
+          },
+          "response": [
+            {
+              "header": [
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application\/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                }
+              ],
+              "code": 401,
+              "body": "{\"message\":\"Unauthenticated.\"}",
+              "name": ""
+            }
+          ]
+        },
+        {
+          "name": "PUT api\/v1\/profile",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/profile",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/profile"
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"phone\":\"b\"}"
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "PUT api\/v1\/profile\/password",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/profile\/password",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/profile\/password"
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[]"
+            },
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "description": "",
+      "item": [
+        {
+          "name": "POST api\/v1\/orders\/{order_id}\/review",
+          "request": {
+            "url": {
+              "host": "{{baseUrl}}",
+              "path": "api\/v1\/orders\/:order_id\/review",
+              "query": [],
+              "raw": "{{baseUrl}}\/api\/v1\/orders\/:order_id\/review",
+              "variable": [
+                {
+                  "id": "order_id",
+                  "key": "order_id",
+                  "value": "1",
+                  "description": "The ID of the order."
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application\/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application\/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rating\":1,\"comment\":\"n\"}"
+            },
+            "description": ""
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "type": "string"
+      }
+    ]
+  }
+}

@@ -1,0 +1,73 @@
+name: Reviews
+description: ""
+endpoints:
+  - custom: []
+    httpMethods:
+      - POST
+    uri: "api/v1/orders/{order_id}/review"
+    metadata:
+      custom: []
+      groupName: Reviews
+      groupDescription: ""
+      subgroup: ""
+      subgroupDescription: ""
+      title: ""
+      description: ""
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: "Bearer {YOUR_AUTH_KEY}"
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      order_id:
+        custom: []
+        name: order_id
+        description: "The ID of the order."
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      order_id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      rating:
+        custom: []
+        name: rating
+        description: "Must be at least 1. Must not be greater than 5."
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      comment:
+        custom: []
+        name: comment
+        description: "Must not be greater than 500 characters."
+        required: false
+        example: "n"
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      rating: 1
+      comment: "n"
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - "Bearer 6g43cv8PD1aE5beadkZfhV6"
+    controller: null
+    method: null
+    route: null
