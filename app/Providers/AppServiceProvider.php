@@ -2,12 +2,15 @@
 
 namespace App\Providers;
 
+use App\Listeners\ApplyBusinessNameToOutgoingMail;
 use App\Pricing\OrderPricingPipeline;
 use App\Services\CloudflarePdfService;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -31,6 +34,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Event::listen(MessageSending::class, ApplyBusinessNameToOutgoingMail::class);
+
         $this->configureDefaults();
     }
 
