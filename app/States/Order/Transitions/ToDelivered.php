@@ -17,7 +17,7 @@ final class ToDelivered extends Transition
         private readonly ?User $actor = null,
     ) {}
 
-    public function handle(): Order
+    public function handle(OrderNotifier $notifier): Order
     {
         $this->order->status = new OrderDelivered($this->order);
         $this->order->save();
@@ -27,7 +27,6 @@ final class ToDelivered extends Transition
             'user_id' => $this->actor?->id,
         ]);
 
-        $notifier = app(OrderNotifier::class);
         $notifier->notifyStatusChanged($this->order);
         $notifier->sendReceipt($this->order);
         $notifier->sendReviewInvite($this->order);

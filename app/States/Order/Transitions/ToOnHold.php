@@ -17,7 +17,7 @@ final class ToOnHold extends Transition
         private readonly ?User $actor = null,
     ) {}
 
-    public function handle(): Order
+    public function handle(OrderNotifier $notifier): Order
     {
         $this->order->status = new OrderOnHold($this->order);
         $this->order->save();
@@ -27,7 +27,7 @@ final class ToOnHold extends Transition
             'user_id' => $this->actor?->id,
         ]);
 
-        app(OrderNotifier::class)->notifyStatusChanged($this->order);
+        $notifier->notifyStatusChanged($this->order);
 
         return $this->order;
     }

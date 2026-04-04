@@ -18,7 +18,7 @@ final class ToPacked extends Transition
         private readonly ?User $actor = null,
     ) {}
 
-    public function handle(): Order
+    public function handle(DeductOrderFromInventory $deductInventory, OrderNotifier $notifier): Order
     {
         $this->order->status = new OrderPacked($this->order);
         $this->order->save();
@@ -28,8 +28,8 @@ final class ToPacked extends Transition
             'user_id' => $this->actor?->id,
         ]);
 
-        app(DeductOrderFromInventory::class)->execute($this->order, $this->actor?->id ?? 0);
-        app(OrderNotifier::class)->notifyStatusChanged($this->order);
+        $deductInventory->execute($this->order, $this->actor?->id ?? 0);
+        $notifier->notifyStatusChanged($this->order);
 
         return $this->order;
     }

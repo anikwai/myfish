@@ -52,16 +52,6 @@ abstract class OrderState extends State
     }
 
     /**
-     * String names of states this state can transition to.
-     *
-     * @return string[]
-     */
-    public function transitionableNames(): array
-    {
-        return $this->transitionableStates();
-    }
-
-    /**
      * Map of all status names to their label and color, for Inertia props.
      *
      * @return array<string, array{label: string, color: string}>

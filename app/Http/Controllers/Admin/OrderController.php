@@ -62,7 +62,7 @@ class OrderController extends Controller
                 'timestamp' => $log->created_at->toISOString(),
                 'actor' => $log->user?->name,
             ]),
-            'allowedTransitions' => $order->status->transitionableNames(),
+            'allowedTransitions' => $order->status->transitionableStates(),
             'statusMeta' => OrderState::metaMap(),
         ]);
     }

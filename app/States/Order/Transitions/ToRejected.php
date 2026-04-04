@@ -18,7 +18,7 @@ final class ToRejected extends Transition
         private readonly ?User $actor = null,
     ) {}
 
-    public function handle(): Order
+    public function handle(OrderNotifier $notifier): Order
     {
         $this->order->status = new OrderRejected($this->order);
         $this->order->rejection_reason = $this->rejectionReason;
@@ -29,7 +29,7 @@ final class ToRejected extends Transition
             'user_id' => $this->actor?->id,
         ]);
 
-        app(OrderNotifier::class)->notifyStatusChanged($this->order);
+        $notifier->notifyStatusChanged($this->order);
 
         return $this->order;
     }
