@@ -22,6 +22,7 @@ import {
   kgToLbs,
   lineFishSubtotalSbd,
 } from "@/lib/pricing";
+import { cn } from "@/lib/utils";
 import { create, index } from "@/routes/orders";
 
 type FishType = { id: number; name: string; price_per_pound: number | null };
@@ -46,8 +47,10 @@ type Tax = {
   label: string;
 };
 
+type Cut = "whole" | "fillet" | "steak";
+
 type FormData = {
-  items: { fish_type_id: number; quantity_kg: string }[];
+  items: { fish_type_id: number; quantity_kg: string; cut: Cut }[];
   filleting: boolean;
   delivery: boolean;
   delivery_location: string;
@@ -70,6 +73,7 @@ export default function CreateOrder({
       items: fishTypes.map((ft) => ({
         fish_type_id: ft.id,
         quantity_kg: "",
+        cut: "whole" satisfies Cut,
       })),
       filleting: false,
       delivery: false,
@@ -117,7 +121,7 @@ export default function CreateOrder({
       <div className="space-y-6">
         <Heading
           title="Place an order"
-          description="Enter the quantity in kilograms for each fish type you want."
+          description="Enter kg per fish type and choose whole, fillet, or steak where it applies."
         />
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -126,6 +130,7 @@ export default function CreateOrder({
               <TableHeader className="bg-muted/50">
                 <TableRow>
                   <TableHead>Fish type</TableHead>
+                  <TableHead>Cut</TableHead>
                   <TableHead className="text-right">Quantity (kg)</TableHead>
                   <TableHead className="text-right">Pounds</TableHead>
                   <TableHead className="text-right">Subtotal (SBD)</TableHead>
@@ -144,10 +149,45 @@ export default function CreateOrder({
                     pricing.kg_to_lbs_rate,
                     rate
                   );
+                  const cut = data.items[i]?.cut ?? "whole";
 
                   return (
                     <TableRow key={ft.id}>
                       <TableCell>{ft.name}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap items-center gap-1">
+                          <span className="sr-only">Cut for {ft.name}</span>
+                          {(["whole", "fillet", "steak"] as Cut[]).map(
+                            (option) => (
+                              <button
+                                key={option}
+                                type="button"
+                                onClick={() => {
+                                  const updated = [...data.items];
+                                  updated[i] = {
+                                    ...updated[i],
+                                    cut: option,
+                                  };
+                                  setData("items", updated);
+                                }}
+                                className={cn(
+                                  "rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize transition-colors",
+                                  cut === option
+                                    ? "border-primary bg-primary text-primary-foreground"
+                                    : "border-border bg-background text-muted-foreground hover:bg-muted"
+                                )}
+                              >
+                                {option}
+                              </button>
+                            )
+                          )}
+                        </div>
+                        <InputError
+                          message={
+                            errors[`items.${i}.cut` as keyof typeof errors]
+                          }
+                        />
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex flex-col items-end">
                           <Input
