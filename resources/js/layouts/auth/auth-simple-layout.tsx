@@ -18,12 +18,12 @@ export default function AuthSimpleLayout({
             >
               <div className="mb-1">
                 <img
-                  src="/images/logo.svg"
+                  src="/media/brand/logo.svg"
                   alt="myFish"
                   className="h-9 w-auto dark:hidden"
                 />
                 <img
-                  src="/images/logo-dark.svg"
+                  src="/media/brand/logo-dark.svg"
                   alt="myFish"
                   className="hidden h-9 w-auto dark:block"
                 />

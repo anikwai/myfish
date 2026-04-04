@@ -2,12 +2,12 @@ export default function AppLogo() {
   return (
     <>
       <img
-        src="/images/logo.svg"
+        src="/media/brand/logo.svg"
         alt="myFish"
         className="h-8 w-auto dark:hidden"
       />
       <img
-        src="/images/logo-dark.svg"
+        src="/media/brand/logo-dark.svg"
         alt="myFish"
         className="hidden h-8 w-auto dark:block"
       />

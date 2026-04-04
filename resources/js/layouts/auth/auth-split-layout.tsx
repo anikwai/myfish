@@ -16,7 +16,7 @@ export default function AuthSplitLayout({
           className="relative z-20 flex items-center text-lg font-medium"
         >
           <img
-            src="/images/logo-dark.svg"
+            src="/media/brand/logo-dark.svg"
             alt="myFish"
             className="mr-2 h-8 w-auto"
           />
@@ -29,12 +29,12 @@ export default function AuthSplitLayout({
             className="relative z-20 flex items-center justify-center lg:hidden"
           >
             <img
-              src="/images/logo.svg"
+              src="/media/brand/logo.svg"
               alt="myFish"
               className="h-10 w-auto dark:hidden sm:h-12"
             />
             <img
-              src="/images/logo-dark.svg"
+              src="/media/brand/logo-dark.svg"
               alt="myFish"
               className="hidden h-10 w-auto dark:block sm:h-12"
             />

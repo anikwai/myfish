@@ -4,7 +4,9 @@
 /public/build
 /public/hot
 /public/storage
-/public/media
+/public/media/**
+!/public/media/brand/
+!/public/media/brand/**
 /storage/*.key
 /storage/pail
 /resources/js/actions
