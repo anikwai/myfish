@@ -6,11 +6,13 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useInitials } from "@/hooks/use-initials";
 import { dashboard, login, register } from "@/routes";
 import { edit as profileEdit } from "@/routes/profile";
+import { edit as securityEdit } from "@/routes/security";
 
 type AuthUser = {
   name: string;
@@ -47,8 +49,12 @@ export function WelcomeHeader({ isLoggedIn, canRegister, user }: Props) {
                 <DropdownMenuItem asChild>
                   <Link href={dashboard()}>Dashboard</Link>
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href={profileEdit()}>Settings</Link>
+                  <Link href={profileEdit()}>Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href={securityEdit()}>Security</Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
