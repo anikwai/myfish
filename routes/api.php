@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\BusinessController as AdminBusinessController;
 use App\Http\Controllers\Api\Admin\FishTypeController as AdminFishTypeController;
 use App\Http\Controllers\Api\Admin\InventoryController as AdminInventoryController;
 use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Admin\PricingController as AdminPricingController;
+use App\Http\Controllers\Api\Admin\ReportingController as AdminReportingController;
+use App\Http\Controllers\Api\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Api\Auth\ForgotPasswordController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutController;
@@ -60,6 +63,16 @@ Route::middleware(['auth:sanctum', 'throttle:api', 'role:admin'])->prefix('admin
 
     Route::get('pricing', [AdminPricingController::class, 'show'])->name('api.admin.pricing.show');
     Route::patch('pricing', [AdminPricingController::class, 'update'])->name('api.admin.pricing.update');
+
+    Route::get('business', [AdminBusinessController::class, 'show'])->name('api.admin.business.show');
+    Route::patch('business', [AdminBusinessController::class, 'update'])->name('api.admin.business.update');
+    Route::post('business/logo', [AdminBusinessController::class, 'storeLogo'])->name('api.admin.business.logo.store');
+    Route::delete('business/logo', [AdminBusinessController::class, 'destroyLogo'])->name('api.admin.business.logo.destroy');
+
+    Route::get('reports', [AdminReportingController::class, 'index'])->name('api.admin.reports.index');
+
+    Route::get('reviews', [AdminReviewController::class, 'index'])->name('api.admin.reviews.index');
+    Route::delete('reviews/{review}', [AdminReviewController::class, 'destroy'])->name('api.admin.reviews.destroy');
 });
 
 Route::middleware(['auth:sanctum', 'throttle:api', 'role:admin|staff'])->prefix('admin')->group(function (): void {
