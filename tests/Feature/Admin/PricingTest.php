@@ -75,6 +75,36 @@ test('admin can update pricing settings', function (): void {
     expect($pricing->kgToLbsRate)->toBe(2.20462);
 });
 
+test('admin can update pricing when core amounts are JSON strings', function (): void {
+    $admin = User::factory()->admin()->create();
+
+    $payload = [
+        'price_per_pound' => '31.25',
+        'filleting_fee' => '12',
+        'delivery_fee' => '6.5',
+        'kg_to_lbs_rate' => '2.20462',
+        'discount_mode' => 'off',
+        'discount_fixed_sbd' => '0',
+        'discount_percent' => '0',
+        'discount_max_sbd' => null,
+        'discount_min_order_sbd' => null,
+        'tax_mode' => 'off',
+        'tax_percent' => '0',
+        'tax_label' => null,
+    ];
+
+    $this->actingAs($admin)
+        ->patchJson(route('admin.pricing.update'), $payload)
+        ->assertRedirect(route('admin.pricing.edit'))
+        ->assertSessionHasNoErrors();
+
+    $pricing = PricingConfig::current();
+    expect($pricing->pricePerPound)->toBe(31.25);
+    expect($pricing->filletingFee)->toBe(12.0);
+    expect($pricing->deliveryFee)->toBe(6.5);
+    expect($pricing->kgToLbsRate)->toBe(2.20462);
+});
+
 test('admin can update order discount settings', function (): void {
     $admin = User::factory()->admin()->create();
 

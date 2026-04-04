@@ -13,7 +13,12 @@ final readonly class UpdatePricingSettings
 {
     public function handle(array $data): void
     {
-        PricingConfig::set($data['price_per_pound'], $data['filleting_fee'], $data['delivery_fee'], $data['kg_to_lbs_rate']);
+        PricingConfig::set(
+            (float) $data['price_per_pound'],
+            (float) $data['filleting_fee'],
+            (float) $data['delivery_fee'],
+            (float) $data['kg_to_lbs_rate'],
+        );
         DiscountConfig::saveFromValidated($data);
         TaxConfig::saveFromValidated($data);
 
