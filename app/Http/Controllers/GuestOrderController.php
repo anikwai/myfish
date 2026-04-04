@@ -6,6 +6,7 @@ use App\Actions\PlaceGuestOrder;
 use App\Http\Requests\StoreGuestOrderRequest;
 use App\Models\Order;
 use App\States\Order\OrderState;
+use App\Support\FlashToast;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -20,7 +21,9 @@ class GuestOrderController extends Controller
     {
         $result = $this->placeGuestOrder->handle($request->validated());
 
-        session()->flash('stock_warning', $result['stockWarning']);
+        if ($result['stockWarning']) {
+            FlashToast::warning(FlashToast::ORDER_EXCEEDS_STOCK_MESSAGE);
+        }
 
         return redirect($result['signedUrl']);
     }
@@ -33,6 +36,7 @@ class GuestOrderController extends Controller
 
         return Inertia::render('orders/guest-confirmation', [
             'order' => $order,
+            'showStockWarning' => $order->exceedsCurrentInventory(),
             'statusLogs' => $order->statusLogs->map(fn ($log) => [
                 'status' => $log->status,
                 'timestamp' => $log->created_at->toISOString(),

@@ -1,4 +1,4 @@
-import { Head, Link, usePage, usePoll } from "@inertiajs/react";
+import { Head, Link, usePoll } from "@inertiajs/react";
 import { OrderTimeline } from "@/components/orders/OrderTimeline";
 import type { StatusLog } from "@/components/orders/OrderTimeline";
 import { Button } from "@/components/ui/button";
@@ -48,18 +48,17 @@ const GUEST_LABEL_OVERRIDES: Record<string, string> = {
 
 export default function GuestConfirmation({
   order,
+  showStockWarning = false,
   statusLogs,
   canRegister = true,
   statusMeta,
 }: {
   order: Order;
+  showStockWarning?: boolean;
   statusLogs: StatusLog[];
   canRegister?: boolean;
   statusMeta: StatusMeta;
 }) {
-  const { props } = usePage<{ flash: { stock_warning?: boolean } }>();
-  const stockWarning = props.flash?.stock_warning;
-
   usePoll(30_000, { only: ["order", "statusLogs"] });
 
   return (
@@ -116,7 +115,7 @@ export default function GuestConfirmation({
               </CardContent>
             </Card>
 
-            {stockWarning && (
+            {showStockWarning && (
               <div className="rounded-md border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-800">
                 Note: your order quantity exceeds current available stock. We
                 will confirm availability shortly.

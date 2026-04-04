@@ -1,6 +1,5 @@
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Head, usePage, usePoll } from "@inertiajs/react";
-import { ORDER_STATUS_ICONS } from "@/lib/order-status-icons";
+import { Head, usePoll } from "@inertiajs/react";
 import Heading from "@/components/heading";
 import { OrderTimeline } from "@/components/orders/OrderTimeline";
 import type { StatusLog } from "@/components/orders/OrderTimeline";
@@ -15,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ORDER_STATUS_ICONS } from "@/lib/order-status-icons";
 import { index } from "@/routes/orders";
 
 type FishType = { id: number; name: string };
@@ -52,16 +52,15 @@ type StatusMeta = Record<
 
 export default function ShowOrder({
   order,
+  showStockWarning = false,
   statusLogs,
   statusMeta,
 }: {
   order: Order;
+  showStockWarning?: boolean;
   statusLogs: StatusLog[];
   statusMeta: StatusMeta;
 }) {
-  const { props } = usePage<{ flash: { stock_warning?: boolean } }>();
-  const stockWarning = props.flash?.stock_warning;
-
   usePoll(30_000, { only: ["order", "statusLogs"] });
 
   return (
@@ -87,7 +86,7 @@ export default function ShowOrder({
           </Badge>
         </div>
 
-        {stockWarning && (
+        {showStockWarning && (
           <Alert className="border-yellow-300 bg-yellow-50 text-yellow-800">
             Note: your order quantity exceeds current available stock. We will
             confirm availability shortly.

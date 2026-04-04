@@ -8,6 +8,7 @@ use App\Models\FishType;
 use App\Models\Inventory;
 use App\Models\Order;
 use App\States\Order\OrderState;
+use App\Support\FlashToast;
 use App\Values\DiscountConfig;
 use App\Values\PricingConfig;
 use App\Values\TaxConfig;
@@ -51,7 +52,9 @@ class OrderController extends Controller
         );
 
         $totalKg = array_sum(array_column($data['items'], 'quantity_kg'));
-        session()->flash('stock_warning', $totalKg > (float) Inventory::current()->stock_kg);
+        if ($totalKg > (float) Inventory::current()->stock_kg) {
+            FlashToast::warning(FlashToast::ORDER_EXCEEDS_STOCK_MESSAGE);
+        }
 
         return to_route('orders.show', $order);
     }
@@ -64,6 +67,7 @@ class OrderController extends Controller
 
         return Inertia::render('orders/show', [
             'order' => $order,
+            'showStockWarning' => $order->exceedsCurrentInventory(),
             'statusLogs' => $order->statusLogs->map(fn ($log) => [
                 'status' => $log->status,
                 'timestamp' => $log->created_at->toISOString(),

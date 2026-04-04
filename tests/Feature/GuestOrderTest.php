@@ -5,9 +5,11 @@ use App\Models\Inventory;
 use App\Models\Order;
 use App\Models\User;
 use App\Notifications\GuestOrderConfirmationNotification;
+use App\Support\FlashToast;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
+use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function (): void {
     $this->seed(RoleSeeder::class);
@@ -77,6 +79,33 @@ test('guest cannot view order with invalid signature', function (): void {
 
     $this->get(route('guest-orders.show', $order))
         ->assertForbidden();
+});
+
+test('guest confirmation shows stock warning prop and flashed toast after over-capacity order', function (): void {
+    Inventory::current()->update(['stock_kg' => 1]);
+    $tuna = FishType::create(['name' => 'Tuna', 'is_active' => true]);
+
+    Notification::fake();
+
+    $this->post(route('guest-orders.store'), [
+        'guest_name' => 'John Doe',
+        'guest_email' => 'john@example.com',
+        'guest_phone' => '+677 12345',
+        'items' => [['fish_type_id' => $tuna->id, 'quantity_kg' => 5]],
+        'filleting' => false,
+        'delivery' => false,
+    ])->assertRedirect();
+
+    $order = Order::first();
+    $signedUrl = URL::signedRoute('guest-orders.show', ['order' => $order->id]);
+
+    $this->get($signedUrl)
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('orders/guest-confirmation')
+            ->where('showStockWarning', true)
+            ->where('flash.toast.type', 'warning')
+            ->where('flash.toast.message', FlashToast::ORDER_EXCEEDS_STOCK_MESSAGE));
 });
 
 test('guest order redirects to signed confirmation url, not dashboard', function (): void {

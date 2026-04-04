@@ -68,6 +68,20 @@ class Order extends Model
     }
 
     /**
+     * Total ordered kg exceeds current inventory snapshot (for post-checkout messaging).
+     */
+    public function exceedsCurrentInventory(): bool
+    {
+        $this->loadMissing('items');
+
+        $totalKg = (float) $this->items->sum(
+            fn (OrderItem $item): float => (float) $item->quantity_kg
+        );
+
+        return $totalKg > (float) Inventory::current()->stock_kg;
+    }
+
+    /**
      * @return HasMany<OrderStatusLog, $this>
      */
     public function statusLogs(): HasMany
