@@ -7,8 +7,10 @@ use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\Auth\TwoFactorController;
 use App\Http\Controllers\Api\GuestOrderController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ReviewController;
+use Illuminate\Broadcasting\BroadcastController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->middleware('throttle:api-auth')->group(function (): void {
@@ -25,6 +27,8 @@ Route::middleware('throttle:api')->group(function (): void {
 });
 
 Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
+    Route::post('broadcasting/auth', [BroadcastController::class, 'authenticate'])->name('api.broadcasting.auth');
+
     Route::delete('auth/logout', [LogoutController::class, 'destroy'])->name('api.auth.logout');
 
     Route::apiResource('orders', OrderController::class)->only(['index', 'store', 'show'])->names([
@@ -34,4 +38,7 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
     ]);
 
     Route::post('orders/{order}/review', [ReviewController::class, 'store'])->name('api.orders.review.store');
+
+    Route::get('notifications', [NotificationController::class, 'index'])->name('api.notifications.index');
+    Route::post('notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('api.notifications.read');
 });

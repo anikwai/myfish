@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Events\OrderStatusUpdated;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\Facades\Notification;
@@ -17,6 +18,8 @@ final class OrderNotifier
 
     public function statusChanged(Order $order, string $newStatus): void
     {
+        broadcast(new OrderStatusUpdated($order, $newStatus));
+
         if ($order->user) {
             $order->user->notify(new OrderStatusChangedNotification($order, $newStatus));
         } elseif ($order->guest_email) {
