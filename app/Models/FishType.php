@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
+use Database\Factories\FishTypeFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 #[Fillable(['name', 'is_active', 'price_per_pound'])]
 class FishType extends Model
 {
+    /** @use HasFactory<FishTypeFactory> */
+    use HasFactory;
+
     /**
      * @return array<string, string>
      */

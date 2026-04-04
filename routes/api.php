@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Auth\LogoutController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\Auth\TwoFactorController;
+use App\Http\Controllers\Api\OrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->middleware('throttle:api-auth')->group(function (): void {
@@ -18,4 +19,10 @@ Route::prefix('auth')->middleware('throttle:api-auth')->group(function (): void 
 
 Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
     Route::delete('auth/logout', [LogoutController::class, 'destroy'])->name('api.auth.logout');
+
+    Route::apiResource('orders', OrderController::class)->only(['index', 'store', 'show'])->names([
+        'index' => 'api.orders.index',
+        'store' => 'api.orders.store',
+        'show' => 'api.orders.show',
+    ]);
 });
