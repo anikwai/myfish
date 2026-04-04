@@ -14,13 +14,15 @@ Fish order fulfillment: customers browse stock, choose by type and size (small /
 
 ## Stack
 
-| Layer | Technology |
-| --- | --- |
-| Backend | Laravel 13, Fortify (auth), Queues, PostgreSQL |
-| Frontend | React 19, Inertia v3, Vite 8, Tailwind CSS v4 |
-| UI | [shadcn/ui](https://ui.shadcn.com/) (Radix primitives) |
-| DX | Laravel Wayfinder (typed routes), Pint, ESLint, Prettier, TypeScript |
-| Authorization | spatie/laravel-permission |
+| Layer         | Technology                                                           |
+| ------------- | -------------------------------------------------------------------- |
+| Backend       | Laravel 13, Fortify (auth), Queues, PostgreSQL                       |
+| Frontend      | React 19, Inertia v3, Vite 8, Tailwind CSS v4                        |
+| UI            | [shadcn/ui](https://ui.shadcn.com/) (Radix primitives)               |
+| DX            | Laravel Wayfinder (typed routes), Pint, ESLint, Prettier, TypeScript |
+| Authorization | spatie/laravel-permission                                            |
+| State machine | spatie/laravel-model-states                                          |
+| Media         | spatie/laravel-medialibrary                                          |
 
 ## Requirements
 
@@ -61,11 +63,11 @@ composer run wayfinder:generate
 
 ## Testing and code quality
 
-| Command | Purpose |
-| --- | --- |
-| `composer test` | Pint (check) + application tests |
-| `php artisan test --compact` | Tests only (faster iteration) |
-| `composer run ci:check` | Full gate: ESLint, Prettier, TypeScript, tests |
+| Command                      | Purpose                                        |
+| ---------------------------- | ---------------------------------------------- |
+| `composer test`              | Pint (check) + application tests               |
+| `php artisan test --compact` | Tests only (faster iteration)                  |
+| `composer run ci:check`      | Full gate: ESLint, Prettier, TypeScript, tests |
 
 Frontend: `npm run lint`, `npm run format`, `npm run types:check`.
 
@@ -75,7 +77,12 @@ GitHub Actions run on `develop`, `main`, `master`, and `workos`: [**tests**](.gi
 
 ## Project layout
 
-- `app/` — HTTP, domain, and authentication (Fortify)
+- `app/Actions/` — Single-responsibility action classes for all write workflows
+- `app/Http/` — Controllers and form requests (thin; delegate to Actions)
+- `app/Models/` — Eloquent models
+- `app/States/` — Order state machine (Spatie Model States) with transition classes
+- `app/Notifications/` — Customer notifications (order status, invoice, receipt)
+- `app/Values/` — Immutable value objects (pricing, tax, discount config)
 - `resources/js/` — Inertia pages and components
 - `routes/` — Web routes (`web.php`, `settings.php`)
 - `tests/` — Pest feature and unit tests
