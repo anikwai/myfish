@@ -15,6 +15,11 @@ class InvoiceNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    /** @var array<int, int> */
+    public array $backoff = [15, 45, 90, 180];
+
+    public int $tries = 5;
+
     public function __construct(public readonly Order $order) {}
 
     /**
