@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\Business;
 use App\Models\Order;
 use App\Services\CloudflarePdfService;
 use App\Values\BusinessConfig;
@@ -38,6 +39,7 @@ class InvoiceNotification extends Notification implements ShouldQueue
         $html = View::make('pdf.invoice', [
             'order' => $order,
             'business' => $business,
+            'business_logo_src' => Business::instance()->logoDataUriForPdf(),
         ])->render();
 
         $pdf = app(CloudflarePdfService::class)->generate($html);

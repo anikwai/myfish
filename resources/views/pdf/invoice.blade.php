@@ -36,8 +36,11 @@
 
 <div class="header">
     <div>
-        @if($business->logo_url)
-        <img src="{{ $business->logo_url }}" alt="{{ $business->name }}" style="height: 52px; width: auto; object-fit: contain; margin-bottom: 8px; display: block;">
+        @php
+            $logoSrc = $business_logo_src ?? $business->logo_url;
+        @endphp
+        @if($logoSrc)
+        <img src="{{ $logoSrc }}" alt="{{ $business->name }}" style="height: 52px; width: auto; object-fit: contain; margin-bottom: 8px; display: block;">
         @endif
         <div class="business-name">{{ $business->name }}</div>
         <div class="business-details">

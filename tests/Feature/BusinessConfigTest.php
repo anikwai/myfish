@@ -125,3 +125,18 @@ test('logo url is included in business config', function (): void {
 
     expect(BusinessConfig::current()->logo_url)->not->toBeNull();
 });
+
+test('business logo data uri embeds file bytes for remote pdf rendering', function (): void {
+    Storage::fake('media');
+
+    $file = UploadedFile::fake()->image('logo.png', 80, 80);
+    Business::instance()->addMedia($file)->toMediaCollection('logo');
+
+    $dataUri = Business::instance()->logoDataUriForPdf();
+
+    expect($dataUri)->toBeString()
+        ->toStartWith('data:image/png;base64,');
+    $raw = base64_decode(substr((string) $dataUri, (int) strpos((string) $dataUri, ',') + 1), true);
+    expect($raw)->not->toBeFalse()
+        ->and(strlen($raw))->toBeGreaterThan(100);
+});
