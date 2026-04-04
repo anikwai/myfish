@@ -27,7 +27,7 @@ test('records status log with acting user', function (): void {
 
     app(UpdateOrderStatus::class)->handle($order, 'confirmed', null, $admin);
 
-    $log = $order->statusLogs()->orderByDesc('id')->first();
+    $log = $order->statusLogs()->reorder()->orderByDesc('id')->first();
     expect($log->status)->toBe('confirmed')
         ->and($log->user_id)->toBe($admin->id);
 });
