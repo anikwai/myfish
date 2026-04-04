@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Auth\LogoutController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\Auth\TwoFactorController;
+use App\Http\Controllers\Api\GuestOrderController;
 use App\Http\Controllers\Api\OrderController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +16,11 @@ Route::prefix('auth')->middleware('throttle:api-auth')->group(function (): void 
     Route::post('two-factor', [TwoFactorController::class, 'store'])->name('api.auth.two-factor');
     Route::post('forgot-password', [ForgotPasswordController::class, 'store'])->name('api.auth.forgot-password');
     Route::post('reset-password', [ResetPasswordController::class, 'store'])->name('api.auth.reset-password');
+});
+
+Route::middleware('throttle:api')->group(function (): void {
+    Route::post('orders/guest', [GuestOrderController::class, 'store'])->name('api.orders.guest.store');
+    Route::get('orders/guest/{order}', [GuestOrderController::class, 'show'])->name('api.orders.guest.show');
 });
 
 Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
