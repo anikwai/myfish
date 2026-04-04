@@ -6,6 +6,7 @@ use App\Values\BusinessConfig;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Spatie\MediaLibrary\MediaCollections\Exceptions\FileUnacceptableForCollection;
 
 beforeEach(function (): void {
     $this->seed(RoleSeeder::class);
@@ -139,4 +140,50 @@ test('business logo data uri embeds file bytes for remote pdf rendering', functi
     $raw = base64_decode(substr((string) $dataUri, (int) strpos((string) $dataUri, ',') + 1), true);
     expect($raw)->not->toBeFalse()
         ->and(strlen($raw))->toBeGreaterThan(100);
+});
+
+test('admin can upload an SVG business logo', function (): void {
+    Storage::fake('media');
+
+    $admin = User::factory()->admin()->create();
+    $svg = '<?xml version="1.0" encoding="UTF-8"?>'
+        .'<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20">'
+        .'<circle cx="10" cy="10" r="8" fill="blue"/></svg>';
+    $file = UploadedFile::fake()->createWithContent('logo.svg', $svg);
+
+    $this->actingAs($admin)
+        ->post(route('admin.business.logo.store'), ['logo' => $file])
+        ->assertRedirect(route('admin.business.edit'));
+
+    $media = Business::instance()->getFirstMedia('logo');
+    expect($media)->not->toBeNull()
+        ->and(strtolower((string) $media->mime_type))->toContain('svg');
+});
+
+test('business logo data uri uses svg mime for svg uploads', function (): void {
+    Storage::fake('media');
+
+    $svg = '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg"></svg>';
+    $file = UploadedFile::fake()->createWithContent('logo.svg', $svg);
+    Business::instance()->addMedia($file)->toMediaCollection('logo');
+
+    expect(Business::instance()->logoDataUriForPdf())->toStartWith('data:image/svg+xml;base64,');
+});
+
+test('logo upload rejects disallowed mime types', function (): void {
+    $admin = User::factory()->admin()->create();
+    $file = UploadedFile::fake()->create('document.pdf', 100, 'application/pdf');
+
+    $this->actingAs($admin)
+        ->post(route('admin.business.logo.store'), ['logo' => $file])
+        ->assertSessionHasErrors(['logo']);
+});
+
+test('business logo media collection rejects disallowed mime types', function (): void {
+    Storage::fake('media');
+
+    $pdf = UploadedFile::fake()->create('document.pdf', 50, 'application/pdf');
+
+    expect(fn () => Business::instance()->addMedia($pdf)->toMediaCollection('logo'))
+        ->toThrow(FileUnacceptableForCollection::class);
 });

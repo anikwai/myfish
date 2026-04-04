@@ -169,7 +169,9 @@ export default function Business({
           <CardHeader>
             <CardTitle>Logo</CardTitle>
             <CardDescription>
-              Displayed on invoices and receipts. PNG or JPG, max 2 MB.
+              PNG, JPG, WebP, GIF, or SVG (max 2 MB). For email, SVG is
+              converted to PNG when the Imagick PHP extension is available;
+              otherwise the business name is shown instead of the logo.
             </CardDescription>
           </CardHeader>
           <Separator />

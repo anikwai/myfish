@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Support\BusinessLogoUpload;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -23,14 +25,35 @@ class Business extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('logo')->singleFile();
+        $this->addMediaCollection('logo')
+            ->singleFile()
+            ->acceptsMimeTypes(BusinessLogoUpload::acceptedMimeTypes());
     }
 
     public function registerMediaConversions(?Media $media = null): void
     {
+        if ($this->logoMediaIsSvg($media)) {
+            return;
+        }
+
         $this->addMediaConversion('preview')
             ->fit(Fit::Contain, 300, 300)
             ->nonQueued();
+    }
+
+    private function logoMediaIsSvg(?Media $media): bool
+    {
+        if ($media === null) {
+            return false;
+        }
+
+        $mime = strtolower((string) $media->mime_type);
+
+        if (str_contains($mime, 'svg')) {
+            return true;
+        }
+
+        return Str::endsWith(strtolower($media->file_name), '.svg');
     }
 
     /**
@@ -58,7 +81,9 @@ class Business extends Model implements HasMedia
 
         $mime = $media->mime_type;
         if ($mime === null || $mime === '') {
-            $mime = 'image/png';
+            $mime = Str::endsWith(strtolower($media->file_name), '.svg')
+                ? 'image/svg+xml'
+                : 'image/png';
         }
 
         return 'data:'.$mime.';base64,'.base64_encode($contents);
