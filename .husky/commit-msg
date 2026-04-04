@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+# Drop IDE-appended footers so they are not stored in git history.
+msg_file=$1
+if [ -z "$msg_file" ] || [ ! -f "$msg_file" ]; then
+  exit 0
+fi
+tmp=$(mktemp)
+grep -v '^Made-with: Cursor$' "$msg_file" > "$tmp" && mv "$tmp" "$msg_file"
