@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\Auth\TwoFactorController;
 use App\Http\Controllers\Api\GuestOrderController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->middleware('throttle:api-auth')->group(function (): void {
@@ -31,4 +32,6 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
         'store' => 'api.orders.store',
         'show' => 'api.orders.show',
     ]);
+
+    Route::post('orders/{order}/review', [ReviewController::class, 'store'])->name('api.orders.review.store');
 });
