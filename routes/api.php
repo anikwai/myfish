@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\Auth\TwoFactorController;
 use App\Http\Controllers\Api\GuestOrderController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ReviewController;
 use Illuminate\Broadcasting\BroadcastController;
 use Illuminate\Support\Facades\Route;
@@ -45,6 +46,10 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
     ]);
 
     Route::post('orders/{order}/review', [ReviewController::class, 'store'])->name('api.orders.review.store');
+
+    Route::get('profile', [ProfileController::class, 'show'])->name('api.profile.show');
+    Route::put('profile', [ProfileController::class, 'update'])->name('api.profile.update');
+    Route::put('profile/password', [ProfileController::class, 'updatePassword'])->name('api.profile.password');
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('api.notifications.index');
     Route::post('notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('api.notifications.read');
