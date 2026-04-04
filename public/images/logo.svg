@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 100" width="100%" height="100%">
+  <g>
+    <path d="M 40 50 L 6 15 L 24 50 L 6 85 Z" fill="#5D27E6" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M 40 50 Q 90 8 140 50 Q 90 92 40 50 Z M 115 33.5 A 4.5 4.5 0 1 0 115 42.5 A 4.5 4.5 0 1 0 115 33.5 Z" fill="#5D27E6" />
+  </g>
+  <text x="150" y="66" font-family="'Instrument Sans', 'Geist Variable', ui-sans-serif, system-ui, sans-serif" font-size="54" font-weight="bold" fill="#020617" letter-spacing="-1.5">myfish</text>
+</svg>
