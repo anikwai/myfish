@@ -48,6 +48,7 @@ type AuthUser = {
   id: number;
   name: string;
   email: string;
+  avatar?: string;
   phone: string | null;
 } | null;
 
@@ -87,7 +88,11 @@ export default function Welcome({
           )}
         />
 
-        <WelcomeHeader isLoggedIn={isLoggedIn} canRegister={canRegister} />
+        <WelcomeHeader
+          isLoggedIn={isLoggedIn}
+          canRegister={canRegister}
+          user={auth?.user ?? null}
+        />
 
         <main className="mx-auto w-full max-w-5xl grow px-4 py-16 sm:px-6 sm:py-24 lg:px-8 lg:py-32">
           <div className="relative rounded-xl bg-background">
