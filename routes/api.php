@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\FishTypeController as AdminFishTypeController;
+use App\Http\Controllers\Api\Admin\InventoryController as AdminInventoryController;
 use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Api\Admin\PricingController as AdminPricingController;
 use App\Http\Controllers\Api\Auth\ForgotPasswordController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutController;
@@ -42,6 +45,21 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('api.notifications.index');
     Route::post('notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('api.notifications.read');
+});
+
+Route::middleware(['auth:sanctum', 'throttle:api', 'role:admin'])->prefix('admin')->group(function (): void {
+    Route::apiResource('fish-types', AdminFishTypeController::class)->names([
+        'index' => 'api.admin.fish-types.index',
+        'store' => 'api.admin.fish-types.store',
+        'update' => 'api.admin.fish-types.update',
+        'destroy' => 'api.admin.fish-types.destroy',
+    ])->except(['show', 'create', 'edit']);
+
+    Route::get('inventory', [AdminInventoryController::class, 'index'])->name('api.admin.inventory.index');
+    Route::post('inventory/adjustments', [AdminInventoryController::class, 'adjust'])->name('api.admin.inventory.adjust');
+
+    Route::get('pricing', [AdminPricingController::class, 'show'])->name('api.admin.pricing.show');
+    Route::patch('pricing', [AdminPricingController::class, 'update'])->name('api.admin.pricing.update');
 });
 
 Route::middleware(['auth:sanctum', 'throttle:api', 'role:admin|staff'])->prefix('admin')->group(function (): void {
