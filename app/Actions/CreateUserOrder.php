@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Services;
+declare(strict_types=1);
+
+namespace App\Actions;
 
 use App\Models\FishType;
 use App\Models\Order;
@@ -12,13 +14,11 @@ use App\Values\PricingConfig;
 use App\Values\TaxConfig;
 use Illuminate\Support\Facades\DB;
 
-final class OrderCreator implements OrderCreatorInterface
+final readonly class CreateUserOrder
 {
-    public function __construct(
-        private readonly OrderPricingPipeline $pricingPipeline,
-    ) {}
+    public function __construct(private OrderPricingPipeline $pricingPipeline) {}
 
-    public function placeForUser(
+    public function handle(
         User $user,
         array $items,
         bool $filleting,
@@ -28,26 +28,6 @@ final class OrderCreator implements OrderCreatorInterface
     ): Order {
         return $this->place(
             identity: ['user_id' => $user->id],
-            items: $items,
-            filleting: $filleting,
-            delivery: $delivery,
-            deliveryLocation: $deliveryLocation,
-            note: $note,
-        );
-    }
-
-    public function placeForGuest(
-        string $guestName,
-        ?string $guestEmail,
-        string $guestPhone,
-        array $items,
-        bool $filleting,
-        bool $delivery,
-        ?string $deliveryLocation = null,
-        ?string $note = null,
-    ): Order {
-        return $this->place(
-            identity: ['user_id' => null, 'guest_name' => $guestName, 'guest_email' => $guestEmail, 'guest_phone' => $guestPhone],
             items: $items,
             filleting: $filleting,
             delivery: $delivery,

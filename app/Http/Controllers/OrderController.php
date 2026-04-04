@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateUserOrder;
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\FishType;
 use App\Models\Inventory;
 use App\Models\Order;
-use App\Services\OrderCreatorInterface;
 use App\Values\DiscountConfig;
 use App\Values\PricingConfig;
 use App\Values\TaxConfig;
@@ -17,7 +17,7 @@ use Inertia\Response;
 
 class OrderController extends Controller
 {
-    public function __construct(private readonly OrderCreatorInterface $orderCreator) {}
+    public function __construct(private readonly CreateUserOrder $createUserOrder) {}
 
     public function create(): Response
     {
@@ -40,7 +40,7 @@ class OrderController extends Controller
     {
         $data = $request->validated();
 
-        $order = $this->orderCreator->placeForUser(
+        $order = $this->createUserOrder->handle(
             user: $request->user(),
             items: $data['items'],
             filleting: $data['filleting'],

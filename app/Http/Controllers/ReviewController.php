@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\SubmitOrderReview;
+use App\Exceptions\OrderAlreadyReviewedException;
 use App\Http\Requests\StoreReviewRequest;
 use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
@@ -12,6 +14,8 @@ use Inertia\Response;
 
 class ReviewController extends Controller
 {
+    public function __construct(private readonly SubmitOrderReview $submitOrderReview) {}
+
     public function show(Request $request, Order $order): Response
     {
         abort_unless($request->hasValidSignature(), 403);
@@ -32,19 +36,11 @@ class ReviewController extends Controller
     {
         abort_unless($request->hasValidSignature(), 403);
 
-        if ($order->review()->exists()) {
+        try {
+            $this->submitOrderReview->handle($order, $request->validated('rating'), $request->validated('comment'));
+        } catch (OrderAlreadyReviewedException) {
             return redirect()->back();
         }
-
-        $reviewerName = $order->user
-            ? explode(' ', $order->user->name)[0]
-            : explode(' ', $order->guest_name ?? 'Customer')[0];
-
-        $order->review()->create([
-            'rating' => $request->validated('rating'),
-            'comment' => $request->validated('comment'),
-            'reviewer_name' => $reviewerName,
-        ]);
 
         return redirect()->back()->with('status', 'review-submitted');
     }

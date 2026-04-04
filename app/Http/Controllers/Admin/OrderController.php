@@ -2,25 +2,27 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Actions\DeductOrderFromInventory;
+use App\Actions\CreateGuestOrder;
+use App\Actions\UpdateOrderStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreGuestOrderRequest;
 use App\Http\Requests\Admin\UpdateOrderStatusRequest;
 use App\Models\FishType;
 use App\Models\Order;
-use App\Services\OrderCreatorInterface;
 use App\Values\DiscountConfig;
 use App\Values\PricingConfig;
 use App\Values\TaxConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class OrderController extends Controller
 {
-    public function __construct(private readonly OrderCreatorInterface $orderCreator) {}
+    public function __construct(
+        private readonly CreateGuestOrder $createGuestOrder,
+        private readonly UpdateOrderStatus $updateOrderStatus,
+    ) {}
 
     public function index(Request $request): Response
     {
@@ -65,17 +67,10 @@ class OrderController extends Controller
     public function updateStatus(UpdateOrderStatusRequest $request, Order $order): RedirectResponse
     {
         $data = $request->validated();
-        $newStatus = $data['status'];
 
         $order->load(['user:id,name', 'items.fishType', 'statusLogs.user:id,name']);
 
-        DB::transaction(function () use ($order, $newStatus, $data, $request): void {
-            $order->transitionTo($newStatus, $data['rejection_reason'] ?? null, $request->user());
-
-            if ($newStatus === 'packed') {
-                (new DeductOrderFromInventory)->execute($order, $request->user()->id);
-            }
-        });
+        $this->updateOrderStatus->handle($order, $data['status'], $data['rejection_reason'] ?? null, $request->user());
 
         return to_route('admin.orders.show', $order)->with('status', 'order-updated');
     }
@@ -101,7 +96,7 @@ class OrderController extends Controller
     {
         $data = $request->validated();
 
-        $order = $this->orderCreator->placeForGuest(
+        $order = $this->createGuestOrder->handle(
             guestName: $data['guest_name'],
             guestEmail: $data['guest_email'] ?? null,
             guestPhone: $data['guest_phone'],

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\DeleteReview;
 use App\Http\Controllers\Controller;
 use App\Models\Review;
 use Illuminate\Http\RedirectResponse;
@@ -10,6 +11,8 @@ use Inertia\Response;
 
 class ReviewController extends Controller
 {
+    public function __construct(private readonly DeleteReview $deleteReview) {}
+
     public function index(): Response
     {
         return Inertia::render('admin/reviews/index', [
@@ -25,7 +28,7 @@ class ReviewController extends Controller
 
     public function destroy(Review $review): RedirectResponse
     {
-        $review->delete();
+        $this->deleteReview->handle($review);
 
         return to_route('admin.reviews.index')->with('status', 'review-deleted');
     }

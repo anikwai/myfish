@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Actions\UpdateUserPassword;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\PasswordUpdateRequest;
 use App\Http\Requests\Settings\TwoFactorAuthenticationRequest;
@@ -14,6 +15,8 @@ use Laravel\Fortify\Features;
 
 class SecurityController extends Controller implements HasMiddleware
 {
+    public function __construct(private readonly UpdateUserPassword $updateUserPassword) {}
+
     /**
      * Get the middleware that should be assigned to the controller.
      */
@@ -49,9 +52,7 @@ class SecurityController extends Controller implements HasMiddleware
      */
     public function update(PasswordUpdateRequest $request): RedirectResponse
     {
-        $request->user()->update([
-            'password' => $request->password,
-        ]);
+        $this->updateUserPassword->handle($request->user(), $request->password);
 
         return back();
     }
