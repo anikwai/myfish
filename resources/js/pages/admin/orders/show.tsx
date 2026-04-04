@@ -22,24 +22,6 @@ import {
 } from "@/components/ui/table";
 import { index } from "@/routes/admin/orders";
 
-const STATUS_LABELS: Record<string, string> = {
-  placed: "Placed",
-  confirmed: "Confirmed",
-  on_hold: "On hold",
-  rejected: "Rejected",
-  packed: "Packed",
-  delivered: "Delivered",
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  placed: "bg-blue-100 text-blue-700",
-  confirmed: "bg-green-100 text-green-700",
-  on_hold: "bg-yellow-100 text-yellow-700",
-  rejected: "bg-red-100 text-red-700",
-  packed: "bg-purple-100 text-purple-700",
-  delivered: "bg-neutral-100 text-neutral-600",
-};
-
 const TRANSITION_LABELS: Record<string, string> = {
   confirmed: "Confirm",
   rejected: "Reject",
@@ -79,14 +61,18 @@ type Order = {
   items: OrderItem[];
 };
 
+type StatusMeta = Record<string, { label: string; color: string }>;
+
 export default function AdminOrderShow({
   order,
   statusLogs,
   allowedTransitions,
+  statusMeta,
 }: {
   order: Order;
   statusLogs: StatusLog[];
   allowedTransitions: string[];
+  statusMeta: StatusMeta;
 }) {
   usePoll(30_000, { only: ["order", "statusLogs"] });
 
@@ -120,11 +106,13 @@ export default function AdminOrderShow({
               {order.guest_phone && <> &middot; {order.guest_phone}</>}
             </p>
           </div>
-          <Badge className={STATUS_COLORS[order.status] ?? "bg-neutral-100"}>
+          <Badge
+            className={statusMeta[order.status]?.color ?? "bg-neutral-100"}
+          >
             {order.status === "delivered" && (
               <HugeiconsIcon icon={PackageDelivered01Icon} size={12} />
             )}
-            {STATUS_LABELS[order.status] ?? order.status}
+            {statusMeta[order.status]?.label ?? order.status}
           </Badge>
         </div>
 

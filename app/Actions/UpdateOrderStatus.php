@@ -6,19 +6,21 @@ namespace App\Actions;
 
 use App\Models\Order;
 use App\Models\User;
+use App\States\Order\OrderRejected;
+use App\States\Order\OrderState;
 use Illuminate\Support\Facades\DB;
 
 final readonly class UpdateOrderStatus
 {
-    public function __construct(private DeductOrderFromInventory $deductOrderFromInventory) {}
-
     public function handle(Order $order, string $newStatus, ?string $rejectionReason, User $actor): void
     {
-        DB::transaction(function () use ($order, $newStatus, $rejectionReason, $actor): void {
-            $order->transitionTo($newStatus, $rejectionReason, $actor);
+        $stateClass = OrderState::classFromName($newStatus);
 
-            if ($newStatus === 'packed') {
-                $this->deductOrderFromInventory->execute($order, $actor->id);
+        DB::transaction(function () use ($order, $stateClass, $rejectionReason, $actor): void {
+            if ($stateClass === OrderRejected::class) {
+                $order->status->transitionTo($stateClass, $rejectionReason, $actor);
+            } else {
+                $order->status->transitionTo($stateClass, $actor);
             }
         });
     }

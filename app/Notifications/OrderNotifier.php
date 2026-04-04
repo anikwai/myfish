@@ -15,22 +15,15 @@ final class OrderNotifier
         Notification::send($admins, new OrderPlacedNotification($order));
     }
 
-    public function statusChanged(Order $order, string $newStatus): void
+    public function notifyStatusChanged(Order $order): void
     {
+        $status = (string) $order->status;
+
         if ($order->user) {
-            $order->user->notify(new OrderStatusChangedNotification($order, $newStatus));
+            $order->user->notify(new OrderStatusChangedNotification($order, $status));
         } elseif ($order->guest_email) {
             Notification::route('mail', $order->guest_email)
-                ->notify(new OrderStatusChangedNotification($order, $newStatus));
-        }
-
-        if ($newStatus === 'confirmed') {
-            $this->sendInvoice($order);
-        }
-
-        if ($newStatus === 'delivered') {
-            $this->sendReceipt($order);
-            $this->sendReviewInvite($order);
+                ->notify(new OrderStatusChangedNotification($order, $status));
         }
     }
 

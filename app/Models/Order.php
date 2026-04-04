@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Notifications\OrderNotifier;
+use App\States\Order\OrderState;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
-use Illuminate\Validation\ValidationException;
+use Spatie\ModelStates\HasStates;
 
 #[Fillable([
     'user_id', 'guest_name', 'guest_email', 'guest_phone', 'status',
@@ -24,12 +24,15 @@ class Order extends Model
     /** @use HasFactory<OrderFactory> */
     use HasFactory;
 
+    use HasStates;
+
     /**
      * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
+            'status' => OrderState::class,
             'filleting' => 'boolean',
             'delivery' => 'boolean',
             'filleting_fee_snapshot' => 'decimal:2',
@@ -70,49 +73,6 @@ class Order extends Model
     public function statusLogs(): HasMany
     {
         return $this->hasMany(OrderStatusLog::class)->orderBy('created_at');
-    }
-
-    /**
-     * Valid transitions from each status.
-     *
-     * @var array<string, string[]>
-     */
-    public const TRANSITIONS = [
-        'placed' => ['confirmed', 'rejected', 'on_hold'],
-        'on_hold' => ['confirmed', 'rejected'],
-        'confirmed' => ['packed'],
-        'packed' => ['delivered'],
-        'rejected' => [],
-        'delivered' => [],
-    ];
-
-    /**
-     * Transition this order to a new status, or throw if the transition is invalid.
-     */
-    public function transitionTo(string $newStatus, ?string $rejectionReason = null, ?User $actor = null): void
-    {
-        $allowed = static::TRANSITIONS[$this->status] ?? [];
-
-        if (! in_array($newStatus, $allowed, true)) {
-            throw ValidationException::withMessages([
-                'status' => "Cannot transition from '{$this->status}' to '{$newStatus}'.",
-            ]);
-        }
-
-        $this->status = $newStatus;
-
-        if ($newStatus === 'rejected') {
-            $this->rejection_reason = $rejectionReason;
-        }
-
-        $this->save();
-
-        $this->statusLogs()->create([
-            'status' => $newStatus,
-            'user_id' => $actor?->id,
-        ]);
-
-        app(OrderNotifier::class)->statusChanged($this, $newStatus);
     }
 
     /**

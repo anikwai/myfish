@@ -7,6 +7,7 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Models\FishType;
 use App\Models\Inventory;
 use App\Models\Order;
+use App\States\Order\OrderState;
 use App\Values\DiscountConfig;
 use App\Values\PricingConfig;
 use App\Values\TaxConfig;
@@ -67,6 +68,7 @@ class OrderController extends Controller
                 'status' => $log->status,
                 'timestamp' => $log->created_at->toISOString(),
             ]),
+            'statusMeta' => OrderState::metaMap(),
         ]);
     }
 
@@ -88,6 +90,7 @@ class OrderController extends Controller
         return Inertia::render('orders/index', [
             'orders' => Inertia::scroll(fn () => $query->paginate(20, ['id', 'status', 'total_sbd', 'created_at'])),
             'filterStatus' => $filterStatus,
+            'statusMeta' => OrderState::metaMap(),
         ]);
     }
 

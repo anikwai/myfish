@@ -5,6 +5,7 @@ use App\Models\Inventory;
 use App\Models\Order;
 use App\Models\OrderStatusLog;
 use App\Models\User;
+use App\States\Order\OrderConfirmed;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
@@ -62,7 +63,7 @@ test('placing a guest order creates a placed log entry', function (): void {
 test('transitionTo creates a log entry with the new status', function (): void {
     $order = Order::factory()->create(['status' => 'placed']);
 
-    $order->transitionTo('confirmed');
+    $order->status->transitionTo(OrderConfirmed::class);
 
     expect(OrderStatusLog::where('order_id', $order->id)->where('status', 'confirmed')->exists())->toBeTrue();
 });
@@ -71,7 +72,7 @@ test('transitionTo records the acting user on the log entry', function (): void 
     $admin = User::factory()->admin()->create();
     $order = Order::factory()->create(['status' => 'placed']);
 
-    $order->transitionTo('confirmed', null, $admin);
+    $order->status->transitionTo(OrderConfirmed::class, $admin);
 
     $log = OrderStatusLog::where('order_id', $order->id)->where('status', 'confirmed')->first();
 
@@ -162,7 +163,7 @@ test('guest confirmation page returns statusLogs without actor', function (): vo
 test('admin order show page returns statusLogs with actor name', function (): void {
     $admin = User::factory()->admin()->create();
     $order = Order::factory()->create(['status' => 'placed']);
-    $order->transitionTo('confirmed', null, $admin);
+    $order->status->transitionTo(OrderConfirmed::class, $admin);
 
     $this->actingAs($admin)
         ->get(route('admin.orders.show', $order))

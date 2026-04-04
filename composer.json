@@ -16,6 +16,7 @@
     "laravel/tinker": "^3.0",
     "laravel/wayfinder": "^0.1.14",
     "spatie/laravel-medialibrary": "^11.21",
+    "spatie/laravel-model-states": "^2.13",
     "spatie/laravel-permission": "^7.2"
   },
   "require-dev": {

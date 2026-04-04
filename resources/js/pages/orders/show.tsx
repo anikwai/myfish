@@ -45,30 +45,16 @@ type Order = {
   items: OrderItem[];
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  placed: "Placed",
-  confirmed: "Confirmed",
-  on_hold: "On hold",
-  rejected: "Rejected",
-  packed: "Packed",
-  delivered: "Delivered",
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  placed: "bg-blue-100 text-blue-700",
-  confirmed: "bg-green-100 text-green-700",
-  on_hold: "bg-yellow-100 text-yellow-700",
-  rejected: "bg-red-100 text-red-700",
-  packed: "bg-purple-100 text-purple-700",
-  delivered: "bg-neutral-100 text-neutral-600",
-};
+type StatusMeta = Record<string, { label: string; color: string }>;
 
 export default function ShowOrder({
   order,
   statusLogs,
+  statusMeta,
 }: {
   order: Order;
   statusLogs: StatusLog[];
+  statusMeta: StatusMeta;
 }) {
   const { props } = usePage<{ flash: { stock_warning?: boolean } }>();
   const stockWarning = props.flash?.stock_warning;
@@ -84,13 +70,14 @@ export default function ShowOrder({
           <Heading title={`Order #${order.id}`} />
           <Badge
             className={
-              STATUS_COLORS[order.status] ?? "bg-neutral-100 text-neutral-600"
+              statusMeta[order.status]?.color ??
+              "bg-neutral-100 text-neutral-600"
             }
           >
             {order.status === "delivered" && (
               <HugeiconsIcon icon={PackageDelivered01Icon} size={12} />
             )}
-            {STATUS_LABELS[order.status] ?? order.status}
+            {statusMeta[order.status]?.label ?? order.status}
           </Badge>
         </div>
 

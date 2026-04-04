@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use App\Models\Order;
+use App\States\Order\OrderState;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -30,9 +31,16 @@ class UpdateOrderStatusRequest extends FormRequest
                 function (string $attribute, mixed $value, \Closure $fail): void {
                     /** @var Order $order */
                     $order = $this->route('order');
-                    $allowed = Order::TRANSITIONS[$order->status] ?? [];
 
-                    if (! in_array($value, $allowed, true)) {
+                    try {
+                        $stateClass = OrderState::classFromName($value);
+                    } catch (\InvalidArgumentException) {
+                        $fail("'{$value}' is not a valid order status.");
+
+                        return;
+                    }
+
+                    if (! $order->status->canTransitionTo($stateClass)) {
                         $fail("Cannot transition from '{$order->status}' to '{$value}'.");
                     }
                 },

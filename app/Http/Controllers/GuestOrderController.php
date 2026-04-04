@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\PlaceGuestOrder;
 use App\Http\Requests\StoreGuestOrderRequest;
 use App\Models\Order;
+use App\States\Order\OrderState;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -37,6 +38,7 @@ class GuestOrderController extends Controller
                 'timestamp' => $log->created_at->toISOString(),
             ]),
             'canRegister' => Features::enabled(Features::registration()),
+            'statusMeta' => OrderState::metaMap(),
         ]);
     }
 }

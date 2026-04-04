@@ -18,7 +18,7 @@ test('transitions order to new status', function (): void {
 
     app(UpdateOrderStatus::class)->handle($order, 'confirmed', null, $admin);
 
-    expect($order->fresh()->status)->toBe('confirmed');
+    expect((string) $order->fresh()->status)->toBe('confirmed');
 });
 
 test('records status log with acting user', function (): void {

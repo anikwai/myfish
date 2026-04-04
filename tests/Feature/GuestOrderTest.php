@@ -36,7 +36,7 @@ test('guest can place an order', function (): void {
         ->and($order->guest_email)->toBe('john@example.com')
         ->and($order->guest_phone)->toBe('+677 12345')
         ->and($order->user_id)->toBeNull()
-        ->and($order->status)->toBe('placed');
+        ->and((string) $order->status)->toBe('placed');
 });
 
 test('guest order sends confirmation email with signed url', function (): void {

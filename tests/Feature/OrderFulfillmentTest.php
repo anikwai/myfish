@@ -87,7 +87,7 @@ test('admin can confirm a placed order', function (): void {
         ->patch(route('admin.orders.update-status', $order), ['status' => 'confirmed'])
         ->assertRedirect(route('admin.orders.show', $order));
 
-    expect($order->fresh()->status)->toBe('confirmed');
+    expect((string) $order->fresh()->status)->toBe('confirmed');
 });
 
 test('admin can reject a placed order with a reason', function (): void {
@@ -100,7 +100,7 @@ test('admin can reject a placed order with a reason', function (): void {
         ]);
 
     $order->refresh();
-    expect($order->status)->toBe('rejected');
+    expect((string) $order->status)->toBe('rejected');
     expect($order->rejection_reason)->toBe('Out of stock');
 });
 
@@ -110,7 +110,7 @@ test('admin can put a placed order on hold', function (): void {
     $this->actingAs(User::factory()->admin()->create())
         ->patch(route('admin.orders.update-status', $order), ['status' => 'on_hold']);
 
-    expect($order->fresh()->status)->toBe('on_hold');
+    expect((string) $order->fresh()->status)->toBe('on_hold');
 });
 
 test('admin can pack a confirmed order and stock is deducted', function (): void {
@@ -137,7 +137,7 @@ test('admin can pack a confirmed order and stock is deducted', function (): void
     $this->actingAs(User::factory()->admin()->create())
         ->patch(route('admin.orders.update-status', $order), ['status' => 'packed']);
 
-    expect($order->fresh()->status)->toBe('packed');
+    expect((string) $order->fresh()->status)->toBe('packed');
     expect(Inventory::current()->stock_kg)->toEqual('90.000'); // 100 - 10
 });
 
@@ -147,7 +147,7 @@ test('admin can mark a packed order as delivered', function (): void {
     $this->actingAs(User::factory()->admin()->create())
         ->patch(route('admin.orders.update-status', $order), ['status' => 'delivered']);
 
-    expect($order->fresh()->status)->toBe('delivered');
+    expect((string) $order->fresh()->status)->toBe('delivered');
 });
 
 test('invalid transitions are rejected', function (): void {
@@ -157,7 +157,7 @@ test('invalid transitions are rejected', function (): void {
         ->patch(route('admin.orders.update-status', $order), ['status' => 'delivered'])
         ->assertSessionHasErrors('status');
 
-    expect($order->fresh()->status)->toBe('placed');
+    expect((string) $order->fresh()->status)->toBe('placed');
 });
 
 test('staff can update order status', function (): void {
@@ -167,7 +167,7 @@ test('staff can update order status', function (): void {
         ->patch(route('admin.orders.update-status', $order), ['status' => 'confirmed'])
         ->assertRedirect();
 
-    expect($order->fresh()->status)->toBe('confirmed');
+    expect((string) $order->fresh()->status)->toBe('confirmed');
 });
 
 test('clients cannot update order status', function (): void {
@@ -197,7 +197,7 @@ test('staff can create a guest order', function (): void {
     expect($order->user_id)->toBeNull();
     expect($order->guest_name)->toBe('John Doe');
     expect($order->guest_phone)->toBe('+677 12345');
-    expect($order->status)->toBe('placed');
+    expect((string) $order->status)->toBe('placed');
 });
 
 test('guest order requires name and phone', function (): void {

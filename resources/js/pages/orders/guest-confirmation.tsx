@@ -36,32 +36,23 @@ type Order = {
   items: OrderItem[];
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  placed: "Placed — awaiting confirmation",
-  confirmed: "Confirmed",
-  on_hold: "On hold",
-  rejected: "Rejected",
-  packed: "Packed",
-  delivered: "Delivered",
-};
+type StatusMeta = Record<string, { label: string; color: string }>;
 
-const STATUS_COLORS: Record<string, string> = {
-  placed: "bg-blue-100 text-blue-700",
-  confirmed: "bg-green-100 text-green-700",
-  on_hold: "bg-yellow-100 text-yellow-700",
-  rejected: "bg-red-100 text-red-700",
-  packed: "bg-purple-100 text-purple-700",
-  delivered: "bg-neutral-100 text-neutral-600",
+// Guest confirmation uses a custom label for 'placed' to convey awaiting status.
+const GUEST_LABEL_OVERRIDES: Record<string, string> = {
+  placed: "Placed — awaiting confirmation",
 };
 
 export default function GuestConfirmation({
   order,
   statusLogs,
   canRegister = true,
+  statusMeta,
 }: {
   order: Order;
   statusLogs: StatusLog[];
   canRegister?: boolean;
+  statusMeta: StatusMeta;
 }) {
   const { props } = usePage<{ flash: { stock_warning?: boolean } }>();
   const stockWarning = props.flash?.stock_warning;
@@ -112,9 +103,11 @@ export default function GuestConfirmation({
                     <p className="text-lg font-semibold">#{order.id}</p>
                   </div>
                   <span
-                    className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${STATUS_COLORS[order.status] ?? "bg-neutral-100 text-neutral-600"}`}
+                    className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${statusMeta[order.status]?.color ?? "bg-neutral-100 text-neutral-600"}`}
                   >
-                    {STATUS_LABELS[order.status] ?? order.status}
+                    {GUEST_LABEL_OVERRIDES[order.status] ??
+                      statusMeta[order.status]?.label ??
+                      order.status}
                   </span>
                 </div>
               </CardContent>

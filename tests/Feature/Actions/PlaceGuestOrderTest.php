@@ -29,7 +29,7 @@ test('creates the order and returns it', function (): void {
 
     expect($result['order'])->toBeInstanceOf(Order::class)
         ->and($result['order']->guest_name)->toBe('John Doe')
-        ->and($result['order']->status)->toBe('placed');
+        ->and((string) $result['order']->status)->toBe('placed');
 });
 
 test('returns a signed url for the order', function (): void {

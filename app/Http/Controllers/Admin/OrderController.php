@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\StoreGuestOrderRequest;
 use App\Http\Requests\Admin\UpdateOrderStatusRequest;
 use App\Models\FishType;
 use App\Models\Order;
+use App\States\Order\OrderState;
 use App\Values\DiscountConfig;
 use App\Values\PricingConfig;
 use App\Values\TaxConfig;
@@ -45,7 +46,8 @@ class OrderController extends Controller
             'orders' => Inertia::scroll(fn () => $query->paginate(20, ['id', 'status', 'total_sbd', 'created_at', 'guest_name', 'user_id'])),
             'filterStatus' => $request->input('status'),
             'search' => $request->input('search', ''),
-            'statuses' => array_keys(Order::TRANSITIONS),
+            'statuses' => OrderState::allNames(),
+            'statusMeta' => OrderState::metaMap(),
         ]);
     }
 
@@ -60,7 +62,8 @@ class OrderController extends Controller
                 'timestamp' => $log->created_at->toISOString(),
                 'actor' => $log->user?->name,
             ]),
-            'allowedTransitions' => Order::TRANSITIONS[$order->status] ?? [],
+            'allowedTransitions' => $order->status->transitionableNames(),
+            'statusMeta' => OrderState::metaMap(),
         ]);
     }
 

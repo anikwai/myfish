@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\States\Order\OrderState;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -22,6 +23,7 @@ class DashboardController extends Controller
             ->get(['id', 'status', 'total_sbd', 'created_at']);
 
         return Inertia::render('dashboard', [
+            'statusMeta' => OrderState::metaMap(),
             'recentOrders' => $recentOrders,
             'orderCount' => Order::where('user_id', $user->id)->count(),
             'activeOrderCount' => Order::where('user_id', $user->id)

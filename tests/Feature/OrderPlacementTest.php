@@ -65,7 +65,7 @@ test('client can place an order with correct total calculation', function (): vo
 
     $order = Order::first();
     expect($order)->not->toBeNull();
-    expect($order->status)->toBe('placed');
+    expect((string) $order->status)->toBe('placed');
     expect($order->user_id)->toBe($client->id);
 
     // 2 kg × 2.20462 = 4.40924 lbs × $25 = $110.23
