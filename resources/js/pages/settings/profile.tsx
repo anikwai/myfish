@@ -1,8 +1,8 @@
 import { Transition } from "@headlessui/react";
 import { Camera01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Form, Head, Link, router, useForm, usePage } from "@inertiajs/react";
-import { useRef } from "react";
+import { Form, Head, Link, router, usePage } from "@inertiajs/react";
+import { useRef, useState } from "react";
 import AvatarController from "@/actions/App/Http/Controllers/Settings/AvatarController";
 import ProfileController from "@/actions/App/Http/Controllers/Settings/ProfileController";
 import DeleteUser from "@/components/delete-user";
@@ -27,13 +27,23 @@ export default function Profile({
   const getInitials = useInitials();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const avatarForm = useForm<{ avatar: File | null }>({ avatar: null });
+  const [uploading, setUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
 
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    avatarForm.setData("avatar", file);
-    avatarForm.post(AvatarController.store.url(), { preserveScroll: true });
+    setAvatarError(null);
+    router.post(
+      AvatarController.store.url(),
+      { avatar: file },
+      {
+        preserveScroll: true,
+        onStart: () => setUploading(true),
+        onFinish: () => setUploading(false),
+        onError: (errors) => setAvatarError(errors.avatar ?? null),
+      }
+    );
   }
 
   function handleRemoveAvatar() {
@@ -59,7 +69,7 @@ export default function Profile({
               type="button"
               className="group relative cursor-pointer rounded-full"
               onClick={() => fileInputRef.current?.click()}
-              disabled={avatarForm.processing}
+              disabled={uploading}
             >
               <Avatar className="size-16">
                 <AvatarImage src={auth.user.avatar} alt={auth.user.name} />
@@ -84,13 +94,11 @@ export default function Profile({
             />
 
             <div className="space-y-1">
-              {avatarForm.processing && (
+              {uploading && (
                 <p className="text-sm text-muted-foreground">Uploading…</p>
               )}
-              {avatarForm.errors.avatar && (
-                <InputError message={avatarForm.errors.avatar} />
-              )}
-              {auth.user.avatar && !avatarForm.processing && (
+              {avatarError && <InputError message={avatarError} />}
+              {auth.user.avatar && !uploading && (
                 <button
                   type="button"
                   onClick={handleRemoveAvatar}
