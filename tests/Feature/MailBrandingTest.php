@@ -5,12 +5,28 @@ use App\Models\Business;
 use App\Models\Order;
 use App\Models\User;
 use App\Notifications\InvoiceNotification;
+use App\Services\CloudflarePdfService;
 use App\Support\BusinessMailBranding;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Mime\Email;
+
+beforeEach(function (): void {
+    $this->instance(CloudflarePdfService::class, new class extends CloudflarePdfService
+    {
+        public function __construct()
+        {
+            parent::__construct('stub-account', 'stub-token');
+        }
+
+        public function generate(string $html): string
+        {
+            return '%PDF-stub';
+        }
+    });
+});
 
 test('notification mail html uses business branding instead of laravel default logo', function () {
     $user = User::factory()->create();
