@@ -16,7 +16,7 @@ test('user can upload an avatar', function () {
         ->post(route('avatar.store'), ['avatar' => $file])
         ->assertRedirect(route('profile.edit'));
 
-    expect($user->fresh()->getFirstMediaUrl('avatar', 'thumb'))->not->toBeEmpty();
+    expect($user->fresh()->getFirstMediaUrl('avatar'))->not->toBeEmpty();
 });
 
 test('avatar is replaced when a new one is uploaded', function () {
