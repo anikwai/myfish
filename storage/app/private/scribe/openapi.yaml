@@ -1,0 +1,1106 @@
+openapi: 3.0.3
+info:
+  title: "Laravel API Documentation"
+  description: "REST API for the myfish mobile application. All authenticated endpoints require a Sanctum Bearer token obtained from the login endpoint."
+  version: 1.0.0
+servers:
+  - url: "https://myfish.test"
+tags:
+  - name: "Admin - Business"
+    description: ""
+  - name: "Admin - Catalogue"
+    description: ""
+  - name: "Admin - Orders"
+    description: ""
+  - name: "Admin - Reports"
+    description: ""
+  - name: "Admin - Reviews"
+    description: ""
+  - name: Authentication
+    description: ""
+  - name: Endpoints
+    description: ""
+  - name: "Guest Orders"
+    description: ""
+  - name: Notifications
+    description: ""
+  - name: Orders
+    description: ""
+  - name: Profile
+    description: ""
+  - name: Reviews
+    description: ""
+components:
+  securitySchemes:
+    default:
+      type: http
+      scheme: bearer
+      description: "Obtain a token via <code>POST /api/v1/auth/login</code>. Pass it as <code>Authorization: Bearer {token}</code>."
+security:
+  - default: []
+paths:
+  /api/v1/admin/business:
+    get:
+      summary: ""
+      operationId: getApiV1AdminBusiness
+      description: ""
+      parameters: []
+      responses:
+        401:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - "Admin - Business"
+    patch:
+      summary: ""
+      operationId: patchApiV1AdminBusiness
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - "Admin - Business"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                business_name:
+                  type: string
+                  description: "Must not be greater than 255 characters."
+                  example: b
+                business_address:
+                  type: string
+                  description: "Must not be greater than 255 characters."
+                  example: "n"
+                  nullable: true
+                business_phone:
+                  type: string
+                  description: "Must not be greater than 50 characters."
+                  example: g
+                  nullable: true
+                business_email:
+                  type: string
+                  description: "Must be a valid email address. Must not be greater than 255 characters."
+                  example: rowan.gulgowski@example.com
+                  nullable: true
+              required:
+                - business_name
+  /api/v1/admin/business/logo:
+    post:
+      summary: ""
+      operationId: postApiV1AdminBusinessLogo
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - "Admin - Business"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                logo:
+                  type: string
+                  format: binary
+                  description: "Must be an image. Must not be greater than 2048 kilobytes."
+              required:
+                - logo
+    delete:
+      summary: ""
+      operationId: deleteApiV1AdminBusinessLogo
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - "Admin - Business"
+  /api/v1/admin/fish-types:
+    get:
+      summary: ""
+      operationId: getApiV1AdminFishTypes
+      description: ""
+      parameters: []
+      responses:
+        401:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - "Admin - Catalogue"
+    post:
+      summary: ""
+      operationId: postApiV1AdminFishTypes
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - "Admin - Catalogue"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "Must not be greater than 100 characters."
+                  example: b
+                price_per_pound:
+                  type: number
+                  description: "Must be at least 0."
+                  example: 39
+                  nullable: true
+                is_active:
+                  type: boolean
+                  description: ""
+                  example: true
+              required:
+                - name
+  "/api/v1/admin/fish-types/{id}":
+    put:
+      summary: ""
+      operationId: putApiV1AdminFishTypesId
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - "Admin - Catalogue"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "Must not be greater than 100 characters."
+                  example: b
+                price_per_pound:
+                  type: number
+                  description: "Must be at least 0."
+                  example: 39
+                  nullable: true
+                is_active:
+                  type: boolean
+                  description: ""
+                  example: true
+    delete:
+      summary: ""
+      operationId: deleteApiV1AdminFishTypesId
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - "Admin - Catalogue"
+    parameters:
+      - in: path
+        name: id
+        description: "The ID of the fish type."
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/admin/inventory:
+    get:
+      summary: ""
+      operationId: getApiV1AdminInventory
+      description: ""
+      parameters: []
+      responses:
+        401:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - "Admin - Catalogue"
+  /api/v1/admin/inventory/adjustments:
+    post:
+      summary: ""
+      operationId: postApiV1AdminInventoryAdjustments
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - "Admin - Catalogue"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                delta_kg:
+                  type: number
+                  description: "Must not be one of <code>0</code>."
+                  example: 4326.41688
+                reason:
+                  type: string
+                  description: "Must not be greater than 255 characters."
+                  example: m
+              required:
+                - delta_kg
+                - reason
+  /api/v1/admin/pricing:
+    get:
+      summary: ""
+      operationId: getApiV1AdminPricing
+      description: ""
+      parameters: []
+      responses:
+        401:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - "Admin - Catalogue"
+    patch:
+      summary: ""
+      operationId: patchApiV1AdminPricing
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - "Admin - Catalogue"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                price_per_pound:
+                  type: number
+                  description: "Must be at least 0."
+                  example: 27
+                filleting_fee:
+                  type: number
+                  description: "Must be at least 0."
+                  example: 39
+                delivery_fee:
+                  type: number
+                  description: "Must be at least 0."
+                  example: 84
+                kg_to_lbs_rate:
+                  type: number
+                  description: ""
+                  example: 4326.41688
+              required:
+                - price_per_pound
+                - filleting_fee
+                - delivery_fee
+                - kg_to_lbs_rate
+  /api/v1/admin/orders:
+    get:
+      summary: ""
+      operationId: getApiV1AdminOrders
+      description: ""
+      parameters: []
+      responses:
+        401:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - "Admin - Orders"
+  /api/v1/admin/orders/guest:
+    post:
+      summary: ""
+      operationId: postApiV1AdminOrdersGuest
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - "Admin - Orders"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                guest_name:
+                  type: string
+                  description: "Must not be greater than 100 characters."
+                  example: b
+                guest_email:
+                  type: string
+                  description: "Must be a valid email address. Must not be greater than 255 characters."
+                  example: zbailey@example.net
+                  nullable: true
+                guest_phone:
+                  type: string
+                  description: "Must not be greater than 30 characters."
+                  example: i
+                items:
+                  type: array
+                  description: "Must have at least 1 items."
+                  example:
+                    - []
+                  items:
+                    type: object
+                    properties:
+                      fish_type_id:
+                        type: integer
+                        description: "The <code>id</code> of an existing record in the fish_types table."
+                        example: 16
+                      cut:
+                        type: string
+                        description: ""
+                        example: whole
+                        enum:
+                          - whole
+                          - fillet
+                          - steak
+                        nullable: true
+                      quantity_kg:
+                        type: number
+                        description: "Must be at least 0.001."
+                        example: 39
+                    required:
+                      - fish_type_id
+                      - quantity_kg
+                filleting:
+                  type: boolean
+                  description: ""
+                  example: true
+                delivery:
+                  type: boolean
+                  description: ""
+                  example: true
+                delivery_location:
+                  type: string
+                  description: "This field is required when <code>delivery</code> is <code>true</code>. Must not be greater than 255 characters."
+                  example: b
+                  nullable: true
+                note:
+                  type: string
+                  description: "Must not be greater than 1000 characters."
+                  example: "n"
+                  nullable: true
+              required:
+                - guest_name
+                - guest_phone
+                - items
+                - filleting
+                - delivery
+  "/api/v1/admin/orders/{id}":
+    get:
+      summary: ""
+      operationId: getApiV1AdminOrdersId
+      description: ""
+      parameters: []
+      responses:
+        401:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - "Admin - Orders"
+    parameters:
+      - in: path
+        name: id
+        description: "The ID of the order."
+        example: 1
+        required: true
+        schema:
+          type: integer
+  "/api/v1/admin/orders/{order_id}/status":
+    patch:
+      summary: ""
+      operationId: patchApiV1AdminOrdersOrder_idStatus
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - "Admin - Orders"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  description: ""
+                  example: architecto
+                rejection_reason:
+                  type: string
+                  description: "Must not be greater than 500 characters."
+                  example: "n"
+                  nullable: true
+              required:
+                - status
+    parameters:
+      - in: path
+        name: order_id
+        description: "The ID of the order."
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/admin/reports:
+    get:
+      summary: ""
+      operationId: getApiV1AdminReports
+      description: ""
+      parameters: []
+      responses:
+        401:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - "Admin - Reports"
+  /api/v1/admin/reviews:
+    get:
+      summary: ""
+      operationId: getApiV1AdminReviews
+      description: ""
+      parameters: []
+      responses:
+        401:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - "Admin - Reviews"
+  "/api/v1/admin/reviews/{id}":
+    delete:
+      summary: ""
+      operationId: deleteApiV1AdminReviewsId
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - "Admin - Reviews"
+    parameters:
+      - in: path
+        name: id
+        description: "The ID of the review."
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/auth/register:
+    post:
+      summary: ""
+      operationId: postApiV1AuthRegister
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "Must not be greater than 255 characters."
+                  example: b
+                email:
+                  type: string
+                  description: "Must be a valid email address. Must not be greater than 255 characters."
+                  example: zbailey@example.net
+                phone:
+                  type: string
+                  description: "Must not be greater than 50 characters."
+                  example: i
+                  nullable: true
+                password:
+                  type: string
+                  description: ""
+                  example: architecto
+                device_name:
+                  type: string
+                  description: "Must not be greater than 255 characters."
+                  example: "n"
+                  nullable: true
+              required:
+                - name
+                - email
+                - password
+      security: []
+  /api/v1/auth/login:
+    post:
+      summary: ""
+      operationId: postApiV1AuthLogin
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: "Must be a valid email address."
+                  example: gbailey@example.net
+                password:
+                  type: string
+                  description: ""
+                  example: "|]|{+-"
+                device_name:
+                  type: string
+                  description: "Must not be greater than 255 characters."
+                  example: v
+                  nullable: true
+              required:
+                - email
+                - password
+      security: []
+  /api/v1/auth/two-factor:
+    post:
+      summary: ""
+      operationId: postApiV1AuthTwoFactor
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                two_factor_token:
+                  type: string
+                  description: ""
+                  example: architecto
+                code:
+                  type: string
+                  description: ""
+                  example: architecto
+                  nullable: true
+                recovery_code:
+                  type: string
+                  description: ""
+                  example: architecto
+                  nullable: true
+                device_name:
+                  type: string
+                  description: "Must not be greater than 255 characters."
+                  example: "n"
+                  nullable: true
+              required:
+                - two_factor_token
+      security: []
+  /api/v1/auth/forgot-password:
+    post:
+      summary: ""
+      operationId: postApiV1AuthForgotPassword
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: "Must be a valid email address."
+                  example: gbailey@example.net
+              required:
+                - email
+      security: []
+  /api/v1/auth/reset-password:
+    post:
+      summary: ""
+      operationId: postApiV1AuthResetPassword
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: ""
+                  example: architecto
+                email:
+                  type: string
+                  description: "Must be a valid email address."
+                  example: zbailey@example.net
+                password:
+                  type: string
+                  description: ""
+                  example: architecto
+              required:
+                - token
+                - email
+                - password
+      security: []
+  /api/v1/auth/logout:
+    delete:
+      summary: ""
+      operationId: deleteApiV1AuthLogout
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - Authentication
+  /api/v1/broadcasting/auth:
+    post:
+      summary: "Authenticate the request for channel access."
+      operationId: authenticateTheRequestForChannelAccess
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - Endpoints
+  /api/v1/orders/guest:
+    post:
+      summary: ""
+      operationId: postApiV1OrdersGuest
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - "Guest Orders"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                guest_name:
+                  type: string
+                  description: "Must not be greater than 255 characters."
+                  example: b
+                guest_email:
+                  type: string
+                  description: "Must be a valid email address. Must not be greater than 255 characters."
+                  example: zbailey@example.net
+                guest_phone:
+                  type: string
+                  description: "Must not be greater than 50 characters."
+                  example: i
+                items:
+                  type: array
+                  description: "Must have at least 1 items."
+                  example:
+                    - []
+                  items:
+                    type: object
+                    properties:
+                      fish_type_id:
+                        type: integer
+                        description: "The <code>id</code> of an existing record in the fish_types table."
+                        example: 16
+                      cut:
+                        type: string
+                        description: ""
+                        example: steak
+                        enum:
+                          - whole
+                          - fillet
+                          - steak
+                        nullable: true
+                      quantity_kg:
+                        type: number
+                        description: "Must be at least 0.001."
+                        example: 39
+                    required:
+                      - fish_type_id
+                      - quantity_kg
+                filleting:
+                  type: boolean
+                  description: ""
+                  example: true
+                delivery:
+                  type: boolean
+                  description: ""
+                  example: true
+                delivery_location:
+                  type: string
+                  description: "This field is required when <code>delivery</code> is <code>true</code>. Must not be greater than 255 characters."
+                  example: b
+                  nullable: true
+                note:
+                  type: string
+                  description: "Must not be greater than 1000 characters."
+                  example: "n"
+                  nullable: true
+              required:
+                - guest_name
+                - guest_email
+                - guest_phone
+                - items
+                - filleting
+                - delivery
+  "/api/v1/orders/guest/{order_id}":
+    get:
+      summary: ""
+      operationId: getApiV1OrdersGuestOrder_id
+      description: ""
+      parameters: []
+      responses:
+        403:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: ""
+                properties:
+                  message:
+                    type: string
+                    example: ""
+      tags:
+        - "Guest Orders"
+      security: []
+    parameters:
+      - in: path
+        name: order_id
+        description: "The ID of the order."
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/notifications:
+    get:
+      summary: ""
+      operationId: getApiV1Notifications
+      description: ""
+      parameters: []
+      responses:
+        401:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Notifications
+  "/api/v1/notifications/{notification_id}/read":
+    post:
+      summary: ""
+      operationId: postApiV1NotificationsNotification_idRead
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - Notifications
+    parameters:
+      - in: path
+        name: notification_id
+        description: "The ID of the notification."
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/v1/orders:
+    get:
+      summary: ""
+      operationId: getApiV1Orders
+      description: ""
+      parameters: []
+      responses:
+        401:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Orders
+    post:
+      summary: ""
+      operationId: postApiV1Orders
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - Orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  description: "Must have at least 1 items."
+                  example:
+                    - []
+                  items:
+                    type: object
+                    properties:
+                      fish_type_id:
+                        type: integer
+                        description: "The <code>id</code> of an existing record in the fish_types table."
+                        example: 16
+                      cut:
+                        type: string
+                        description: ""
+                        example: steak
+                        enum:
+                          - whole
+                          - fillet
+                          - steak
+                        nullable: true
+                      quantity_kg:
+                        type: number
+                        description: "Must be at least 0.001."
+                        example: 39
+                    required:
+                      - fish_type_id
+                      - quantity_kg
+                filleting:
+                  type: boolean
+                  description: ""
+                  example: true
+                delivery:
+                  type: boolean
+                  description: ""
+                  example: false
+                delivery_location:
+                  type: string
+                  description: "This field is required when <code>delivery</code> is <code>true</code>. Must not be greater than 255 characters."
+                  example: b
+                  nullable: true
+                note:
+                  type: string
+                  description: "Must not be greater than 1000 characters."
+                  example: "n"
+                  nullable: true
+              required:
+                - items
+                - filleting
+                - delivery
+  "/api/v1/orders/{id}":
+    get:
+      summary: ""
+      operationId: getApiV1OrdersId
+      description: ""
+      parameters: []
+      responses:
+        401:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Orders
+    parameters:
+      - in: path
+        name: id
+        description: "The ID of the order."
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/profile:
+    get:
+      summary: ""
+      operationId: getApiV1Profile
+      description: ""
+      parameters: []
+      responses:
+        401:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Profile
+    put:
+      summary: ""
+      operationId: putApiV1Profile
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - Profile
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+                  description: "Must not be greater than 50 characters."
+                  example: b
+                  nullable: true
+  /api/v1/profile/password:
+    put:
+      summary: ""
+      operationId: putApiV1ProfilePassword
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - Profile
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                current_password:
+                  type: string
+                  description: ""
+                  example: null
+                password:
+                  type: string
+                  description: ""
+                  example: null
+  "/api/v1/orders/{order_id}/review":
+    post:
+      summary: ""
+      operationId: postApiV1OrdersOrder_idReview
+      description: ""
+      parameters: []
+      responses: {}
+      tags:
+        - Reviews
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: integer
+                  description: "Must be at least 1. Must not be greater than 5."
+                  example: 1
+                comment:
+                  type: string
+                  description: "Must not be greater than 500 characters."
+                  example: "n"
+                  nullable: true
+              required:
+                - rating
+    parameters:
+      - in: path
+        name: order_id
+        description: "The ID of the order."
+        example: 1
+        required: true
+        schema:
+          type: integer

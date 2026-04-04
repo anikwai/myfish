@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
+/** @group Admin - Catalogue */
 class FishTypeController extends Controller
 {
     public function index(): AnonymousResourceCollection

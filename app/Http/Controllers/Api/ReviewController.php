@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
+/** @group Reviews */
 class ReviewController extends Controller
 {
     public function store(StoreReviewRequest $request, Order $order): JsonResponse

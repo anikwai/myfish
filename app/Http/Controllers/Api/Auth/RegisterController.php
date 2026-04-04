@@ -8,8 +8,10 @@ use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 
+/** @group Authentication */
 class RegisterController extends Controller
 {
+    /** @unauthenticated */
     public function store(RegisterRequest $request, CreateNewUser $createNewUser): JsonResponse
     {
         $user = $createNewUser->create(array_merge(

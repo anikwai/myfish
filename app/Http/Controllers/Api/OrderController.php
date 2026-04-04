@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Gate;
 
+/** @group Orders */
 class OrderController extends Controller
 {
     public function __construct(private readonly OrderCreatorInterface $orderCreator) {}

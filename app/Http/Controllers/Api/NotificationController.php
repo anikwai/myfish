@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\DatabaseNotification;
 
+/** @group Notifications */
 class NotificationController extends Controller
 {
     public function index(Request $request): JsonResponse

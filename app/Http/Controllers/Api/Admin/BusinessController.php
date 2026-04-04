@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
+/** @group Admin - Business */
 class BusinessController extends Controller
 {
     public function show(): JsonResponse

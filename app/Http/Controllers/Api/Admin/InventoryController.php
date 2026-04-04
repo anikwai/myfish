@@ -7,6 +7,7 @@ use App\Models\Inventory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/** @group Admin - Catalogue */
 class InventoryController extends Controller
 {
     public function index(): JsonResponse

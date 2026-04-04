@@ -7,6 +7,7 @@ use App\Models\Review;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
+/** @group Admin - Reviews */
 class ReviewController extends Controller
 {
     public function index(): JsonResponse

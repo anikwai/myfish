@@ -12,8 +12,10 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
+/** @group Authentication */
 class LoginController extends Controller
 {
+    /** @unauthenticated */
     public function store(LoginRequest $request): JsonResponse
     {
         if (! Auth::attempt($request->only('email', 'password'))) {

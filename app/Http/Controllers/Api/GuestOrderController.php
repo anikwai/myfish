@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\URL;
 
+/** @group Guest Orders */
 class GuestOrderController extends Controller
 {
     public function __construct(private readonly OrderCreatorInterface $orderCreator) {}
@@ -43,6 +44,7 @@ class GuestOrderController extends Controller
             ->setStatusCode(201);
     }
 
+    /** @unauthenticated */
     public function show(Request $request, Order $order): OrderResource
     {
         abort_unless($request->hasValidSignature(), 403);

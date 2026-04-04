@@ -11,10 +11,12 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
 
+/** @group Authentication */
 class TwoFactorController extends Controller
 {
     public function __construct(private TwoFactorAuthenticationProvider $twoFactor) {}
 
+    /** @unauthenticated */
     public function store(TwoFactorRequest $request): JsonResponse
     {
         $cacheKey = "api.2fa_pending.{$request->two_factor_token}";

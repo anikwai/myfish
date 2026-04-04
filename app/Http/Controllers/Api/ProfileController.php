@@ -9,6 +9,7 @@ use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/** @group Profile */
 class ProfileController extends Controller
 {
     use PasswordValidationRules, ProfileValidationRules;

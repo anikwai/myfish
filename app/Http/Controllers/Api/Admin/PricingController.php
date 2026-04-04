@@ -9,6 +9,7 @@ use App\Values\TaxConfig;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/** @group Admin - Catalogue */
 class PricingController extends Controller
 {
     public function show(): JsonResponse

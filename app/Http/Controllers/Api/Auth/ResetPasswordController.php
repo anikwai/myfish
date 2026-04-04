@@ -12,8 +12,10 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
+/** @group Authentication */
 class ResetPasswordController extends Controller
 {
+    /** @unauthenticated */
     public function store(ResetPasswordRequest $request): JsonResponse
     {
         $status = Password::reset(
