@@ -4,6 +4,7 @@ import {
   SortByUp01Icon,
   Sorting01Icon,
 } from "@hugeicons/core-free-icons";
+import { ORDER_STATUS_ICONS } from "@/lib/order-status-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Head, InfiniteScroll, Link, router } from "@inertiajs/react";
 import type {
@@ -111,6 +112,12 @@ function makeColumns(statusMeta: StatusMeta): ColumnDef<Order>[] {
               "bg-neutral-100 text-neutral-600"
           )}
         >
+          {ORDER_STATUS_ICONS[statusMeta[row.original.status]?.icon] && (
+            <HugeiconsIcon
+              icon={ORDER_STATUS_ICONS[statusMeta[row.original.status].icon]}
+              size={12}
+            />
+          )}
           {statusMeta[row.original.status]?.label ?? row.original.status}
         </Badge>
       ),

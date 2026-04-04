@@ -1,6 +1,7 @@
 import { PlusSignIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Head, InfiniteScroll, Link, router } from "@inertiajs/react";
+import { ORDER_STATUS_ICONS } from "@/lib/order-status-icons";
 import Heading from "@/components/heading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -121,6 +122,18 @@ export default function OrderIndex({
                               "bg-neutral-100 text-neutral-600"
                           )}
                         >
+                          {ORDER_STATUS_ICONS[
+                            statusMeta[order.status]?.icon
+                          ] && (
+                            <HugeiconsIcon
+                              icon={
+                                ORDER_STATUS_ICONS[
+                                  statusMeta[order.status].icon
+                                ]
+                              }
+                              size={12}
+                            />
+                          )}
                           {statusMeta[order.status]?.label ?? order.status}
                         </Badge>
                       </TableCell>

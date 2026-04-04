@@ -3,6 +3,7 @@ import {
   PlusSignIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { ORDER_STATUS_ICONS } from "@/lib/order-status-icons";
 import { Deferred, Head, Link } from "@inertiajs/react";
 import Heading from "@/components/heading";
 import { Badge } from "@/components/ui/badge";
@@ -91,6 +92,18 @@ export default function Dashboard({
                       statusMeta[activeOrder.status]?.color ?? "bg-neutral-100"
                     }
                   >
+                    {ORDER_STATUS_ICONS[
+                      statusMeta[activeOrder.status]?.icon
+                    ] && (
+                      <HugeiconsIcon
+                        icon={
+                          ORDER_STATUS_ICONS[
+                            statusMeta[activeOrder.status].icon
+                          ]
+                        }
+                        size={12}
+                      />
+                    )}
                     {statusMeta[activeOrder.status]?.label ??
                       activeOrder.status}
                   </Badge>
@@ -173,6 +186,18 @@ export default function Dashboard({
                             statusMeta[order.status]?.color ?? "bg-neutral-100"
                           }
                         >
+                          {ORDER_STATUS_ICONS[
+                            statusMeta[order.status]?.icon
+                          ] && (
+                            <HugeiconsIcon
+                              icon={
+                                ORDER_STATUS_ICONS[
+                                  statusMeta[order.status].icon
+                                ]
+                              }
+                              size={12}
+                            />
+                          )}
                           {statusMeta[order.status]?.label ?? order.status}
                         </Badge>
                       </TableCell>
