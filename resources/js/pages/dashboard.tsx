@@ -27,7 +27,10 @@ type Order = {
   created_at: string;
 };
 
-type StatusMeta = Record<string, { label: string; color: string }>;
+type StatusMeta = Record<
+  string,
+  { label: string; color: string; icon: string }
+>;
 
 export default function Dashboard({
   recentOrders,

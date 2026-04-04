@@ -17,4 +17,9 @@ final class OrderDelivered extends OrderState
     {
         return 'bg-neutral-100 text-neutral-600';
     }
+
+    public function icon(): string
+    {
+        return 'PackageDelivered01Icon';
+    }
 }

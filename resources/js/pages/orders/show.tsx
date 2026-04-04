@@ -1,6 +1,6 @@
-import { PackageDelivered01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Head, usePage, usePoll } from "@inertiajs/react";
+import { ORDER_STATUS_ICONS } from "@/lib/order-status-icons";
 import Heading from "@/components/heading";
 import { OrderTimeline } from "@/components/orders/OrderTimeline";
 import type { StatusLog } from "@/components/orders/OrderTimeline";
@@ -45,7 +45,10 @@ type Order = {
   items: OrderItem[];
 };
 
-type StatusMeta = Record<string, { label: string; color: string }>;
+type StatusMeta = Record<
+  string,
+  { label: string; color: string; icon: string }
+>;
 
 export default function ShowOrder({
   order,
@@ -74,8 +77,11 @@ export default function ShowOrder({
               "bg-neutral-100 text-neutral-600"
             }
           >
-            {order.status === "delivered" && (
-              <HugeiconsIcon icon={PackageDelivered01Icon} size={12} />
+            {ORDER_STATUS_ICONS[statusMeta[order.status]?.icon] && (
+              <HugeiconsIcon
+                icon={ORDER_STATUS_ICONS[statusMeta[order.status].icon]}
+                size={12}
+              />
             )}
             {statusMeta[order.status]?.label ?? order.status}
           </Badge>

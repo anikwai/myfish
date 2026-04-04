@@ -1,5 +1,5 @@
-import { PackageDelivered01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { ORDER_STATUS_ICONS } from "@/lib/order-status-icons";
 import { Head, router, useForm, usePoll } from "@inertiajs/react";
 import AdminOrderController from "@/actions/App/Http/Controllers/Admin/OrderController";
 import Heading from "@/components/heading";
@@ -61,7 +61,10 @@ type Order = {
   items: OrderItem[];
 };
 
-type StatusMeta = Record<string, { label: string; color: string }>;
+type StatusMeta = Record<
+  string,
+  { label: string; color: string; icon: string }
+>;
 
 export default function AdminOrderShow({
   order,
@@ -109,8 +112,11 @@ export default function AdminOrderShow({
           <Badge
             className={statusMeta[order.status]?.color ?? "bg-neutral-100"}
           >
-            {order.status === "delivered" && (
-              <HugeiconsIcon icon={PackageDelivered01Icon} size={12} />
+            {ORDER_STATUS_ICONS[statusMeta[order.status]?.icon] && (
+              <HugeiconsIcon
+                icon={ORDER_STATUS_ICONS[statusMeta[order.status].icon]}
+                size={12}
+              />
             )}
             {statusMeta[order.status]?.label ?? order.status}
           </Badge>

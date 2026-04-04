@@ -41,7 +41,10 @@ import {
 import { cn } from "@/lib/utils";
 import { index, show } from "@/routes/admin/orders";
 
-type StatusMeta = Record<string, { label: string; color: string }>;
+type StatusMeta = Record<
+  string,
+  { label: string; color: string; icon: string }
+>;
 
 type Order = {
   id: number;

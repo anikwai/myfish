@@ -25,6 +25,8 @@ abstract class OrderState extends State
 
     abstract public function color(): string;
 
+    abstract public function icon(): string;
+
     /**
      * Resolve a state FQCN from its string name.
      */
@@ -54,7 +56,7 @@ abstract class OrderState extends State
     /**
      * Map of all status names to their label and color, for Inertia props.
      *
-     * @return array<string, array{label: string, color: string}>
+     * @return array<string, array{label: string, color: string, icon: string}>
      */
     public static function metaMap(): array
     {
@@ -74,6 +76,7 @@ abstract class OrderState extends State
             $map[$class::$name] = [
                 'label' => $instance->label(),
                 'color' => $instance->color(),
+                'icon' => $instance->icon(),
             ];
         }
 

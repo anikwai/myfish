@@ -36,7 +36,10 @@ type Order = {
   items: OrderItem[];
 };
 
-type StatusMeta = Record<string, { label: string; color: string }>;
+type StatusMeta = Record<
+  string,
+  { label: string; color: string; icon: string }
+>;
 
 // Guest confirmation uses a custom label for 'placed' to convey awaiting status.
 const GUEST_LABEL_OVERRIDES: Record<string, string> = {

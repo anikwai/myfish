@@ -17,4 +17,9 @@ final class OrderPlaced extends OrderState
     {
         return 'bg-blue-100 text-blue-700';
     }
+
+    public function icon(): string
+    {
+        return 'Clock01Icon';
+    }
 }

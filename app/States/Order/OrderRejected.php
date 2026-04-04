@@ -17,4 +17,9 @@ final class OrderRejected extends OrderState
     {
         return 'bg-red-100 text-red-700';
     }
+
+    public function icon(): string
+    {
+        return 'CancelCircleIcon';
+    }
 }

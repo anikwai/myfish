@@ -17,4 +17,9 @@ final class OrderOnHold extends OrderState
     {
         return 'bg-yellow-100 text-yellow-700';
     }
+
+    public function icon(): string
+    {
+        return 'PauseCircleIcon';
+    }
 }

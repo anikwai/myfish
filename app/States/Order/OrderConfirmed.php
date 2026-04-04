@@ -17,4 +17,9 @@ final class OrderConfirmed extends OrderState
     {
         return 'bg-green-100 text-green-700';
     }
+
+    public function icon(): string
+    {
+        return 'CheckmarkCircle01Icon';
+    }
 }

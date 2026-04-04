@@ -17,4 +17,9 @@ final class OrderPacked extends OrderState
     {
         return 'bg-purple-100 text-purple-700';
     }
+
+    public function icon(): string
+    {
+        return 'Package01Icon';
+    }
 }
