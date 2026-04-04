@@ -14,6 +14,7 @@ class OrderStatusLogResource extends JsonApiResource
     {
         return [
             'status' => $this->status,
+            'actor_name' => $this->whenLoaded('user', fn () => $this->user?->name),
             'created_at' => $this->created_at,
         ];
     }

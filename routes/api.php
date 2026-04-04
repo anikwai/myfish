@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Auth\ForgotPasswordController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutController;
@@ -41,4 +42,11 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('api.notifications.index');
     Route::post('notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('api.notifications.read');
+});
+
+Route::middleware(['auth:sanctum', 'throttle:api', 'role:admin|staff'])->prefix('admin')->group(function (): void {
+    Route::get('orders', [AdminOrderController::class, 'index'])->name('api.admin.orders.index');
+    Route::post('orders/guest', [AdminOrderController::class, 'storeGuest'])->name('api.admin.orders.guest.store');
+    Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('api.admin.orders.show');
+    Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('api.admin.orders.status');
 });
