@@ -1,12 +1,16 @@
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { NotificationBell } from "@/components/notification-bell";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { BreadcrumbItem as BreadcrumbItemType } from "@/types";
 
 function ClientOnly({ children }: { children: React.ReactNode }) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+
   return mounted ? <>{children}</> : null;
 }
 
