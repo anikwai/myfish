@@ -46,6 +46,7 @@ class HandleInertiaRequests extends Middleware
                     'roles' => $request->user()->getRoleNames(),
                     'avatar' => $request->user()->getFirstMediaUrl('avatar') ?: null,
                 ]) : null,
+                'unreadNotificationsCount' => fn () => $request->user()?->unreadNotifications()->count() ?? 0,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

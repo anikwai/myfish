@@ -1,7 +1,5 @@
 import {
-  BookOpen01Icon,
   DashboardSquare01Icon,
-  Folder01Icon,
   Menu01Icon,
   Search01Icon,
 } from "@hugeicons/core-free-icons";
@@ -9,6 +7,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Link, usePage } from "@inertiajs/react";
 import AppLogo from "@/components/app-logo";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { NotificationBell } from "@/components/notification-bell";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,15 +28,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { UserMenuContent } from "@/components/user-menu-content";
 import { useCurrentUrl } from "@/hooks/use-current-url";
 import { useInitials } from "@/hooks/use-initials";
-import { cn, toUrl } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { dashboard } from "@/routes";
 import type { BreadcrumbItem, NavItem } from "@/types";
 
@@ -50,19 +44,6 @@ const mainNavItems: NavItem[] = [
     title: "Dashboard",
     href: dashboard(),
     icon: DashboardSquare01Icon,
-  },
-];
-
-const rightNavItems: NavItem[] = [
-  {
-    title: "Repository",
-    href: "https://github.com/laravel/react-starter-kit",
-    icon: Folder01Icon,
-  },
-  {
-    title: "Documentation",
-    href: "https://laravel.com/docs/starter-kits#react",
-    icon: BookOpen01Icon,
   },
 ];
 
@@ -113,23 +94,6 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                           )}
                           <span>{item.title}</span>
                         </Link>
-                      ))}
-                    </div>
-
-                    <div className="flex flex-col space-y-4">
-                      {rightNavItems.map((item) => (
-                        <a
-                          key={item.title}
-                          href={toUrl(item.href)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center space-x-2 font-medium"
-                        >
-                          {item.icon && (
-                            <HugeiconsIcon icon={item.icon} size={20} />
-                          )}
-                          <span>{item.title}</span>
-                        </a>
                       ))}
                     </div>
                   </div>
@@ -194,32 +158,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                   className="opacity-80 group-hover:opacity-100"
                 />
               </Button>
-              <div className="ml-1 hidden gap-1 lg:flex">
-                {rightNavItems.map((item) => (
-                  <Tooltip key={item.title}>
-                    <TooltipTrigger>
-                      <a
-                        href={toUrl(item.href)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent p-0 text-sm font-medium text-accent-foreground ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-                      >
-                        <span className="sr-only">{item.title}</span>
-                        {item.icon && (
-                          <HugeiconsIcon
-                            icon={item.icon}
-                            size={20}
-                            className="opacity-80 group-hover:opacity-100"
-                          />
-                        )}
-                      </a>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{item.title}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                ))}
-              </div>
+              <NotificationBell />
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

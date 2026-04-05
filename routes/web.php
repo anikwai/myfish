@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuestOrderController;
+use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WelcomeController;
@@ -22,6 +23,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('orders/create', [OrderController::class, 'create'])->name('orders.create');
     Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+
+    Route::get('notifications', [NotificationsController::class, 'index'])->name('notifications.index');
+    Route::get('notifications/recent', [NotificationsController::class, 'recent'])->name('notifications.recent');
+    Route::post('notifications/{id}/read', [NotificationsController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('notifications/read-all', [NotificationsController::class, 'markAllAsRead'])->name('notifications.read-all');
 });
 
 require __DIR__.'/settings.php';

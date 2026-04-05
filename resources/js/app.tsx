@@ -1,4 +1,5 @@
 import { createInertiaApp } from "@inertiajs/react";
+import "@/echo";
 import { InertiaFlashToast } from "@/components/inertia-flash-toast";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
