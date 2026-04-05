@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -38,7 +39,7 @@ class NotificationsController extends Controller
         return response()->json($notifications);
     }
 
-    public function markAsRead(Request $request, string $id): JsonResponse
+    public function markAsRead(Request $request, string $id): JsonResponse|RedirectResponse
     {
         $request->user()
             ->notifications()
@@ -46,12 +47,20 @@ class NotificationsController extends Controller
             ->first()
             ?->markAsRead();
 
+        if ($request->header('X-Inertia')) {
+            return back();
+        }
+
         return response()->json(['ok' => true]);
     }
 
-    public function markAllAsRead(Request $request): JsonResponse
+    public function markAllAsRead(Request $request): JsonResponse|RedirectResponse
     {
         $request->user()->unreadNotifications()->update(['read_at' => now()]);
+
+        if ($request->header('X-Inertia')) {
+            return back();
+        }
 
         return response()->json(['ok' => true]);
     }
