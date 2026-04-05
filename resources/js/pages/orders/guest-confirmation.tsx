@@ -3,6 +3,7 @@ import { OrderTimeline } from "@/components/orders/OrderTimeline";
 import type { StatusLog } from "@/components/orders/OrderTimeline";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Confetti } from "@/components/ui/confetti";
 import { Separator } from "@/components/ui/separator";
 import { register } from "@/routes";
 
@@ -64,6 +65,8 @@ export default function GuestConfirmation({
   return (
     <>
       <Head title={`Order #${order.id} — MyFish`} />
+
+      <Confetti className="pointer-events-none fixed inset-0 z-50 h-full w-full" />
 
       <div className="min-h-screen bg-background">
         {/* Nav */}
