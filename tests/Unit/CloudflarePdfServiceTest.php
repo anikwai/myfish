@@ -1,6 +1,7 @@
 <?php
 
 use App\Services\CloudflarePdfService;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Sleep;
 use Tests\TestCase;
@@ -40,7 +41,7 @@ test('throws immediately on HTTP 429 without retrying', function (): void {
     $svc = new CloudflarePdfService('acct', 'tok');
 
     expect(fn () => $svc->generate('<html></html>'))
-        ->toThrow(\Illuminate\Http\Client\RequestException::class);
+        ->toThrow(RequestException::class);
 
     expect($calls)->toBe(1);
     Sleep::assertNeverSlept();
