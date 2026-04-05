@@ -4,6 +4,7 @@ import { StarIcon, StarOffIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import InputError from "@/components/input-error";
 import { Button } from "@/components/ui/button";
+import { Confetti } from "@/components/ui/confetti";
 import { Textarea } from "@/components/ui/textarea";
 
 type Order = {
@@ -79,13 +80,18 @@ export default function Review({
       <div className="flex min-h-screen items-center justify-center bg-background px-4 py-16">
         <div className="w-full max-w-md space-y-6">
           {submitted ? (
-            <div className="rounded-xl border bg-muted p-8 text-center space-y-3">
-              <div className="text-4xl">🎉</div>
-              <h1 className="text-xl font-semibold">Thanks for your review!</h1>
-              <p className="text-sm text-muted-foreground">
-                Your feedback helps us serve you better.
-              </p>
-            </div>
+            <>
+              <Confetti className="pointer-events-none fixed inset-0 z-50 h-full w-full" />
+              <div className="rounded-xl border bg-muted p-8 text-center space-y-3">
+                <div className="text-4xl">🎉</div>
+                <h1 className="text-xl font-semibold">
+                  Thanks for your review!
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Your feedback helps us serve you better.
+                </p>
+              </div>
+            </>
           ) : (
             <>
               <div className="text-center space-y-1">
