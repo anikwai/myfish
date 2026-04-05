@@ -1,3 +1,4 @@
+import { useEchoNotification } from "@laravel/echo-react";
 import { Notification03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { router, usePage } from "@inertiajs/react";
@@ -48,24 +49,18 @@ export function NotificationBell() {
     }
   }, [open, loadRecent]);
 
-  // Listen for real-time notifications via Echo
-  useEffect(() => {
-    if (!auth.user?.id || !window.Echo) {
-      return;
-    }
+  type IncomingNotification = AppNotification["data"] & {
+    id: string;
+    created_at: string;
+  };
 
-    const channel = window.Echo.private(`App.Models.User.${auth.user.id}`);
+  useEchoNotification<IncomingNotification>(
+    `App.Models.User.${auth.user?.id}`,
+    (notification) => {
+      setUnreadCount((c) => c + 1);
 
-    channel.notification(
-      (
-        notification: AppNotification["data"] & {
-          id: string;
-          created_at: string;
-        }
-      ) => {
-        setUnreadCount((c) => c + 1);
-
-        const newNotif: AppNotification = {
+      setNotifications((prev) => [
+        {
           id: notification.id,
           data: {
             title: notification.title,
@@ -75,24 +70,19 @@ export function NotificationBell() {
           },
           read_at: null,
           created_at: notification.created_at ?? new Date().toISOString(),
-        };
+        },
+        ...prev,
+      ]);
 
-        setNotifications((prev) => [newNotif, ...prev]);
-
-        toast(notification.title, {
-          description: notification.message,
-          action: {
-            label: "View order",
-            onClick: () => router.visit(ordersShow.url(notification.order_id)),
-          },
-        });
-      }
-    );
-
-    return () => {
-      window.Echo.leave(`App.Models.User.${auth.user.id}`);
-    };
-  }, [auth.user?.id]);
+      toast(notification.title, {
+        description: notification.message,
+        action: {
+          label: "View order",
+          onClick: () => router.visit(ordersShow.url(notification.order_id)),
+        },
+      });
+    }
+  );
 
   function handleMarkAllRead() {
     fetch(readAll.url(), {
