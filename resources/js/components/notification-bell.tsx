@@ -1,6 +1,6 @@
 import { Notification03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { router, useHttp, usePage } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -28,16 +28,18 @@ export function NotificationBell() {
   );
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const { get: fetchRecent, processing } = useHttp({});
-
-  const loadRecent = useCallback(() => {
-    fetchRecent(recent.url(), {
-      onSuccess: (data: unknown) => {
-        setNotifications(data as AppNotification[]);
-      },
-    });
-  }, [fetchRecent]);
+  const loadRecent = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(recent.url());
+      const data = await res.json();
+      setNotifications(data as AppNotification[]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // Load notifications when dropdown opens
   useEffect(() => {
@@ -157,7 +159,7 @@ export function NotificationBell() {
           )}
         </div>
         <DropdownMenuSeparator />
-        {processing && notifications.length === 0 && (
+        {loading && notifications.length === 0 && (
           <div className="space-y-2 p-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse space-y-1">
@@ -167,7 +169,7 @@ export function NotificationBell() {
             ))}
           </div>
         )}
-        {!processing && notifications.length === 0 && (
+        {!loading && notifications.length === 0 && (
           <p className="px-3 py-6 text-center text-sm text-muted-foreground">
             No notifications
           </p>
