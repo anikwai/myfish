@@ -1,23 +1,11 @@
-import Echo from "laravel-echo";
-import Pusher from "pusher-js";
+import { configureEcho } from "@laravel/echo-react";
 
-declare global {
-  interface Window {
-    Pusher: typeof Pusher;
-    Echo: Echo<"reverb">;
-  }
-}
-
-if (typeof window !== "undefined") {
-  window.Pusher = Pusher;
-
-  window.Echo = new Echo({
-    broadcaster: "reverb",
-    key: import.meta.env.VITE_REVERB_APP_KEY,
-    wsHost: import.meta.env.VITE_REVERB_HOST,
-    wsPort: import.meta.env.VITE_REVERB_PORT ?? 80,
-    wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
-    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? "https") === "https",
-    enabledTransports: ["ws", "wss"],
-  });
-}
+configureEcho({
+  broadcaster: "reverb",
+  key: import.meta.env.VITE_REVERB_APP_KEY,
+  wsHost: import.meta.env.VITE_REVERB_HOST,
+  wsPort: import.meta.env.VITE_REVERB_PORT ?? 80,
+  wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
+  forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? "https") === "https",
+  enabledTransports: ["ws", "wss"],
+});
