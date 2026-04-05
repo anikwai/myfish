@@ -1,7 +1,7 @@
 import { useEchoNotification } from "@laravel/echo-react";
 import { Notification03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { router, usePage } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import {
   index as notificationsIndex,
@@ -42,7 +44,6 @@ export function NotificationBell() {
     }
   }, []);
 
-  // Load notifications when dropdown opens
   useEffect(() => {
     if (open) {
       loadRecent();
@@ -136,77 +137,95 @@ export function NotificationBell() {
           )}
         </Button>
       </DropdownMenuTrigger>
+
       <DropdownMenuContent align="end" className="w-80">
-        <div className="flex items-center justify-between px-3 py-2">
-          <span className="text-sm font-semibold">Notifications</span>
+        <DropdownMenuLabel className="flex items-center justify-between text-sm font-semibold text-foreground">
+          Notifications
           {unreadCount > 0 && (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-auto px-2 py-1 text-xs font-normal text-muted-foreground"
               onClick={handleMarkAllRead}
-              className="text-xs text-muted-foreground hover:text-foreground"
             >
               Mark all read
-            </button>
+            </Button>
           )}
-        </div>
+        </DropdownMenuLabel>
+
         <DropdownMenuSeparator />
+
         {loading && notifications.length === 0 && (
-          <div className="space-y-2 p-3">
+          <div className="space-y-3 p-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse space-y-1">
-                <div className="h-3 w-3/4 rounded bg-muted" />
-                <div className="h-3 w-1/2 rounded bg-muted" />
+              <div key={i} className="space-y-1.5">
+                <Skeleton className="h-3 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
               </div>
             ))}
           </div>
         )}
+
         {!loading && notifications.length === 0 && (
           <p className="px-3 py-6 text-center text-sm text-muted-foreground">
             No notifications
           </p>
         )}
-        {notifications.map((notification) => (
-          <DropdownMenuItem
-            key={notification.id}
-            className={cn(
-              "flex cursor-pointer flex-col items-start gap-0.5 px-3 py-2.5",
-              !notification.read_at && "bg-blue-50/50 dark:bg-blue-950/20"
-            )}
-            onClick={() => handleClickNotification(notification)}
-          >
-            <div className="flex w-full items-center gap-2">
-              {!notification.read_at && (
-                <span className="h-2 w-2 shrink-0 rounded-full bg-blue-500" />
+
+        <div className="max-h-72 space-y-1 overflow-y-auto">
+          {notifications.map((notification) => (
+            <DropdownMenuItem
+              key={notification.id}
+              className={cn(
+                "flex cursor-pointer flex-col items-start gap-1 px-3 py-2.5",
+                !notification.read_at && "bg-blue-50/50 dark:bg-blue-950/20"
               )}
-              <span
-                className={cn(
-                  "text-sm font-medium",
-                  !notification.read_at && "font-semibold"
+              onClick={() => handleClickNotification(notification)}
+            >
+              <div className="flex w-full items-center gap-2">
+                {!notification.read_at && (
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-blue-500" />
                 )}
+                <span
+                  className={cn(
+                    "truncate text-sm",
+                    !notification.read_at ? "font-semibold" : "font-medium"
+                  )}
+                >
+                  {notification.data.title}
+                </span>
+              </div>
+              <p className="w-full truncate text-xs text-muted-foreground">
+                {notification.data.message}
+              </p>
+              <p
+                className="text-xs text-muted-foreground/60"
+                suppressHydrationWarning
               >
-                {notification.data.title}
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {notification.data.message}
-            </p>
-            <p className="text-xs text-muted-foreground/60">
-              {new Date(notification.created_at).toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
-          </DropdownMenuItem>
-        ))}
+                {new Date(notification.created_at).toLocaleDateString(
+                  undefined,
+                  {
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }
+                )}
+              </p>
+            </DropdownMenuItem>
+          ))}
+        </div>
+
         {notifications.length > 0 && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               asChild
-              className="justify-center py-2 text-center text-sm"
+              className="justify-center py-2 text-center text-sm font-medium"
             >
-              <a href={notificationsIndex.url()}>View all notifications</a>
+              <Link href={notificationsIndex.url()}>
+                View all notifications
+              </Link>
             </DropdownMenuItem>
           </>
         )}

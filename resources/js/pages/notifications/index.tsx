@@ -19,7 +19,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { read, readAll } from "@/routes/notifications";
+import {
+  index as notificationsIndex,
+  read,
+  readAll,
+} from "@/routes/notifications";
 import { show as ordersShow } from "@/routes/orders";
 import type { AppNotification } from "@/types";
 
@@ -144,7 +148,10 @@ export default function NotificationsIndex({ notifications }: Props) {
                         {notification.read_at ? "Read" : "Unread"}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right text-sm text-muted-foreground">
+                    <TableCell
+                      className="text-right text-sm text-muted-foreground"
+                      suppressHydrationWarning
+                    >
                       {new Date(notification.created_at).toLocaleDateString(
                         undefined,
                         {
@@ -198,3 +205,7 @@ export default function NotificationsIndex({ notifications }: Props) {
     </>
   );
 }
+
+NotificationsIndex.layout = {
+  breadcrumbs: [{ title: "Notifications", href: notificationsIndex.url() }],
+};
