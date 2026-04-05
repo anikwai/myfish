@@ -4,6 +4,7 @@ import {
   ClipboardIcon,
   DashboardSquare01Icon,
   FishFoodIcon,
+  Notification03Icon,
   Package01Icon,
   Settings02Icon,
   ShoppingBag01Icon,
@@ -26,6 +27,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { dashboard } from "@/routes";
+import { index as notificationsIndex } from "@/routes/notifications";
 import { edit as editBusiness } from "@/routes/admin/business";
 import { index as reviewsIndex } from "@/routes/admin/reviews";
 import type { NavItem } from "@/types";
@@ -40,6 +42,11 @@ const userNavItems: NavItem[] = [
     title: "My orders",
     href: OrderController.index.url(),
     icon: ShoppingBag01Icon,
+  },
+  {
+    title: "Notifications",
+    href: notificationsIndex(),
+    icon: Notification03Icon,
   },
 ];
 

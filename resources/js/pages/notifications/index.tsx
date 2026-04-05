@@ -1,8 +1,7 @@
 import { Notification03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Head, Link, router, useForm } from "@inertiajs/react";
+import { Head, router, useForm } from "@inertiajs/react";
 import Heading from "@/components/heading";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -11,21 +10,14 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { cn } from "@/lib/utils";
-import {
   index as notificationsIndex,
   read,
   readAll,
 } from "@/routes/notifications";
 import { show as ordersShow } from "@/routes/orders";
 import type { AppNotification } from "@/types";
+import { columns } from "./columns";
+import { DataTable } from "./data-table";
 
 type PaginatedNotifications = {
   data: AppNotification[];
@@ -46,7 +38,7 @@ export default function NotificationsIndex({ notifications }: Props) {
     markAllRead(readAll.url(), { preserveScroll: true });
   }
 
-  function handleClickNotification(notification: AppNotification) {
+  function handleRowClick(notification: AppNotification) {
     if (!notification.read_at) {
       router.post(
         read.url(notification.id),
@@ -64,6 +56,7 @@ export default function NotificationsIndex({ notifications }: Props) {
   }
 
   const unreadCount = notifications.data.filter((n) => !n.read_at).length;
+  const { data, ...pagination } = notifications;
 
   return (
     <>
@@ -86,7 +79,7 @@ export default function NotificationsIndex({ notifications }: Props) {
           )}
         </div>
 
-        {notifications.data.length === 0 ? (
+        {data.length === 0 ? (
           <Empty>
             <EmptyHeader>
               <HugeiconsIcon
@@ -101,105 +94,12 @@ export default function NotificationsIndex({ notifications }: Props) {
             </EmptyDescription>
           </Empty>
         ) : (
-          <>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Notification</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {notifications.data.map((notification) => (
-                  <TableRow
-                    key={notification.id}
-                    className={cn(
-                      "cursor-pointer",
-                      !notification.read_at &&
-                        "bg-blue-50/50 hover:bg-blue-50 dark:bg-blue-950/20 dark:hover:bg-blue-950/30"
-                    )}
-                    onClick={() => handleClickNotification(notification)}
-                  >
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {!notification.read_at && (
-                          <span className="h-2 w-2 shrink-0 rounded-full bg-blue-500" />
-                        )}
-                        <div>
-                          <p
-                            className={cn(
-                              "text-sm",
-                              !notification.read_at && "font-semibold"
-                            )}
-                          >
-                            {notification.data.title}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {notification.data.message}
-                          </p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={notification.read_at ? "secondary" : "default"}
-                      >
-                        {notification.read_at ? "Read" : "Unread"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell
-                      className="text-right text-sm text-muted-foreground"
-                      suppressHydrationWarning
-                    >
-                      {new Date(notification.created_at).toLocaleDateString(
-                        undefined,
-                        {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        }
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-
-            {(notifications.prev_page_url || notifications.next_page_url) && (
-              <div className="mt-4 flex items-center justify-between">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={!notifications.prev_page_url}
-                  asChild={!!notifications.prev_page_url}
-                >
-                  {notifications.prev_page_url ? (
-                    <Link href={notifications.prev_page_url}>Previous</Link>
-                  ) : (
-                    <span>Previous</span>
-                  )}
-                </Button>
-                <span className="text-sm text-muted-foreground">
-                  Page {notifications.current_page} of {notifications.last_page}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={!notifications.next_page_url}
-                  asChild={!!notifications.next_page_url}
-                >
-                  {notifications.next_page_url ? (
-                    <Link href={notifications.next_page_url}>Next</Link>
-                  ) : (
-                    <span>Next</span>
-                  )}
-                </Button>
-              </div>
-            )}
-          </>
+          <DataTable
+            columns={columns}
+            data={data}
+            pagination={pagination}
+            meta={{ onRowClick: handleRowClick }}
+          />
         )}
       </div>
     </>
