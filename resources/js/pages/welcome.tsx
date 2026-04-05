@@ -81,7 +81,7 @@ export default function Welcome({
         />
       </Head>
 
-      <div className="relative flex min-h-screen flex-col bg-background overflow-hidden">
+      <div className="relative flex min-h-screen flex-col bg-background overflow-hidden pb-20 lg:pb-0">
         <DotPattern
           className={cn(
             "[mask-image:radial-gradient(300px_circle_at_center,white,transparent)]"
@@ -94,7 +94,7 @@ export default function Welcome({
           user={auth?.user ?? null}
         />
 
-        <main className="mx-auto w-full max-w-5xl grow px-4 py-16 sm:px-6 sm:py-24 lg:px-8 lg:py-32">
+        <main className="mx-auto w-full max-w-6xl grow px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
           <div className="relative rounded-xl bg-background">
             <ConversationalOrderFlow
               fishTypes={fishTypes}

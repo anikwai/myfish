@@ -336,9 +336,9 @@ export function ConversationalOrderFlow({
         className="sr-only"
       />
 
-      <div className="grid items-start gap-6 md:grid-cols-[1fr_300px]">
+      <div className="grid items-start gap-6 lg:grid-cols-[1fr_300px]">
         {/* Conversational flow column */}
-        <div className="space-y-3 pb-20 md:pb-0">
+        <div className="space-y-3 pb-24 lg:pb-0">
           {activeStep > 0 && (
             <StepChip
               stepName="Fish"
@@ -372,7 +372,7 @@ export function ConversationalOrderFlow({
                 <button
                   type="button"
                   onClick={() => goTo((activeStep - 1) as Step)}
-                  className="mb-4 flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground md:hidden"
+                  className="mb-4 flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground lg:hidden"
                 >
                   ← Back
                 </button>
@@ -481,7 +481,7 @@ export function ConversationalOrderFlow({
                                   onClick={() =>
                                     adjustQuantity(idx, -increment)
                                   }
-                                  className="flex h-8 w-8 items-center justify-center rounded-full border text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30"
+                                  className="flex size-12 items-center justify-center rounded-full border text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30"
                                   aria-label={`Decrease ${ft?.name} by ${increment} kg`}
                                 >
                                   <HugeiconsIcon
@@ -489,13 +489,13 @@ export function ConversationalOrderFlow({
                                     size={14}
                                   />
                                 </button>
-                                <span className="w-16 text-center text-sm font-medium tabular-nums">
+                                <span className="w-14 text-center text-sm font-medium tabular-nums">
                                   {qty > 0 ? `${qty} kg` : "—"}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => adjustQuantity(idx, increment)}
-                                  className="flex h-8 w-8 items-center justify-center rounded-full border text-muted-foreground transition-colors hover:bg-muted"
+                                  className="flex size-12 items-center justify-center rounded-full border text-muted-foreground transition-colors hover:bg-muted"
                                   aria-label={`Increase ${ft?.name} by ${increment} kg`}
                                 >
                                   <HugeiconsIcon
@@ -591,6 +591,7 @@ export function ConversationalOrderFlow({
                             </Label>
                             <Input
                               id="delivery_location"
+                              className="text-base"
                               placeholder="e.g. Near the market, Honiara"
                               value={data.delivery_location}
                               onChange={(e) =>
@@ -613,6 +614,7 @@ export function ConversationalOrderFlow({
                     </Label>
                     <Textarea
                       id="note"
+                      className="text-base"
                       value={data.note}
                       onChange={(e) => setData("note", e.target.value)}
                       placeholder="e.g. Please call before delivery"
@@ -644,7 +646,10 @@ export function ConversationalOrderFlow({
                         id="guest_name"
                         value={data.guest_name}
                         readOnly={isLoggedIn}
-                        className={isLoggedIn ? "bg-muted" : ""}
+                        className={cn(
+                          "text-base",
+                          isLoggedIn ? "bg-muted" : ""
+                        )}
                         onChange={(e) => setData("guest_name", e.target.value)}
                         placeholder={
                           orderingFor === "business"
@@ -664,7 +669,10 @@ export function ConversationalOrderFlow({
                         type="email"
                         value={data.guest_email}
                         readOnly={isLoggedIn}
-                        className={isLoggedIn ? "bg-muted" : ""}
+                        className={cn(
+                          "text-base",
+                          isLoggedIn ? "bg-muted" : ""
+                        )}
                         onChange={(e) => setData("guest_email", e.target.value)}
                         placeholder="your@email.com"
                       />
@@ -679,7 +687,10 @@ export function ConversationalOrderFlow({
                         type="tel"
                         value={data.guest_phone}
                         readOnly={isLoggedIn}
-                        className={isLoggedIn ? "bg-muted" : ""}
+                        className={cn(
+                          "text-base",
+                          isLoggedIn ? "bg-muted" : ""
+                        )}
                         onChange={(e) => setData("guest_phone", e.target.value)}
                         placeholder="+677 12345"
                       />
@@ -776,7 +787,7 @@ export function ConversationalOrderFlow({
               )}
 
               {/* Navigation — desktop only */}
-              <div className="mt-6 hidden items-center justify-between md:flex">
+              <div className="mt-6 hidden items-center justify-between lg:flex">
                 {activeStep > 0 ? (
                   <Button
                     type="button"
@@ -804,11 +815,20 @@ export function ConversationalOrderFlow({
               </div>
             </CardContent>
           </Card>
+
+          {/* Mobile inline pricing summary — always visible, hidden on desktop where sidebar takes over */}
+          <div className="lg:hidden">
+            <Card>
+              <CardContent className="pt-5">
+                <PricingSummary preview={pricingPreview} />
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Desktop pricing panel */}
-        <div className="hidden md:block">
-          <div className="sticky top-24">
+        <div className="hidden lg:block">
+          <div className="sticky top-20 max-h-[calc(100vh-5rem)] overflow-y-auto">
             <Card>
               <CardContent className="pt-6">
                 <PricingSummary preview={pricingPreview} />
@@ -818,12 +838,15 @@ export function ConversationalOrderFlow({
         </div>
       </div>
 
-      {/* Mobile sticky pricing bar */}
-      <div className="fixed right-0 bottom-0 left-0 z-40 border-t bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div>
+      {/* Mobile sticky CTA bar */}
+      <div
+        className="fixed right-0 bottom-0 left-0 z-40 border-t bg-background/95 px-4 pt-3 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:hidden"
+        style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+      >
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+          <div className="min-w-0">
             <p className="text-xs text-muted-foreground">Total</p>
-            <p className="font-bold">
+            <p className="truncate font-bold">
               ${grandTotal.toFixed(2)}{" "}
               <span className="text-xs font-normal text-muted-foreground">
                 SBD
@@ -835,11 +858,12 @@ export function ConversationalOrderFlow({
               type="button"
               disabled={!canContinue}
               onClick={() => goTo((activeStep + 1) as Step)}
+              className="shrink-0"
             >
               Continue
             </Button>
           ) : (
-            <Button type="submit" disabled={processing}>
+            <Button type="submit" disabled={processing} className="shrink-0">
               Place order
             </Button>
           )}
