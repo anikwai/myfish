@@ -31,19 +31,19 @@ export function WelcomeHeader({ isLoggedIn, canRegister, user }: Props) {
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center">
+        <Link href="/" className="flex min-w-0 items-center">
           <img
             src="/media/brand/logo.svg"
             alt="myFish"
-            className="h-8 w-auto dark:hidden"
+            className="h-8 w-auto max-w-full dark:hidden"
           />
           <img
             src="/media/brand/logo-dark.svg"
             alt="myFish"
-            className="hidden h-8 w-auto dark:block"
+            className="hidden h-8 w-auto max-w-full dark:block"
           />
         </Link>
-        <nav className="flex items-center gap-2 sm:gap-3">
+        <nav className="flex shrink-0 items-center gap-2 sm:gap-3">
           {isLoggedIn && user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
