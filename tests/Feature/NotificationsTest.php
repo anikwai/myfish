@@ -16,14 +16,14 @@ test('OrderStatusChangedNotification sends via mail, database, and broadcast cha
     $order = Order::factory()->create();
     $notification = new OrderStatusChangedNotification($order, 'confirmed');
 
-    expect($notification->via(new stdClass()))->toBe(['mail', 'database', 'broadcast']);
+    expect($notification->via(new stdClass))->toBe(['mail', 'database', 'broadcast']);
 });
 
 test('OrderStatusChangedNotification toArray contains expected keys', function (): void {
     $order = Order::factory()->create();
     $notification = new OrderStatusChangedNotification($order, 'confirmed');
 
-    $data = $notification->toArray(new stdClass());
+    $data = $notification->toArray(new stdClass);
 
     expect($data)
         ->toHaveKey('title')
