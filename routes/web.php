@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuestOrderController;
 use App\Http\Controllers\NotificationsController;
@@ -9,6 +10,9 @@ use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', WelcomeController::class)->name('home');
+
+Route::get('auth/google/redirect', [SocialiteController::class, 'redirect'])->name('auth.google.redirect');
+Route::get('auth/google/callback', [SocialiteController::class, 'callback'])->name('auth.google.callback');
 
 Route::post('orders/guest', [GuestOrderController::class, 'store'])->name('guest-orders.store');
 Route::get('orders/guest/{order}', [GuestOrderController::class, 'show'])->name('guest-orders.show');

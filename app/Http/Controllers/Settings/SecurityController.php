@@ -35,6 +35,8 @@ class SecurityController extends Controller implements HasMiddleware
     {
         $props = [
             'canManageTwoFactor' => Features::canManageTwoFactorAuthentication(),
+            'googleConnected' => (bool) $request->user()->google_id,
+            'hasPassword' => (bool) $request->user()->password,
         ];
 
         if (Features::canManageTwoFactorAuthentication()) {

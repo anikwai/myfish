@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Settings\AvatarController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
@@ -25,4 +26,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('user-password.update');
 
     Route::inertia('settings/appearance', 'settings/appearance')->name('appearance.edit');
+
+    Route::get('auth/google/connect', [SocialiteController::class, 'connect'])->name('auth.google.connect');
+    Route::get('auth/google/connect/callback', [SocialiteController::class, 'connectCallback'])->name('auth.google.connect.callback');
+    Route::delete('auth/google/disconnect', [SocialiteController::class, 'disconnect'])->name('auth.google.disconnect');
 });
