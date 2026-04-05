@@ -36,12 +36,11 @@ class CloudflarePdfService
                 return $response->body();
             }
 
-            if ($response->status() === 429 && $attempt < self::MAX_ATTEMPTS) {
-                $retryAfter = (int) $response->header('Retry-After');
-                if ($retryAfter < 1 || $retryAfter > 120) {
-                    $retryAfter = min(60, 2 ** $attempt);
-                }
-                Sleep::sleep($retryAfter);
+            // 429 means rate-limited — throw immediately so the queued job's
+            // own backoff schedule (15 → 45 → 90 → 180 s) handles the retry.
+            // Only retry internally for transient 5xx server errors.
+            if ($response->serverError() && $attempt < self::MAX_ATTEMPTS) {
+                Sleep::sleep(min(30, 2 ** $attempt));
 
                 continue;
             }

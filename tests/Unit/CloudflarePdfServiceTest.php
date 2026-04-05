@@ -24,18 +24,36 @@ test('returns pdf body on first successful response', function (): void {
     Sleep::assertNeverSlept();
 });
 
-test('retries on HTTP 429 then returns pdf body', function (): void {
+test('throws immediately on HTTP 429 without retrying', function (): void {
+    Sleep::fake();
+
+    $calls = 0;
+    Http::fake(function () use (&$calls) {
+        $calls++;
+
+        return Http::response(
+            json_encode(['success' => false, 'errors' => [['code' => 2001, 'message' => 'Rate limit exceeded']]]),
+            429,
+        );
+    });
+
+    $svc = new CloudflarePdfService('acct', 'tok');
+
+    expect(fn () => $svc->generate('<html></html>'))
+        ->toThrow(\Illuminate\Http\Client\RequestException::class);
+
+    expect($calls)->toBe(1);
+    Sleep::assertNeverSlept();
+});
+
+test('retries on 5xx server error then returns pdf body', function (): void {
     Sleep::fake();
 
     $calls = 0;
     Http::fake(function () use (&$calls) {
         $calls++;
         if ($calls === 1) {
-            return Http::response(
-                json_encode(['success' => false, 'errors' => [['code' => 2001, 'message' => 'Rate limit exceeded']]]),
-                429,
-                ['Retry-After' => '1'],
-            );
+            return Http::response('Server Error', 503);
         }
 
         return Http::response('%PDF-retry', 200, ['Content-Type' => 'application/pdf']);
