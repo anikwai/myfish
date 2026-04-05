@@ -1,7 +1,14 @@
+import { useEffect, useState } from "react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { NotificationBell } from "@/components/notification-bell";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { BreadcrumbItem as BreadcrumbItemType } from "@/types";
+
+function ClientOnly({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  return mounted ? <>{children}</> : null;
+}
 
 export function AppSidebarHeader({
   breadcrumbs = [],
@@ -15,7 +22,9 @@ export function AppSidebarHeader({
         <Breadcrumbs breadcrumbs={breadcrumbs} />
       </div>
       <div className="ml-auto">
-        <NotificationBell />
+        <ClientOnly>
+          <NotificationBell />
+        </ClientOnly>
       </div>
     </header>
   );
